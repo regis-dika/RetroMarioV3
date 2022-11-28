@@ -17,13 +17,28 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting
+        val commonMain by getting {
+            dependencies {
+                // FIRE STORE
+                implementation("dev.gitlive:firebase-firestore:1.2.0")
+                implementation("dev.gitlive:firebase-auth:1.6.2")
+
+                //COROUTINE
+                implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+            }
+        }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
             }
         }
-        val androidMain by getting
+        val androidMain by getting{
+            dependencies {
+                // FIREBASE
+                implementation("com.google.firebase:firebase-core:21.1.1")
+                implementation("com.google.firebase:firebase-firestore:24.4.0")
+            }
+        }
         val androidTest by getting
         val iosX64Main by getting
         val iosArm64Main by getting
@@ -53,4 +68,7 @@ android {
         minSdk = 21
         targetSdk = 32
     }
+}
+dependencies {
+    implementation("com.google.firebase:firebase-auth-ktx:21.1.0")
 }
