@@ -30,6 +30,49 @@
             {
               "client_id": "996690076592-7kt2h9r0859ucequiadbui7s4dovoo93.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "996690076592-jup3amq3jeoltqqmcplfs4017bh3anoi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "orgIdentifier.iosApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:996690076592:android:9aa595ca20a52174556c75",
+        "android_client_info": {
+          "package_name": "com.example.retromariokmm.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "996690076592-7kt2h9r0859ucequiadbui7s4dovoo93.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIbk-SHhYKNkrby8uJpSdMtGWc9csBkTs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "996690076592-7kt2h9r0859ucequiadbui7s4dovoo93.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "996690076592-jup3amq3jeoltqqmcplfs4017bh3anoi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "orgIdentifier.iosApp"
+              }
             }
           ]
         }
@@ -59,6 +102,13 @@
             {
               "client_id": "996690076592-7kt2h9r0859ucequiadbui7s4dovoo93.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "996690076592-jup3amq3jeoltqqmcplfs4017bh3anoi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "orgIdentifier.iosApp"
+              }
             }
           ]
         }
@@ -88,6 +138,13 @@
             {
               "client_id": "996690076592-7kt2h9r0859ucequiadbui7s4dovoo93.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "996690076592-jup3amq3jeoltqqmcplfs4017bh3anoi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "orgIdentifier.iosApp"
+              }
             }
           ]
         }

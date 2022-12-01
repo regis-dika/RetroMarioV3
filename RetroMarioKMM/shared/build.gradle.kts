@@ -1,6 +1,7 @@
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
+    kotlin("plugin.serialization") version "1.7.10"
 }
 
 kotlin {
@@ -19,9 +20,16 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+
+                api("org.jetbrains.kotlin:kotlin-stdlib-common")
+
+                implementation ("org.jetbrains.kotlin:kotlin-stdlib-common:1.7.22")
                 // FIRE STORE
-                implementation("dev.gitlive:firebase-firestore:1.2.0")
+                implementation("dev.gitlive:firebase-firestore:1.6.2")
                 implementation("dev.gitlive:firebase-auth:1.6.2")
+
+                // SERIALIZATION
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 
                 //COROUTINE
                 implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
@@ -36,7 +44,9 @@ kotlin {
             dependencies {
                 // FIREBASE
                 implementation("com.google.firebase:firebase-core:21.1.1")
-                implementation("com.google.firebase:firebase-firestore:24.4.0")
+                implementation("com.google.firebase:firebase-firestore:24.4.1")
+
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
             }
         }
         val androidTest by getting

@@ -1,4 +1,6 @@
-package com.example.rtromariocomposeapp.domain.models
+package com.example.retromariokmm.domain.models
+
+import com.example.retromariokmm.domain.models.UserAction
 
 data class RetroUser(
     val uid :String,

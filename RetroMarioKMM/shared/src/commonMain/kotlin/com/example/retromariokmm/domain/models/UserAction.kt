@@ -1,4 +1,4 @@
-package com.example.rtromariocomposeapp.domain.models
+package com.example.retromariokmm.domain.models
 
 data class UserAction(
     val author : String,

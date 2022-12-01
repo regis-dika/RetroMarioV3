@@ -4,19 +4,22 @@ import com.example.retromariokmm.data.toRetroUser
 import com.example.retromariokmm.domain.repository.RetroMarioRepository
 import com.example.retromariokmm.utils.Resource
 import com.example.retromariokmm.utils.Success
-import com.example.rtromariocomposeapp.domain.models.RetroUser
-import com.example.rtromariocomposeapp.domain.models.UserAction
-import com.example.rtromariocomposeapp.domain.models.UserComment
+import com.example.retromariokmm.domain.models.RetroUser
+import com.example.retromariokmm.domain.models.UserAction
+import com.example.retromariokmm.domain.models.UserComment
+import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
+import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.FirebaseFirestore
+import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
-class FirebaseRetroMarioRepositoryImpl(
-    private val fireStore: FirebaseFirestore,
-    private val firebaseAuth: FirebaseAuth
-) : RetroMarioRepository {
+class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
+
+    private val fireStore: FirebaseFirestore = Firebase.firestore
+    private val firebaseAuth: FirebaseAuth = Firebase.auth
 
     private val userCollection = fireStore.collection("users")
 
@@ -48,7 +51,7 @@ class FirebaseRetroMarioRepositoryImpl(
         }
     }
 
-    override suspend fun getRetroUsers(): Flow<Resource<List<RetroUser>>> = callbackFlow {
+    override fun getRetroUsers(): Flow<Resource<List<RetroUser>>> = callbackFlow {
         userCollection.snapshots.collect {
             val updatedList = it.documents.map { dc ->
                 dc.toRetroUser()

@@ -5,9 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -16,6 +19,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.retromariokmm.data.remote.FirebaseRetroMarioRepositoryImpl
+import com.example.retromariokmm.utils.Error
+import com.example.retromariokmm.utils.Loading
+import com.example.retromariokmm.utils.Resource
+import com.example.retromariokmm.utils.Success
+import com.example.retromariokmm.domain.models.RetroUser
 
 @Composable
 fun MyApplicationTheme(
@@ -57,6 +66,8 @@ fun MyApplicationTheme(
 }
 
 class MainActivity : ComponentActivity() {
+
+    private val retroMarioRepository = FirebaseRetroMarioRepositoryImpl()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -65,7 +76,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Greeting(Greeting().greeting())
+                    val state = retroMarioRepository.getRetroUsers().collectAsState(initial = Loading())
+                    Greeting(list = state.value)
                 }
             }
         }
@@ -73,14 +85,25 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(text: String) {
-    Text(text = text)
+fun Greeting(list: Resource<List<RetroUser>>) {
+    when (list) {
+        is Error -> Snackbar() {
+            Text(text = list.msg)
+        }
+        is Loading -> {
+            CircularProgressIndicator()
+        }
+        is Success -> LazyColumn() {
+            items(list.value) { user ->
+                Text(text = user.name)
+            }
+        }
+    }
 }
 
 @Preview
 @Composable
 fun DefaultPreview() {
     MyApplicationTheme {
-        Greeting("Hello, Android!")
     }
 }
