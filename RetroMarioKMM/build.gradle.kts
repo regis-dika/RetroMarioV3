@@ -3,6 +3,7 @@ plugins {
     id("com.android.application").version("7.2.2").apply(false)
     id("com.android.library").version("7.2.2").apply(false)
     id("com.google.gms.google-services").version("4.3.13").apply(false)
+    id("com.google.dagger.hilt.android").version("2.42").apply(false)
     kotlin("android").version("1.7.10").apply(false)
     kotlin("multiplatform").version("1.7.10").apply(false)
 }
