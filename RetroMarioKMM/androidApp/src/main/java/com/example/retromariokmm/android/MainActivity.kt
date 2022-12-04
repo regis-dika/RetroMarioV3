@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,12 +20,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.retromariokmm.data.remote.FirebaseRetroMarioRepositoryImpl
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.retromariokmm.android.ui.lifeanddifficulty.LifeAndDifficultyViewModel
+import com.example.retromariokmm.android.ui.login.LoginScreen
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
-import com.example.retromariokmm.utils.Resource
 import com.example.retromariokmm.utils.Success
-import com.example.retromariokmm.domain.models.RetroUser
+import dagger.hilt.android.AndroidEntryPoint
 
 @Composable
 fun MyApplicationTheme(
@@ -65,9 +70,9 @@ fun MyApplicationTheme(
     )
 }
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val retroMarioRepository = FirebaseRetroMarioRepositoryImpl()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -76,8 +81,15 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    val state = retroMarioRepository.getRetroUsers().collectAsState(initial = Loading())
-                    Greeting(list = state.value)
+                    val navController = rememberNavController()
+                    NavHost(navController = navController, startDestination = "login_screen") {
+                        composable("login_screen") {
+                            LoginScreen(navController)
+                        }
+                        composable("life_difficulty_screen") {
+                            Greeting()
+                        }
+                    }
                 }
             }
         }
@@ -85,8 +97,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(list: Resource<List<RetroUser>>) {
-    when (list) {
+fun Greeting(lifeAndDifficultyViewModel: LifeAndDifficultyViewModel = hiltViewModel()) {
+    val state = lifeAndDifficultyViewModel.usersState.collectAsState()
+
+    when (val list = state.value.userContainerList) {
         is Error -> Snackbar() {
             Text(text = list.msg)
         }
@@ -95,7 +109,7 @@ fun Greeting(list: Resource<List<RetroUser>>) {
         }
         is Success -> LazyColumn() {
             items(list.value) { user ->
-                Text(text = user.name)
+                Text(text = user.firstName)
             }
         }
     }

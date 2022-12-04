@@ -3,19 +3,12 @@ package com.example.retromariokmm.domain.models
 import com.example.retromariokmm.domain.models.UserAction
 
 data class RetroUser(
-    val uid :String,
-    val name: String,
-    val bitmap: String,
-    var life: Int,
-    var difficulty: Int,
-    val commentsList: MutableList<UserComment>,
-    val actionList: MutableList<UserAction>
+    val uid :String = "",
+    val name: String = "error name",
+    val bitmap: String = "",
+    var life: Int = -1,
+    var difficulty: Int = -1,
+    val commentsList: MutableList<UserComment> = mutableListOf(),
+    val actionList: MutableList<UserAction> = mutableListOf()
 
-) {
-    companion object {
-        fun errorRetroUser(): RetroUser = RetroUser(
-            "uid","no Name", "no bitmap", -1, -1, mutableListOf(),
-            mutableListOf()
-        )
-    }
-}
+)
