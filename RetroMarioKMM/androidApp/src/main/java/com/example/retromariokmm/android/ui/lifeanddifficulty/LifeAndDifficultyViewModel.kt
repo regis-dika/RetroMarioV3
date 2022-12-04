@@ -31,13 +31,14 @@ class LifeAndDifficultyViewModel @Inject constructor(
                 _usersState.value = when (it) {
                     is Success -> UsersStateScreen(Success(it.value.map { user ->
                         UserContainer(
+                            user.uid,
                             user.name,
                             user.bitmap,
                             user.life,
                             user.difficulty,
                             user.uid == ""
                         )
-                    }))
+                    }.sortedBy { it.life }))
                     is Loading -> UsersStateScreen((Loading()))
                     is Error -> UsersStateScreen(Error(it.msg))
                 }
@@ -51,6 +52,7 @@ data class UsersStateScreen(
 )
 
 data class UserContainer(
+    val uid :String,
     val firstName: String,
     val lastName: String,
     val life: Int,

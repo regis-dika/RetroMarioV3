@@ -3,14 +3,16 @@ package com.example.retromariokmm.android
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,6 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.retromariokmm.android.ui.components.NoteItem
 import com.example.retromariokmm.android.ui.lifeanddifficulty.LifeAndDifficultyViewModel
 import com.example.retromariokmm.android.ui.login.LoginScreen
 import com.example.retromariokmm.utils.Error
@@ -96,6 +99,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Greeting(lifeAndDifficultyViewModel: LifeAndDifficultyViewModel = hiltViewModel()) {
     val state = lifeAndDifficultyViewModel.usersState.collectAsState()
@@ -108,8 +112,19 @@ fun Greeting(lifeAndDifficultyViewModel: LifeAndDifficultyViewModel = hiltViewMo
             CircularProgressIndicator()
         }
         is Success -> LazyColumn() {
-            items(list.value) { user ->
-                Text(text = user.firstName)
+            items(list.value, key = {
+                it.uid
+            }) { user ->
+                NoteItem(
+                    userContainer = user,
+                    backgroundColor = Color.Cyan,
+                    onNoteClick = { },
+                    onDeleteClick = { },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(6.dp)
+                        .animateItemPlacement()
+                )
             }
         }
     }
