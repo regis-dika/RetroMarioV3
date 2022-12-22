@@ -163,7 +163,7 @@ fun Greeting(lifeAndDifficultyViewModel: LifeAndDifficultyViewModel = hiltViewMo
                     }) { user ->
                         NoteItem(
                             userContainer = user,
-                            backgroundColor = Color.Cyan,
+                            backgroundColor = if(user.isCurrentUser) Color.Red else Color.Cyan  ,
                             onNoteClick = { },
                             onDeleteClick = { },
                             modifier = Modifier

@@ -2,6 +2,7 @@ package com.example.retromariokmm.android.ui.lifeanddifficulty
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.retromariokmm.domain.usecases.users.CurrentUserUseCase
 import com.example.retromariokmm.domain.usecases.users.SetLifeDifficultyUseCase
 import com.example.retromariokmm.domain.usecases.users.UserListUseCase
 import com.example.retromariokmm.utils.*
@@ -15,7 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LifeAndDifficultyViewModel @Inject constructor(
     private val userListUseCase: UserListUseCase,
-    private val setLifeDifficultyUseCase: SetLifeDifficultyUseCase
+    private val setLifeDifficultyUseCase: SetLifeDifficultyUseCase,
+    private val currentUserUseCase: CurrentUserUseCase
 ) : ViewModel() {
 
     private val _usersState = MutableStateFlow(UsersStateScreen(Loading(), -1, -1, NOT_STARTED))
@@ -26,24 +28,27 @@ class LifeAndDifficultyViewModel @Inject constructor(
     }
 
     private fun fetchUsers() {
-        viewModelScope.launch {
-            userListUseCase.invoke().collect {
-                _usersState.value = _usersState.value.copy(
-                    userContainerList = when (it) {
-                        is Success -> Success(it.value.map { user ->
-                            UserContainer(
-                                user.uid,
-                                user.name,
-                                user.bitmap,
-                                user.life,
-                                user.difficulty,
-                                user.uid == ""
-                            )
-                        }.sortedBy { it.life })
-                        is Loading -> (Loading())
-                        is Error -> Error(it.msg)
-                    }
-                )
+        val currentUser = currentUserUseCase.invoke()
+        if (currentUser is Success) {
+            viewModelScope.launch {
+                userListUseCase.invoke().collect {
+                    _usersState.value = _usersState.value.copy(
+                        userContainerList = when (it) {
+                            is Success -> Success(it.value.map { user ->
+                                UserContainer(
+                                    user.uid,
+                                    user.name,
+                                    user.bitmap,
+                                    user.life,
+                                    user.difficulty,
+                                    user.uid == currentUser.value.uid
+                                )
+                            }.sortedBy { it.life })
+                            is Loading -> (Loading())
+                            is Error -> Error(it.msg)
+                        }
+                    )
+                }
             }
         }
     }

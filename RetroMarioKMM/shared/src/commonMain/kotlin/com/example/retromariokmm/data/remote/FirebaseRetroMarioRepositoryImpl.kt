@@ -27,7 +27,12 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
     private val userCollection = fireStore.collection("users")
     private val startCommentsCollection = fireStore.collection("starPostsList")
 
-    private var userId: String? = null
+    var currentUser: RetroUser? = null
+    get() = field
+    private set(value){
+        field = value
+    }
+
 
     override suspend fun createUser(email: String, password: String): Resource<RetroUser> {
         return try {
@@ -48,7 +53,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password)
             val user = result.user
             if (user != null) {
-                userId = user.uid
+                currentUser = user.toRetroUser()
                 Success(user.toRetroUser())
             } else {
                 com.example.retromariokmm.utils.Error("error user is null")
@@ -71,9 +76,9 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
     override suspend fun setLifeDifficulty(life: Int, difficulty: Int) = flow {
         emit(Loading())
         try {
-            userId?.let {
-                userCollection.document(it).update(hashMapOf(Pair("life", life)))
-                userCollection.document(it).update(hashMapOf(Pair("difficulty", difficulty)))
+            currentUser?.let {
+                userCollection.document(it.uid).update(hashMapOf(Pair("life", life)))
+                userCollection.document(it.uid).update(hashMapOf(Pair("difficulty", difficulty)))
             }
             emit(Success(Unit))
         } catch (e: Exception) {
