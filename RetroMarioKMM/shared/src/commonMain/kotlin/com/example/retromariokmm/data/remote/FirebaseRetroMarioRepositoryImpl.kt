@@ -7,6 +7,8 @@ import com.example.retromariokmm.utils.Success
 import com.example.retromariokmm.domain.models.RetroUser
 import com.example.retromariokmm.domain.models.UserAction
 import com.example.retromariokmm.domain.models.UserComment
+import com.example.retromariokmm.utils.Error
+import com.example.retromariokmm.utils.Loading
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
@@ -15,6 +17,7 @@ import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
 
 class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
 
@@ -22,6 +25,9 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
     private val firebaseAuth: FirebaseAuth = Firebase.auth
 
     private val userCollection = fireStore.collection("users")
+    private val startCommentsCollection = fireStore.collection("starPostsList")
+
+    private var userId: String? = null
 
     override suspend fun createUser(email: String, password: String): Resource<RetroUser> {
         return try {
@@ -42,6 +48,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password)
             val user = result.user
             if (user != null) {
+                userId = user.uid
                 Success(user.toRetroUser())
             } else {
                 com.example.retromariokmm.utils.Error("error user is null")
@@ -61,8 +68,20 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         awaitClose()
     }
 
-    override suspend fun getAllComments(): Flow<Resource<List<UserComment>>> {
-        TODO("Not yet implemented")
+    override suspend fun setLifeDifficulty(life: Int, difficulty: Int) = flow {
+        emit(Loading())
+        try {
+            userId?.let {
+                userCollection.document(it).update(hashMapOf(Pair("life", life)))
+                userCollection.document(it).update(hashMapOf(Pair("difficulty", difficulty)))
+            }
+            emit(Success(Unit))
+        } catch (e: Exception) {
+            emit(Error(e.toString()))
+        }
+    }
+
+    override suspend fun getAllComments(): Flow<Resource<List<UserComment>>> = callbackFlow {
     }
 
     override suspend fun getAllActions(): Flow<Resource<List<UserAction>>> {

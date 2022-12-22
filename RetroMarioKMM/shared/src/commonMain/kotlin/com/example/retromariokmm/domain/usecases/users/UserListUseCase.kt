@@ -5,10 +5,8 @@ import com.example.retromariokmm.domain.models.RetroUser
 import com.example.retromariokmm.utils.Resource
 import kotlinx.coroutines.flow.Flow
 //TODO Add Interface
-class UserListUseCase {
+class UserListUseCase(private val repository : FirebaseRetroMarioRepositoryImpl) {
     //TODO Inject repo
-    private val repository = FirebaseRetroMarioRepositoryImpl()
-
      fun invoke(): Flow<Resource<List<RetroUser>>> {
         return repository.getRetroUsers()
     }
