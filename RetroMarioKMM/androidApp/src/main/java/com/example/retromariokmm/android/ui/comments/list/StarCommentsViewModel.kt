@@ -61,4 +61,7 @@ data class CommentsScreen(
 data class CommentContainer(
     val userComment: UserComment,
     val isFromCurrentUser: Boolean = false
-)
+){
+    val nbLikes get() =  userComment.feelings?.filter { it.value.state == 1L }?.map { it.value }
+    val nbDisLikes get() =  userComment.feelings?.filter { it.value.state == -1L }?.map { it.value }
+}

@@ -9,6 +9,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,12 +42,22 @@ fun CommentUserItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {//push all elements to the extremitate
-                Text(text = commentContainer.userComment.description, fontWeight = FontWeight.SemiBold, fontSize = 20.sp)
+                Text(
+                    text = commentContainer.userComment.description,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 20.sp
+                )
                 Icon(
                     modifier = Modifier.clickable(MutableInteractionSource(), null) { onDeleteClick.invoke() },
                     imageVector = Icons.Default.Close,
                     contentDescription = "delete note button"
                 )
+            }
+            FeelingsCounterItem(
+                nbLikes = commentContainer.nbLikes?.size ?: 0,
+                nbDislikes = commentContainer.nbDisLikes?.size ?: 0,
+                onLikeClick = {}) {
+
             }
         }
     }
