@@ -39,11 +39,11 @@ fun DocumentSnapshot.toUserComment(): UserComment {
 
     return try {
         val postId = get<String>("postId").toString()
-        val creatorUid = if (contains("creatorUid")) get<String>("creatorUid") else ""
+        val authorId = get<String>("authorId")
         val description = get<String>("description")
         val feelings = get<HashMap<String, Feelings>?>("feelings")
         UserComment(
-            postId, creatorUid, description, feelings
+            postId, authorId, description, feelings
         )
 
     } catch (e: Exception) {

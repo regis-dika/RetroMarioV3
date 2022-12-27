@@ -6,6 +6,7 @@ import com.example.retromariokmm.domain.models.UserComment
 import com.example.retromariokmm.domain.usecases.comments.CreateStarCommentUseCase
 import com.example.retromariokmm.domain.usecases.comments.StarCommentsListUseCase
 import com.example.retromariokmm.domain.usecases.comments.UpdateStarCommentUseCase
+import com.example.retromariokmm.domain.usecases.users.CurrentUserUseCase
 import com.example.retromariokmm.utils.*
 import com.example.retromariokmm.utils.ActionState.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,8 +19,7 @@ import kotlin.random.Random
 @HiltViewModel
 class StarCommentsViewModel @Inject constructor(
     private val starCommentsListUseCase: StarCommentsListUseCase,
-    private val createStarCommentUseCase: CreateStarCommentUseCase,
-    private val updateStarCommentUseCase: UpdateStarCommentUseCase
+    private val currentUserUseCase: CurrentUserUseCase
 ) : ViewModel() {
     private val _commentsState: MutableStateFlow<CommentsScreen> = MutableStateFlow(CommentsScreen())
     val commentsState = _commentsState.asStateFlow()
@@ -30,50 +30,27 @@ class StarCommentsViewModel @Inject constructor(
 
     private fun fetchCommentsList() {
         viewModelScope.launch {
-            starCommentsListUseCase.invoke().collect { resource ->
-                _commentsState.value = _commentsState.value.copy(
-                    comments = when (resource) {
-                        is com.example.retromariokmm.utils.Error -> com.example.retromariokmm.utils.Error(resource.msg)
-                        is Loading -> Loading()
-                        is Success -> Success(resource.value.map { CommentContainer(it) })
-                    }
-                )
+            val currentUserId = currentUserUseCase.invoke()
+            if(currentUserId is Success) {
+                starCommentsListUseCase.invoke().collect { resource ->
+                    _commentsState.value = _commentsState.value.copy(
+                        comments = when (resource) {
+                            is Error -> Error(resource.msg)
+                            is Loading -> Loading()
+                            is Success -> Success(resource.value.map {
+                                CommentContainer(
+                                    it,
+                                    isFromCurrentUser = it.authorId == currentUserId.value.uid
+                                )
+                            })
+                        }
+                    )
+                }
+            }else{
+                _commentsState.value = _commentsState.value.copy(comments = Error("no user Id available "))
             }
         }
     }
-
-    fun createComment() {
-        viewModelScope.launch {
-            createStarCommentUseCase.invoke(
-                    description = "BlablaBlaBla"
-            ).collect {
-                _commentsState.value = _commentsState.value.copy(
-                    createNoteAction = when (it) {
-                        is Error -> ERROR
-                        is Loading -> PENDING
-                        is Success -> SUCCESS
-                    }
-                )
-            }
-        }
-    }
-
-    fun updateComment(commentId: String) {
-        viewModelScope.launch {
-            updateStarCommentUseCase.invoke(
-                commentId, Random(1000).toString()
-            ).collect {
-                _commentsState.value = _commentsState.value.copy(
-                    createNoteAction = when (it) {
-                        is Error -> ERROR
-                        is Loading -> PENDING
-                        is Success -> SUCCESS
-                    }
-                )
-            }
-        }
-    }
-
 }
 
 data class CommentsScreen(
