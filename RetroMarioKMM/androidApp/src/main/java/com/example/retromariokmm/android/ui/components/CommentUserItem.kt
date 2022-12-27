@@ -10,18 +10,17 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.retromariokmm.android.ui.lifeanddifficulty.UserContainer
+import com.example.retromariokmm.android.ui.comments.CommentContainer
 
 @Composable
-fun RetroUserItem(
-    userContainer: UserContainer,
+fun CommentUserItem(
+    commentContainer: CommentContainer,
     backgroundColor: Color,
     onNoteClick: () -> Unit,
     onDeleteClick: () -> Unit,
@@ -42,17 +41,13 @@ fun RetroUserItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {//push all elements to the extremitate
-                Text(text = userContainer.firstName, fontWeight = FontWeight.SemiBold, fontSize = 20.sp)
+                Text(text = commentContainer.userComment.description, fontWeight = FontWeight.SemiBold, fontSize = 20.sp)
                 Icon(
                     modifier = Modifier.clickable(MutableInteractionSource(), null) { onDeleteClick.invoke() },
                     imageVector = Icons.Default.Close,
                     contentDescription = "delete note button"
                 )
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = userContainer.lastName, fontWeight = FontWeight.Light)
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = userContainer.life.toString(), color = Color.DarkGray, modifier = Modifier.align(Alignment.End))
         }
     }
 }

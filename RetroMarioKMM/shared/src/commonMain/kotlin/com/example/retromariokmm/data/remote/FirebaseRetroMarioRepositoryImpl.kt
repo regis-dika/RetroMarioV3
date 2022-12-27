@@ -1,6 +1,7 @@
 package com.example.retromariokmm.data.remote
 
 import com.example.retromariokmm.data.toRetroUser
+import com.example.retromariokmm.data.toUserComment
 import com.example.retromariokmm.domain.repository.RetroMarioRepository
 import com.example.retromariokmm.utils.Resource
 import com.example.retromariokmm.utils.Success
@@ -87,9 +88,32 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
     }
 
     override suspend fun getAllComments(): Flow<Resource<List<UserComment>>> = callbackFlow {
+        startCommentsCollection.snapshots.collect {
+            val updatedList = it.documents.map { dc ->
+                dc.toUserComment()
+            }
+            trySend(Success(updatedList))
+        }
+        awaitClose()
+    }
+
+    override suspend fun setStarComment(starComment: UserComment) = flow {
+        emit(Loading())
+        try {
+            currentUser?.let {
+                startCommentsCollection.document.update(starComment)
+                emit(Success(Unit))
+            }
+        }catch (e: Exception){
+            emit(Error<Unit>(e.toString()))
+        }
     }
 
     override suspend fun getAllActions(): Flow<Resource<List<UserAction>>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun setAction(userAction: UserAction): Flow<Resource<List<UserAction>>> {
         TODO("Not yet implemented")
     }
 
