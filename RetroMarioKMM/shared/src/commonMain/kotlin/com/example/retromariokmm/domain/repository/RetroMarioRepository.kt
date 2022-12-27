@@ -12,7 +12,8 @@ interface RetroMarioRepository {
     fun getRetroUsers(): Flow<Resource<List<RetroUser>>>
     suspend fun setLifeDifficulty(life: Int, difficulty: Int): Flow<Resource<Unit>>
     suspend fun getAllComments(): Flow<Resource<List<UserComment>>>
-    suspend fun setStarComment(starComment: UserComment): Flow<Resource<Unit>>
+    suspend fun createStarComment(starComment: UserComment): Flow<Resource<Unit>>
+    suspend fun updateComment(commentId : String, description :String): Flow<Resource<Unit>>
     suspend fun getAllActions(): Flow<Resource<List<UserAction>>>
     suspend fun setAction(userAction: UserAction): Flow<Resource<List<UserAction>>>
 }

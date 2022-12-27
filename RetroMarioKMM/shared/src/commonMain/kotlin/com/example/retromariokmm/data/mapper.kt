@@ -43,7 +43,7 @@ fun DocumentSnapshot.toUserComment(): UserComment {
         val description = get<String>("description")
         val feelings = get<HashMap<String, Feelings>?>("feelings")
         UserComment(
-            postId, creatorUid, description, feelings?.map { it.value } ?: emptyList()
+            postId, creatorUid, description, feelings
         )
 
     } catch (e: Exception) {

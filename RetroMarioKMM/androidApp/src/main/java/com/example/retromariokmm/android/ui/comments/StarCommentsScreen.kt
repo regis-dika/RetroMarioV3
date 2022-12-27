@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.retromariokmm.android.ui.components.CommentUserItem
+import com.example.retromariokmm.utils.ActionState.*
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
 import com.example.retromariokmm.utils.Success
@@ -27,27 +28,49 @@ fun StarCommentsScreen(starCommentsViewModel: StarCommentsViewModel = hiltViewMo
             .fillMaxSize()
             .padding(6.dp)
     ) {
-        when (val list = state.value) {
-            is Error -> Snackbar() {
-                Text(text = list.msg)
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(6.dp)
+        ) {
+            when (state.value.createNoteAction) {
+                NOT_STARTED -> {}
+                PENDING -> CircularProgressIndicator()
+                SUCCESS -> {
+                    Snackbar() {
+                        Text(text = "SUCCESS Created")
+                    }
+                }
+                ERROR -> {
+                    Snackbar() {
+                        Text(text = "ERROR Created")
+                    }
+                }
             }
-            is Loading -> {
-                CircularProgressIndicator()
-            }
-            is Success -> LazyColumn() {
-                items(list.value, key = {
-                    it.userComment.postId
-                }) { comment ->
-                    CommentUserItem(
-                        commentContainer = comment ,
-                        backgroundColor = if (comment.isFromCurrentUser) Color.Red else Color.Cyan,
-                        onNoteClick = { },
-                        onDeleteClick = { },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(6.dp)
-                            .animateItemPlacement()
-                    )
+            when (val list = state.value.comments) {
+                is Error -> Snackbar() {
+                    Text(text = list.msg)
+                }
+                is Loading -> {
+                    CircularProgressIndicator()
+                }
+                is Success -> LazyColumn() {
+                    items(list.value, key = {
+                        it.userComment.postId
+                    }) { comment ->
+                        CommentUserItem(
+                            commentContainer = comment,
+                            backgroundColor = if (comment.isFromCurrentUser) Color.Red else Color.Cyan,
+                            onNoteClick = {
+                                starCommentsViewModel.updateComment(comment.userComment.postId)
+                            },
+                            onDeleteClick = { },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(6.dp)
+                                .animateItemPlacement()
+                        )
+                    }
                 }
             }
         }
