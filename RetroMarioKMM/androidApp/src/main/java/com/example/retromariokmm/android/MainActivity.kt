@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.retromariokmm.android.ui.comments.StarCommentsScreen
+import com.example.retromariokmm.android.ui.comments.list.StarCommentsScreen
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserHealthScreen
 import com.example.retromariokmm.android.ui.login.LoginScreen
 import dagger.hilt.android.AndroidEntryPoint

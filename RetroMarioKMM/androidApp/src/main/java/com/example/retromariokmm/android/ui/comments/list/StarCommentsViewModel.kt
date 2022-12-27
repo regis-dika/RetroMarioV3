@@ -1,4 +1,4 @@
-package com.example.retromariokmm.android.ui.comments
+package com.example.retromariokmm.android.ui.comments.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
