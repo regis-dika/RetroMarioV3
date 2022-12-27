@@ -45,9 +45,7 @@ class StarCommentsViewModel @Inject constructor(
     fun createComment() {
         viewModelScope.launch {
             createStarCommentUseCase.invoke(
-                UserComment(
                     description = "BlablaBlaBla"
-                )
             ).collect {
                 _commentsState.value = _commentsState.value.copy(
                     createNoteAction = when (it) {

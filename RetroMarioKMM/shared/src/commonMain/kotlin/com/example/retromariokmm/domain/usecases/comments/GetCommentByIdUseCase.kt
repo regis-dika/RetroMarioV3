@@ -5,9 +5,9 @@ import com.example.retromariokmm.domain.models.UserComment
 import com.example.retromariokmm.utils.Resource
 import kotlinx.coroutines.flow.Flow
 //TODO Add Interface
-class CreateStarCommentUseCase(private val repository : FirebaseRetroMarioRepositoryImpl) {
+class GetCommentByIdUseCase(private val repository : FirebaseRetroMarioRepositoryImpl) {
     //TODO Inject repo
-    suspend fun invoke(description :String): Flow<Resource<Unit>> {
-        return repository.createStarComment(description)
+    suspend fun invoke(commentId :String): Flow<Resource<UserComment>> {
+        return repository.getCommentById(commentId)
     }
 }

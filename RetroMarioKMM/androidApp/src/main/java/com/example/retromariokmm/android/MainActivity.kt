@@ -16,9 +16,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavType
+import androidx.navigation.NavType.Companion
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.retromariokmm.android.ui.comments.details.CommentDetailsScreen
 import com.example.retromariokmm.android.ui.comments.list.StarCommentsScreen
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserHealthScreen
 import com.example.retromariokmm.android.ui.login.LoginScreen
@@ -83,7 +87,16 @@ class MainActivity : ComponentActivity() {
                             UserHealthScreen(navController)
                         }
                         composable("comments_screen") {
-                            StarCommentsScreen()
+                            StarCommentsScreen(navController = navController)
+                        }
+                        composable("comment_details_screen/{commentId}", arguments = listOf(
+                            navArgument(name = "commentId"){
+                                type = NavType.StringType
+                                defaultValue = ""
+                            }
+                        )) { backStackEntry ->
+                            val commentId = backStackEntry.arguments?.getString("commentId") ?: ""
+                            CommentDetailsScreen(commentId, navController)
                         }
                     }
                 }

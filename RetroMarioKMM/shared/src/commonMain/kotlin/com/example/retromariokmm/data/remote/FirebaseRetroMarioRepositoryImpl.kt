@@ -97,13 +97,13 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         awaitClose()
     }
 
-    override suspend fun createStarComment(starComment: UserComment) = flow {
+    override suspend fun createStarComment(description: String) = flow {
         emit(Loading())
         try {
             currentUser?.let {
                 val docRef = startCommentsCollection.document
-                val updatedComment = starComment.copy(postId = docRef.id, authorId = it.uid)
-                docRef.set(updatedComment)
+                val createdComment = UserComment(postId = docRef.id, authorId = it.uid, description = description )
+                docRef.set(createdComment)
                 emit(Success(Unit))
             }
         }catch (e: Exception){
@@ -121,6 +121,18 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
             }
         }catch (e: Exception){
             emit(Error<Unit>(e.toString()))
+        }
+    }
+
+    override suspend fun getCommentById(commentId: String) = flow {
+        emit(Loading())
+        try {
+            currentUser?.let {
+                val doc = startCommentsCollection.document(commentId).get()
+                emit(Success(doc.toUserComment()))
+            }
+        }catch (e: Exception){
+            emit(Error<UserComment>(e.toString()))
         }
     }
 

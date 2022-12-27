@@ -2,6 +2,7 @@ package com.example.retromariokmm.android.di
 
 import com.example.retromariokmm.data.remote.FirebaseRetroMarioRepositoryImpl
 import com.example.retromariokmm.domain.usecases.comments.CreateStarCommentUseCase
+import com.example.retromariokmm.domain.usecases.comments.GetCommentByIdUseCase
 import com.example.retromariokmm.domain.usecases.comments.StarCommentsListUseCase
 import com.example.retromariokmm.domain.usecases.comments.UpdateStarCommentUseCase
 import com.example.retromariokmm.domain.usecases.login.LoginUseCase
@@ -35,4 +36,6 @@ object UseCaseModule {
     fun provideCreateStarCommentUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) = CreateStarCommentUseCase(firebaseRetroMarioRepositoryImpl)
     @Provides
     fun provideUpdateStarCommentUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) = UpdateStarCommentUseCase(firebaseRetroMarioRepositoryImpl)
+    @Provides
+    fun provideGetCommentUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) = GetCommentByIdUseCase(firebaseRetroMarioRepositoryImpl)
 }
