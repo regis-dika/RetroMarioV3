@@ -39,12 +39,12 @@ class StarCommentsViewModel @Inject constructor(
                         comments = when (resource) {
                             is Error -> Error(resource.msg)
                             is Loading -> Loading()
-                            is Success -> Success(resource.value.map {
+                            is Success -> Success(resource.value.map { userComment ->
                                 CommentContainer(
-                                    userComment = it,
-                                    isFromCurrentUser = it.authorId == currentUserId.value.uid,
-                                    feelingsFromCurrentUser = it.feelings?.map { it }
-                                        ?.first { it.key == currentUserId.value.uid }?.value?.toFeelingState()
+                                    userComment = userComment,
+                                    isFromCurrentUser = userComment.authorId == currentUserId.value.uid,
+                                    feelingsFromCurrentUser = userComment.feelings?.map { it }
+                                        ?.firstOrNull() { it.key == currentUserId.value.uid }?.value?.toFeelingState()
                                         ?: NOT_FEELINGS
 
                                 )
