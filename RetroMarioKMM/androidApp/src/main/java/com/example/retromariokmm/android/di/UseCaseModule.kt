@@ -1,10 +1,7 @@
 package com.example.retromariokmm.android.di
 
 import com.example.retromariokmm.data.remote.FirebaseRetroMarioRepositoryImpl
-import com.example.retromariokmm.domain.usecases.comments.CreateStarCommentUseCase
-import com.example.retromariokmm.domain.usecases.comments.GetCommentByIdUseCase
-import com.example.retromariokmm.domain.usecases.comments.StarCommentsListUseCase
-import com.example.retromariokmm.domain.usecases.comments.UpdateStarCommentUseCase
+import com.example.retromariokmm.domain.usecases.comments.*
 import com.example.retromariokmm.domain.usecases.login.LoginUseCase
 import com.example.retromariokmm.domain.usecases.users.CurrentUserUseCase
 import com.example.retromariokmm.domain.usecases.users.SetLifeDifficultyUseCase
@@ -21,21 +18,41 @@ object UseCaseModule {
 
     @Singleton
     @Provides
-    fun provideFirebaseRepo() : FirebaseRetroMarioRepositoryImpl = FirebaseRetroMarioRepositoryImpl()
+    fun provideFirebaseRepo(): FirebaseRetroMarioRepositoryImpl = FirebaseRetroMarioRepositoryImpl()
+
     @Provides
-    fun providesLoginUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) = LoginUseCase(firebaseRetroMarioRepositoryImpl)
+    fun providesLoginUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        LoginUseCase(firebaseRetroMarioRepositoryImpl)
+
     @Provides
-    fun providesRetroUsers(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) = UserListUseCase(firebaseRetroMarioRepositoryImpl)
+    fun providesRetroUsers(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        UserListUseCase(firebaseRetroMarioRepositoryImpl)
+
     @Provides
-    fun provideSetLifeAndDifficultyUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) = SetLifeDifficultyUseCase(firebaseRetroMarioRepositoryImpl)
+    fun provideSetLifeAndDifficultyUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        SetLifeDifficultyUseCase(firebaseRetroMarioRepositoryImpl)
+
     @Provides
-    fun provideCurrentUserUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) = CurrentUserUseCase(firebaseRetroMarioRepositoryImpl)
+    fun provideCurrentUserUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        CurrentUserUseCase(firebaseRetroMarioRepositoryImpl)
+
     @Provides
-    fun provideStarCommentsUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) = StarCommentsListUseCase(firebaseRetroMarioRepositoryImpl)
+    fun provideStarCommentsUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        StarCommentsListUseCase(firebaseRetroMarioRepositoryImpl)
+
     @Provides
-    fun provideCreateStarCommentUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) = CreateStarCommentUseCase(firebaseRetroMarioRepositoryImpl)
+    fun provideCreateStarCommentUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        CreateStarCommentUseCase(firebaseRetroMarioRepositoryImpl)
+
     @Provides
-    fun provideUpdateStarCommentUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) = UpdateStarCommentUseCase(firebaseRetroMarioRepositoryImpl)
+    fun provideUpdateStarCommentUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        UpdateStarCommentUseCase(firebaseRetroMarioRepositoryImpl)
+
     @Provides
-    fun provideGetCommentUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) = GetCommentByIdUseCase(firebaseRetroMarioRepositoryImpl)
+    fun provideGetCommentUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        GetCommentByIdUseCase(firebaseRetroMarioRepositoryImpl)
+
+    @Provides
+    fun provideUpdateLikeCommentUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        UpdateLikeCommentUseCase(firebaseRetroMarioRepositoryImpl)
 }

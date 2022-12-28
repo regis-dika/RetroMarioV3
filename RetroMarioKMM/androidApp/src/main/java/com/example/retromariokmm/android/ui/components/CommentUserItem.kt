@@ -24,6 +24,8 @@ fun CommentUserItem(
     commentContainer: CommentContainer,
     backgroundColor: Color,
     onNoteClick: () -> Unit,
+    onLikeClick: (FeelingsState) -> Unit,
+    onDisLikeClick: (FeelingsState) -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -56,9 +58,12 @@ fun CommentUserItem(
             FeelingsCounterItem(
                 nbLikes = commentContainer.nbLikes?.size ?: 0,
                 nbDislikes = commentContainer.nbDisLikes?.size ?: 0,
-                onLikeClick = {}) {
-
-            }
+                onLikeClick = {
+                    onLikeClick.invoke(it)
+                }, onDisLikeClick = {
+                    onDisLikeClick.invoke(it)
+                }, feelingsState = commentContainer.feelingsFromCurrentUser
+            )
         }
     }
 }

@@ -136,7 +136,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
                         else -> 0
                     }
                 )
-                val hashMap = hashMapOf("feelings" to hashMapOf(it to updatedFeelings))
+                val hashMap = hashMapOf("feelings" to hashMapOf(it.uid to updatedFeelings))
                 docRef.update(hashMap)
             }
         } catch (e: Exception) {

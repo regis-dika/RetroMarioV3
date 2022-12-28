@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.retromariokmm.android.ui.components.CommentUserItem
+import com.example.retromariokmm.android.ui.components.toFeelings
 import com.example.retromariokmm.utils.ActionState.*
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
@@ -23,7 +24,7 @@ import com.example.retromariokmm.utils.Success
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
-fun StarCommentsScreen(navController: NavController,starCommentsViewModel: StarCommentsViewModel = hiltViewModel()) {
+fun StarCommentsScreen(navController: NavController, starCommentsViewModel: StarCommentsViewModel = hiltViewModel()) {
     val state = starCommentsViewModel.commentsState.collectAsState()
     Box(
         modifier = Modifier
@@ -35,8 +36,8 @@ fun StarCommentsScreen(navController: NavController,starCommentsViewModel: StarC
                 .fillMaxSize()
                 .padding(6.dp)
         ) {
-            OutlinedButton(onClick = { navController.navigate("comment_details_screen/ ")}) {
-              Text(text = "New Comment")
+            OutlinedButton(onClick = { navController.navigate("comment_details_screen/ ") }) {
+                Text(text = "New Comment")
             }
             when (state.value.createNoteAction) {
                 NOT_STARTED -> {}
@@ -73,7 +74,13 @@ fun StarCommentsScreen(navController: NavController,starCommentsViewModel: StarC
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(6.dp)
-                                .animateItemPlacement()
+                                .animateItemPlacement(),
+                            onLikeClick = {
+                                starCommentsViewModel.updateLikeComment(comment.userComment.postId, it.toFeelings())
+                            },
+                            onDisLikeClick = {
+                                starCommentsViewModel.updateLikeComment(comment.userComment.postId, it.toFeelings())
+                            }
                         )
                     }
                 }
