@@ -66,8 +66,7 @@ class StarCommentsViewModel @Inject constructor(
 }
 
 data class CommentsScreen(
-    val comments: Resource<List<CommentContainer>> = Loading(),
-    val createNoteAction: ActionState = NOT_STARTED
+    val comments: Resource<List<CommentContainer>> = Loading()
 )
 
 data class CommentContainer(

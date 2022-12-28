@@ -2,6 +2,7 @@ package com.example.retromariokmm.data
 
 import com.example.retromariokmm.domain.models.Feelings
 import com.example.retromariokmm.domain.models.RetroUser
+import com.example.retromariokmm.domain.models.UserAction
 import com.example.retromariokmm.domain.models.UserComment
 import dev.gitlive.firebase.auth.FirebaseUser
 import dev.gitlive.firebase.firestore.DocumentSnapshot
@@ -11,9 +12,7 @@ fun FirebaseUser.toRetroUser() = RetroUser(
     this.displayName ?: "noName",
     this.photoURL ?: "gs://retro-mario-ionic.appspot.com/Default/download.jpg",
     0,
-    0,
-    mutableListOf(),
-    mutableListOf()
+    0
 )
 
 fun DocumentSnapshot.toRetroUser(): RetroUser {
@@ -27,8 +26,7 @@ fun DocumentSnapshot.toRetroUser(): RetroUser {
         val life: Long = this.get<Long>("life")
 
         RetroUser(
-            uid, name, url, life.toInt(), difficulty.toInt(),
-            mutableListOf()
+            uid, name, url, life.toInt(), difficulty.toInt()
         )
     } catch (e: Exception) {
         RetroUser()
@@ -48,5 +46,19 @@ fun DocumentSnapshot.toUserComment(): UserComment {
 
     } catch (e: Exception) {
         UserComment()
+    }
+}
+
+fun DocumentSnapshot.toUserAction(): UserAction {
+
+    return try {
+        val authorId = get<String>("authorId")
+        val title = get<String>("title")
+        val description = get<String>("description")
+        val isCheck = get<Boolean>("isCheck")
+        val actorList = get<HashMap<String, String>>("actorList")
+        UserAction(authorId, title, description, isCheck, actorList)
+    } catch (e: Exception) {
+        UserAction()
     }
 }

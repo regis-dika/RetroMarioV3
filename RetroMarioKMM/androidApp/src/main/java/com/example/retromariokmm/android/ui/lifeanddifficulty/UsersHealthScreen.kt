@@ -67,7 +67,7 @@ fun UserHealthScreen(
                 .fillMaxWidth()
                 .background(Color.Cyan)
         )
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             OutlinedButton(onClick = { lifeAndDifficultyViewModel.setLifeAndDifficulty() }) {
                 Text(text = "Valider")
             }

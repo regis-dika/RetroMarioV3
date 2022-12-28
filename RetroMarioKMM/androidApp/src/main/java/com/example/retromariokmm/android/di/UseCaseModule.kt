@@ -1,6 +1,7 @@
 package com.example.retromariokmm.android.di
 
 import com.example.retromariokmm.data.remote.FirebaseRetroMarioRepositoryImpl
+import com.example.retromariokmm.domain.usecases.actions.ActionListUseCase
 import com.example.retromariokmm.domain.usecases.comments.*
 import com.example.retromariokmm.domain.usecases.login.LoginUseCase
 import com.example.retromariokmm.domain.usecases.users.CurrentUserUseCase
@@ -55,4 +56,7 @@ object UseCaseModule {
     @Provides
     fun provideUpdateLikeCommentUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
         UpdateLikeCommentUseCase(firebaseRetroMarioRepositoryImpl)
+    @Provides
+    fun provideActionListUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        ActionListUseCase(firebaseRetroMarioRepositoryImpl)
 }

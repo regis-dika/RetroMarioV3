@@ -8,7 +8,4 @@ data class RetroUser(
     val bitmap: String = "",
     var life: Int = -1,
     var difficulty: Int = -1,
-    val commentsList: MutableList<UserComment> = mutableListOf(),
-    val actionList: MutableList<UserAction> = mutableListOf()
-
 )

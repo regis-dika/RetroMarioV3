@@ -1,4 +1,4 @@
-package com.example.retromariokmm.android.ui.comments.list
+package com.example.retromariokmm.android.ui.actions.list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
@@ -15,17 +15,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.retromariokmm.android.ui.components.CommentUserItem
-import com.example.retromariokmm.android.ui.components.toFeelings
-import com.example.retromariokmm.utils.ActionState.*
+import com.example.retromariokmm.android.ui.components.UserActionItem
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
 import com.example.retromariokmm.utils.Success
 
-@Composable
 @OptIn(ExperimentalFoundationApi::class)
-fun StarCommentsScreen(navController: NavController, starCommentsViewModel: StarCommentsViewModel = hiltViewModel()) {
-    val state = starCommentsViewModel.commentsState.collectAsState()
+@Composable
+fun ActionsScreen(navController: NavController, viewModel: ActionsViewModel = hiltViewModel()) {
+    val state = viewModel.actionsState.collectAsState(initial = Loading())
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -37,14 +35,19 @@ fun StarCommentsScreen(navController: NavController, starCommentsViewModel: Star
                 .padding(6.dp)
         ) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                OutlinedButton(onClick = { navController.navigate("comment_details_screen/ ") }) {
-                    Text(text = "New Comment")
+                OutlinedButton(onClick = {
+                    //navController.navigate("comment_details_screen/ ")
+                }) {
+                    Text(text = "New Action")
                 }
-                OutlinedButton(onClick = { navController.navigate("actions_screen") }) {
-                    Text(text = "Go to ACTION")
+                OutlinedButton(onClick = {
+                    //navController.navigate("actions_screen")
+                }) {
+                    Text(text = "Go to Updated HealthyScreen")
                 }
             }
-            when (val list = state.value.comments) {
+
+            when (val list = state.value) {
                 is Error -> Snackbar() {
                     Text(text = list.msg)
                 }
@@ -53,38 +56,31 @@ fun StarCommentsScreen(navController: NavController, starCommentsViewModel: Star
                 }
                 is Success ->
                     if (list.value.isEmpty()) {
-                        Text(modifier = Modifier.fillMaxSize(), text = "NO Comments")
+                        Text(modifier = Modifier.fillMaxSize(), text = "NO Actions")
                     } else {
                         LazyColumn() {
                             items(list.value, key = {
-                                it.userComment.postId
-                            }) { comment ->
-                                CommentUserItem(
-                                    commentContainer = comment,
-                                    backgroundColor = if (comment.isFromCurrentUser) Color.Red else Color.Cyan,
-                                    onNoteClick = {
-                                        navController.navigate("comment_details_screen/${comment.userComment.postId}")
+                                it.userAction.authorId
+                            }) { action ->
+                                UserActionItem(
+                                    actionContainer = action,
+                                    backgroundColor = if (action.isFromCurrentUser) Color.Red else Color.Cyan,
+                                    onActionClick = {
+                                        //navController.navigate("comment_details_screen/${comment.userComment.postId}")
                                     },
                                     onDeleteClick = { },
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(6.dp)
                                         .animateItemPlacement(),
-                                    onLikeClick = {
-                                        starCommentsViewModel.updateLikeComment(
-                                            comment.userComment.postId,
-                                            it.toFeelings()
-                                        )
+                                    onCheckClick = {
+                                        //starCommentsViewModel.updateLikeComment(comment.userComment.postId, it.toFeelings())
                                     },
-                                    onDisLikeClick = {
-                                        starCommentsViewModel.updateLikeComment(
-                                            comment.userComment.postId,
-                                            it.toFeelings()
-                                        )
+                                    onTakeActionClick = {
+                                        //starCommentsViewModel.updateLikeComment(comment.userComment.postId, it.toFeelings())
                                     }
                                 )
                             }
-
                         }
                     }
             }

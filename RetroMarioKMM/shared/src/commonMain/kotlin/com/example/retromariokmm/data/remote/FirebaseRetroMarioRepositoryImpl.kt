@@ -1,6 +1,7 @@
 package com.example.retromariokmm.data.remote
 
 import com.example.retromariokmm.data.toRetroUser
+import com.example.retromariokmm.data.toUserAction
 import com.example.retromariokmm.data.toUserComment
 import com.example.retromariokmm.domain.models.Feelings
 import com.example.retromariokmm.domain.repository.RetroMarioRepository
@@ -28,6 +29,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
 
     private val userCollection = fireStore.collection("users")
     private val startCommentsCollection = fireStore.collection("starPostsList")
+    private val actionCollection = fireStore.collection("actions")
 
     var currentUser: RetroUser? = null
         get() = field
@@ -155,8 +157,14 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         }
     }
 
-    override suspend fun getAllActions(): Flow<Resource<List<UserAction>>> {
-        TODO("Not yet implemented")
+    override suspend fun getAllActions(): Flow<Resource<List<UserAction>>>  = callbackFlow {
+        actionCollection.snapshots.collect {
+            val updatedList = it.documents.map { dc ->
+                dc.toUserAction()
+            }
+            trySend(Success(updatedList))
+        }
+        awaitClose()
     }
 
     override suspend fun setAction(userAction: UserAction): Flow<Resource<List<UserAction>>> {
