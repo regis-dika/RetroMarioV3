@@ -11,12 +11,19 @@ interface RetroMarioRepository {
     suspend fun signIn(email: String, password: String): Resource<RetroUser>
     fun getRetroUsers(): Flow<Resource<List<RetroUser>>>
     suspend fun setLifeDifficulty(life: Int, difficulty: Int): Flow<Resource<Unit>>
+
+    //Comments
     suspend fun getAllComments(): Flow<Resource<List<UserComment>>>
     suspend fun createStarComment(description: String): Flow<Resource<Unit>>
     suspend fun updateComment(commentId : String, description :String): Flow<Resource<Unit>>
     suspend fun updateLikeComment(commentId : String,isLiked :Boolean?)
     suspend fun getCommentById(commentId : String): Flow<Resource<UserComment>>
+
+    //Action
     suspend fun getAllActions(): Flow<Resource<List<UserAction>>>
     suspend fun createAction(title: String,description: String): Flow<Resource<Unit>>
-    suspend fun setAction(userAction: UserAction): Flow<Resource<List<UserAction>>>
+    suspend fun getActionById(actionId : String): Flow<Resource<UserAction>>
+    suspend fun updateAction(actionId :String,title: String,description: String): Flow<Resource<Unit>>
+    suspend fun updateActorList(actionId :String,takeAction: Boolean)
+    suspend fun updateActionCheckState(actionId :String,isCheck: Boolean)
 }

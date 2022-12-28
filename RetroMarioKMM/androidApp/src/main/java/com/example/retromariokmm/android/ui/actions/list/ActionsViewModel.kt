@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.retromariokmm.domain.models.UserAction
 import com.example.retromariokmm.domain.usecases.actions.ActionListUseCase
+import com.example.retromariokmm.domain.usecases.actions.UpdateActionActorListUseCase
+import com.example.retromariokmm.domain.usecases.actions.UpdateActionCheckStateUseCase
 import com.example.retromariokmm.domain.usecases.users.CurrentUserUseCase
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
@@ -18,7 +20,9 @@ import javax.inject.Inject
 @HiltViewModel
 class ActionsViewModel @Inject constructor(
     private val actionListUseCase: ActionListUseCase,
-    private val currentUserUseCase: CurrentUserUseCase
+    private val currentUserUseCase: CurrentUserUseCase,
+    private val updateActionCheckStateUseCase: UpdateActionCheckStateUseCase,
+    private val updateActionActorListUseCase: UpdateActionActorListUseCase
 ) : ViewModel() {
 
     private val _actionsState: MutableStateFlow<Resource<List<ActionContainer>>> = MutableStateFlow(Loading())
@@ -39,7 +43,8 @@ class ActionsViewModel @Inject constructor(
                         is Success -> Success(resource.value.map {
                             ActionContainer(
                                 it,
-                                userId.value.uid == it.authorId
+                                userId.value.uid == it.authorId,
+                                userId.value.uid
                             )
                         })
                     }
@@ -49,11 +54,25 @@ class ActionsViewModel @Inject constructor(
             _actionsState.value = Error("no user Id available ")
         }
     }
+
+    fun onCheck(actionId: String, isCheck: Boolean) {
+        viewModelScope.launch {
+            updateActionCheckStateUseCase.invoke(actionId, isCheck)
+        }
+    }
+
+    fun onTakenAction(actionId: String, isTaken: Boolean) {
+        viewModelScope.launch {
+            updateActionActorListUseCase.invoke(actionId, isTaken)
+        }
+    }
 }
 
 data class ActionContainer(
     val userAction: UserAction,
-    val isFromCurrentUser: Boolean = false
+    val isFromCurrentUser: Boolean = false,
+    val currentUserId: String
 ) {
-    val actors get() = userAction.actorList?.map { it.value }?.joinToString { "-" } ?: "NO ACTOR"
+    val actors get() = userAction.actorList?.map { it.value }?.joinToString { it } ?: "NO ACTOR"
+    val currentActor get() = userAction.actorList?.contains(currentUserId) ?: false
 }

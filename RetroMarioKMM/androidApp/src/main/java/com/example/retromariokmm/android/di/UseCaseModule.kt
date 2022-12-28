@@ -1,8 +1,7 @@
 package com.example.retromariokmm.android.di
 
 import com.example.retromariokmm.data.remote.FirebaseRetroMarioRepositoryImpl
-import com.example.retromariokmm.domain.usecases.actions.ActionListUseCase
-import com.example.retromariokmm.domain.usecases.actions.CreateActionUseCase
+import com.example.retromariokmm.domain.usecases.actions.*
 import com.example.retromariokmm.domain.usecases.comments.*
 import com.example.retromariokmm.domain.usecases.login.LoginUseCase
 import com.example.retromariokmm.domain.usecases.users.CurrentUserUseCase
@@ -65,4 +64,20 @@ object UseCaseModule {
     @Provides
     fun provideCreateActionUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
         CreateActionUseCase(firebaseRetroMarioRepositoryImpl)
+
+    @Provides
+    fun provideUpdateLActionUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        UpdateActionUseCase(firebaseRetroMarioRepositoryImpl)
+
+    @Provides
+    fun provideUpdateActionActorListListUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        UpdateActionActorListUseCase(firebaseRetroMarioRepositoryImpl)
+
+    @Provides
+    fun provideUpdateActionCheckStateUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        UpdateActionCheckStateUseCase(firebaseRetroMarioRepositoryImpl)
+
+    @Provides
+    fun provideGetActionByIdUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        GetActionByIdUseCase(firebaseRetroMarioRepositoryImpl)
 }

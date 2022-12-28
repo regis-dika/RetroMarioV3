@@ -3,7 +3,7 @@ package com.example.retromariokmm.android.ui.actions.details
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.retromariokmm.domain.usecases.actions.CreateActionUseCase
+import com.example.retromariokmm.domain.usecases.actions.*
 import com.example.retromariokmm.utils.ActionState
 import com.example.retromariokmm.utils.ActionState.*
 import com.example.retromariokmm.utils.Error
@@ -11,7 +11,6 @@ import com.example.retromariokmm.utils.Loading
 import com.example.retromariokmm.utils.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,8 +18,9 @@ import javax.inject.Inject
 @HiltViewModel
 class ActionDetailsViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val createActionUseCase: CreateActionUseCase
-
+    private val getActionByIdUseCase: GetActionByIdUseCase,
+    private val createActionUseCase: CreateActionUseCase,
+    private val updateActionUseCase: UpdateActionUseCase
 ) : ViewModel() {
 
     private val actionTitle = savedStateHandle.getStateFlow("actionTitle", "")
@@ -39,19 +39,22 @@ class ActionDetailsViewModel @Inject constructor(
                 return@let
             }
             existingActionId = it
-            fetchComment()
+            fetchAction()
         }
     }
 
-    private fun fetchComment() {
+    private fun fetchAction() {
         viewModelScope.launch {
-            /*getCommentByIdUseCase.invoke(existingActionId!!).collect {
+            getActionByIdUseCase.invoke(existingActionId!!).collect {
                 when (it) {
                     is Error -> {}
                     is Loading -> {}
-                    is Success -> savedStateHandle["commentDescription"] = it.value.description
+                    is Success -> {
+                        savedStateHandle["actionTitle"] = it.value.title
+                        savedStateHandle["actionDescription"] = it.value.description
+                    }
                 }
-            }*/
+            }
         }
     }
 
@@ -63,16 +66,16 @@ class ActionDetailsViewModel @Inject constructor(
     }
 
     fun saveAction() {
-        val commentId = existingActionId
+        val actionId = existingActionId
         viewModelScope.launch {
-            if (commentId != null) {
-                /*updateStarCommentUseCase.invoke(commentId, commentDescription.value).collect {
+            if (actionId != null) {
+                updateActionUseCase.invoke(actionId,actionTitle.value,actionDescription.value).collect {
                     _saveAction.value = when (it) {
                         is Error -> ActionState.ERROR
                         is Loading -> PENDING
                         is Success -> SUCCESS
                     }
-                }*/
+                }
             } else {
                 createActionUseCase.invoke(actionTitle.value,actionDescription.value).collect {
                     _saveAction.value = when (it) {

@@ -4,17 +4,18 @@ import com.example.retromariokmm.data.toRetroUser
 import com.example.retromariokmm.data.toUserAction
 import com.example.retromariokmm.data.toUserComment
 import com.example.retromariokmm.domain.models.Feelings
-import com.example.retromariokmm.domain.repository.RetroMarioRepository
-import com.example.retromariokmm.utils.Resource
-import com.example.retromariokmm.utils.Success
 import com.example.retromariokmm.domain.models.RetroUser
 import com.example.retromariokmm.domain.models.UserAction
 import com.example.retromariokmm.domain.models.UserComment
+import com.example.retromariokmm.domain.repository.RetroMarioRepository
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
+import com.example.retromariokmm.utils.Resource
+import com.example.retromariokmm.utils.Success
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
+import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.channels.awaitClose
@@ -157,7 +158,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         }
     }
 
-    override suspend fun getAllActions(): Flow<Resource<List<UserAction>>>  = callbackFlow {
+    override suspend fun getAllActions(): Flow<Resource<List<UserAction>>> = callbackFlow {
         actionCollection.snapshots.collect {
             val updatedList = it.documents.map { dc ->
                 dc.toUserAction()
@@ -172,7 +173,8 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         try {
             currentUser?.let {
                 val docRef = actionCollection.document
-                val createdComment = UserAction(actionId = docRef.id, authorId = it.uid,title = title, description = description)
+                val createdComment =
+                    UserAction(actionId = docRef.id, authorId = it.uid, title = title, description = description)
                 docRef.set(createdComment)
                 emit(Success(Unit))
             }
@@ -181,8 +183,62 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         }
     }
 
-    override suspend fun setAction(userAction: UserAction): Flow<Resource<List<UserAction>>> {
-        TODO("Not yet implemented")
+    override suspend fun getActionById(actionId: String) = flow {
+        emit(Loading())
+        try {
+            currentUser?.let {
+                val doc = actionCollection.document(actionId).get()
+                emit(Success(doc.toUserAction()))
+            }
+        } catch (e: Exception) {
+            emit(Error<UserAction>(e.toString()))
+        }
     }
 
+    override suspend fun updateAction(actionId: String, title: String, description: String) = flow {
+        emit(Loading())
+        try {
+            currentUser?.let {
+                val docRef = actionCollection.document(actionId)
+                docRef.update(
+                    hashMapOf(
+                        Pair("title", title),
+                        Pair("description", description),
+                        (Pair("authorId", it.uid))
+                    )
+                )
+                emit(Success(Unit))
+            }
+        } catch (e: Exception) {
+            emit(Error<Unit>(e.toString()))
+        }
+    }
+
+    override suspend fun updateActorList(actionId: String, takeAction: Boolean) {
+        try {
+            currentUser?.let { retroUser ->
+                val docRef = actionCollection.document(actionId)
+                if (takeAction) {
+                    val actorMapUpdated = hashMapOf("actorList" to hashMapOf(retroUser.uid to retroUser.name))
+                    docRef.set(actorMapUpdated, merge = true)
+                } else {
+                    val actorMapRemoved = hashMapOf("actorList" to hashMapOf(retroUser.uid to FieldValue.delete))
+                    docRef.set(actorMapRemoved, merge = true)
+                }
+            }
+        } catch (e: Exception) {
+            readln()
+        }
+    }
+
+    override suspend fun updateActionCheckState(actionId: String, isCheck: Boolean) {
+        try {
+            currentUser?.let {
+                val docRef = actionCollection.document(actionId)
+                val actorMap = hashMapOf("isCheck" to isCheck)
+                docRef.set(actorMap, merge = true)
+            }
+        } catch (e: Exception) {
+        }
+    }
 }

@@ -66,7 +66,7 @@ fun ActionsScreen(navController: NavController, viewModel: ActionsViewModel = hi
                                     actionContainer = action,
                                     backgroundColor = if (action.isFromCurrentUser) Color.Red else Color.Cyan,
                                     onActionClick = {
-                                        //navController.navigate("comment_details_screen/${comment.userComment.postId}")
+                                        navController.navigate("action_details_screen/${action.userAction.actionId}")
                                     },
                                     onDeleteClick = { },
                                     modifier = Modifier
@@ -74,10 +74,10 @@ fun ActionsScreen(navController: NavController, viewModel: ActionsViewModel = hi
                                         .padding(6.dp)
                                         .animateItemPlacement(),
                                     onCheckClick = {
-                                        //starCommentsViewModel.updateLikeComment(comment.userComment.postId, it.toFeelings())
+                                        viewModel.onCheck(action.userAction.actionId, it)
                                     },
                                     onTakeActionClick = {
-                                        //starCommentsViewModel.updateLikeComment(comment.userComment.postId, it.toFeelings())
+                                        viewModel.onTakenAction(action.userAction.actionId, it)
                                     }
                                 )
                             }
