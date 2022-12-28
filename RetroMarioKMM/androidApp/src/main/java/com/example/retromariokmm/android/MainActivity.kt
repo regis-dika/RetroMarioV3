@@ -22,6 +22,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.retromariokmm.android.ui.actions.details.ActionDetailsScreen
 import com.example.retromariokmm.android.ui.actions.list.ActionsScreen
 import com.example.retromariokmm.android.ui.comments.details.CommentDetailsScreen
 import com.example.retromariokmm.android.ui.comments.list.StarCommentsScreen
@@ -101,6 +102,15 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("actions_screen") {
                             ActionsScreen(navController = navController)
+                        }
+                        composable("action_details_screen/{actionId}", arguments = listOf(
+                            navArgument(name = "actionId"){
+                                type = NavType.StringType
+                                defaultValue = ""
+                            }
+                        )) { backStackEntry ->
+                            val actionId = backStackEntry.arguments?.getString("actionId") ?: ""
+                            ActionDetailsScreen(actionId, navController)
                         }
                     }
                 }

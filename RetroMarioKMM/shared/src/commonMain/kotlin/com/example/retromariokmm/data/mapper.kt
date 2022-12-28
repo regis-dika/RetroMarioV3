@@ -52,12 +52,17 @@ fun DocumentSnapshot.toUserComment(): UserComment {
 fun DocumentSnapshot.toUserAction(): UserAction {
 
     return try {
+        val actionId = get<String>("actionId")
         val authorId = get<String>("authorId")
         val title = get<String>("title")
         val description = get<String>("description")
         val isCheck = get<Boolean>("isCheck")
-        val actorList = get<HashMap<String, String>>("actorList")
-        UserAction(authorId, title, description, isCheck, actorList)
+        val actorList = if(contains("actorList")){
+            get<HashMap<String, String>?>("actorList")
+        }else{
+            null
+        }
+        UserAction(actionId,authorId, title, description, isCheck, actorList)
     } catch (e: Exception) {
         UserAction()
     }

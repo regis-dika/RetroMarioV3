@@ -167,6 +167,20 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         awaitClose()
     }
 
+    override suspend fun createAction(title: String, description: String) = flow {
+        emit(Loading())
+        try {
+            currentUser?.let {
+                val docRef = actionCollection.document
+                val createdComment = UserAction(actionId = docRef.id, authorId = it.uid,title = title, description = description)
+                docRef.set(createdComment)
+                emit(Success(Unit))
+            }
+        } catch (e: Exception) {
+            emit(Error<Unit>(e.toString()))
+        }
+    }
+
     override suspend fun setAction(userAction: UserAction): Flow<Resource<List<UserAction>>> {
         TODO("Not yet implemented")
     }

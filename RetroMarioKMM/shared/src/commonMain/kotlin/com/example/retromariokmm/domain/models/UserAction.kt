@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserAction(
+    val actionId : String = "",
     val authorId : String = "",
     val title : String = "",
     val description : String  = "",

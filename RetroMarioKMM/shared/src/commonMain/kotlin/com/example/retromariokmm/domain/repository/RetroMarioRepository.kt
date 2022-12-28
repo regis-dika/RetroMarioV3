@@ -17,5 +17,6 @@ interface RetroMarioRepository {
     suspend fun updateLikeComment(commentId : String,isLiked :Boolean?)
     suspend fun getCommentById(commentId : String): Flow<Resource<UserComment>>
     suspend fun getAllActions(): Flow<Resource<List<UserAction>>>
+    suspend fun createAction(title: String,description: String): Flow<Resource<Unit>>
     suspend fun setAction(userAction: UserAction): Flow<Resource<List<UserAction>>>
 }

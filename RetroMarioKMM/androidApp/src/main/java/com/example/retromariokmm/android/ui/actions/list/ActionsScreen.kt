@@ -36,7 +36,7 @@ fun ActionsScreen(navController: NavController, viewModel: ActionsViewModel = hi
         ) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 OutlinedButton(onClick = {
-                    //navController.navigate("comment_details_screen/ ")
+                    navController.navigate("action_details_screen/ ")
                 }) {
                     Text(text = "New Action")
                 }
@@ -60,7 +60,7 @@ fun ActionsScreen(navController: NavController, viewModel: ActionsViewModel = hi
                     } else {
                         LazyColumn() {
                             items(list.value, key = {
-                                it.userAction.authorId
+                                it.userAction.actionId
                             }) { action ->
                                 UserActionItem(
                                     actionContainer = action,

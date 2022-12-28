@@ -2,11 +2,13 @@ package com.example.retromariokmm.android.ui.actions.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.retromariokmm.android.ui.comments.list.CommentsScreen
 import com.example.retromariokmm.domain.models.UserAction
 import com.example.retromariokmm.domain.usecases.actions.ActionListUseCase
 import com.example.retromariokmm.domain.usecases.users.CurrentUserUseCase
-import com.example.retromariokmm.utils.*
+import com.example.retromariokmm.utils.Error
+import com.example.retromariokmm.utils.Loading
+import com.example.retromariokmm.utils.Resource
+import com.example.retromariokmm.utils.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,7 +49,6 @@ class ActionsViewModel @Inject constructor(
             _actionsState.value = Error("no user Id available ")
         }
     }
-
 }
 
 data class ActionContainer(
