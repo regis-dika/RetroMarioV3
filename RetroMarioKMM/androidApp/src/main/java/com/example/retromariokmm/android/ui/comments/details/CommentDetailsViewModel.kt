@@ -36,18 +36,19 @@ class CommentDetailsViewModel @Inject constructor(
     private lateinit var commentPath: String
 
     init {
+        savedStateHandle.get<String>("path")?.let {
+            if (it.isBlank()) {
+                return@let
+            }
+            commentPath = it
+        }
         savedStateHandle.get<String>("commentId")?.let { s ->
             if (s.isBlank()) {
                 return@let
             }
             existingCommentId = s
             fetchComment()
-        }
-        savedStateHandle.get<String>("path")?.let {
-            if (it.isBlank()) {
-                return@let
-            }
-            commentPath = it
+
         }
     }
 
