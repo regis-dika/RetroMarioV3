@@ -62,7 +62,7 @@ fun LoginScreen(
             Idle -> {}
             Loading -> CircularProgressIndicator()
             is Success -> Snackbar() {
-                Text(text = result.retroUser.name)
+                Text(text = "Successful Login")
             }
         }
     }

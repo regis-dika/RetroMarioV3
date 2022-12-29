@@ -34,7 +34,7 @@ class LoginScreenViewModel @Inject constructor(
             _loginState.value = when (result) {
                 is Error -> LoginState.Error(result.msg)
                 is Loading -> LoginState.Loading
-                is Success -> LoginState.Success(result.value)
+                is Success -> LoginState.Success
             }
         }
     }
@@ -51,7 +51,7 @@ class LoginScreenViewModel @Inject constructor(
 sealed interface LoginState {
     object Idle : LoginState
     object Loading : LoginState
-    data class Success(val retroUser: RetroUser) : LoginState
+    object Success : LoginState
     data class Error(val msg: String) : LoginState
 }
 

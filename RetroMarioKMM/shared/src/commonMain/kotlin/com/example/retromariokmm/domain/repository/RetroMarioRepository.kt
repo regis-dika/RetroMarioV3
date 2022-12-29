@@ -7,8 +7,8 @@ import com.example.retromariokmm.domain.models.UserComment
 import kotlinx.coroutines.flow.Flow
 
 interface RetroMarioRepository {
-    suspend fun createUser(email: String, password: String): Resource<RetroUser>
-    suspend fun signIn(email: String, password: String): Resource<RetroUser>
+    suspend fun createUser(email: String, password: String): Resource<Unit>
+    suspend fun signIn(email: String, password: String): Resource<Unit>
     fun getRetroUsers(): Flow<Resource<List<RetroUser>>>
     suspend fun setLifeDifficulty(life: Int, difficulty: Int): Flow<Resource<Unit>>
 

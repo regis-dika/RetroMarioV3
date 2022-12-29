@@ -15,12 +15,12 @@ import com.example.retromariokmm.utils.Success
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
-import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 
 class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
@@ -38,32 +38,41 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
             field = value
         }
 
-    override suspend fun createUser(email: String, password: String): Resource<RetroUser> {
+    override suspend fun createUser(email: String, password: String): Resource<Unit> {
         return try {
             val result = firebaseAuth.createUserWithEmailAndPassword(email, password)
             val user = result.user
             if (user != null) {
-                Success(user.toRetroUser())
+                currentUser = getRetroUsers().firstOrNull { it is Success }?.value?.first { it.uid == user.uid }
+                if (currentUser != null) {
+                    Success(Unit)
+                } else {
+                    Error("current user is null")
+                }
             } else {
-                com.example.retromariokmm.utils.Error("error user is null")
+                Error("error user is null")
             }
         } catch (e: Exception) {
-            com.example.retromariokmm.utils.Error(e.toString())
+            Error(e.toString())
         }
     }
 
-    override suspend fun signIn(email: String, password: String): Resource<RetroUser> {
+    override suspend fun signIn(email: String, password: String): Resource<Unit> {
         return try {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password)
             val user = result.user
             if (user != null) {
-                currentUser = user.toRetroUser()
-                Success(user.toRetroUser())
+                currentUser = getRetroUsers().firstOrNull { it is Success }?.value?.first { it.uid == user.uid }
+                if (currentUser != null) {
+                    Success(Unit)
+                } else {
+                    Error("current user is null")
+                }
             } else {
-                com.example.retromariokmm.utils.Error("error user is null")
+                Error("error user is null")
             }
         } catch (e: Exception) {
-            com.example.retromariokmm.utils.Error(e.toString())
+            Error(e.toString())
         }
     }
 
@@ -225,7 +234,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
                     val currentDoc = docRef.get().toUserAction()
                     currentDoc.actorList?.remove(retroUser.uid)
                     val docActorListRemoved = currentDoc.copy(actorList = currentDoc.actorList)
-                    docRef.set(docActorListRemoved, merge = true)
+                    docRef.set(docActorListRemoved)
                 }
             }
         } catch (e: Exception) {
