@@ -225,7 +225,6 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
                     val currentDoc = docRef.get().toUserAction()
                     currentDoc.actorList?.remove(retroUser.uid)
                     val docActorListRemoved = currentDoc.copy(actorList = currentDoc.actorList)
-                    //val actorMapRemoved = hashMapOf("actorList" to hashMapOf(retroUser.uid to FieldValue.delete))
                     docRef.set(docActorListRemoved, merge = true)
                 }
             }
