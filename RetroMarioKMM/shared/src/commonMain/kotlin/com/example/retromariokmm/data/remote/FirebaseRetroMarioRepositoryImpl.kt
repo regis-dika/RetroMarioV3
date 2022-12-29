@@ -222,8 +222,11 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
                     val actorMapUpdated = hashMapOf("actorList" to hashMapOf(retroUser.uid to retroUser.name))
                     docRef.set(actorMapUpdated, merge = true)
                 } else {
-                    val actorMapRemoved = hashMapOf("actorList" to hashMapOf(retroUser.uid to FieldValue.delete))
-                    docRef.set(actorMapRemoved, merge = true)
+                    val currentDoc = docRef.get().toUserAction()
+                    currentDoc.actorList?.remove(retroUser.uid)
+                    val docActorListRemoved = currentDoc.copy(actorList = currentDoc.actorList)
+                    //val actorMapRemoved = hashMapOf("actorList" to hashMapOf(retroUser.uid to FieldValue.delete))
+                    docRef.set(docActorListRemoved, merge = true)
                 }
             }
         } catch (e: Exception) {
