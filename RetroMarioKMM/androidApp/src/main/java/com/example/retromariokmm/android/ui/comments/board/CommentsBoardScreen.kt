@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
@@ -25,48 +26,58 @@ fun CommentsBoardScreen(navController: NavController, viewModel: CommentsBoardVi
     val state = viewModel.boardState.collectAsState(initial = Loading())
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(6.dp), horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                IconButton(
-                    modifier = Modifier.background(Color.Blue),
-                    onClick = { navController.navigate("comments_screen/$STAR_COMMENTS") }) {
-                    Column(Modifier.wrapContentSize()) {
-                        Icon(Icons.Default.Star, contentDescription = "star")
-                        Text(text = state.value.value?.nbStarComments.toString())
-                    }
-                }
-                IconButton(
-                    modifier = Modifier.background(Color.Blue),
-                    onClick = { navController.navigate("comments_screen/$BOO_COMMENTS") }) {
-                    Column(Modifier.wrapContentSize()) {
-                        Icon(Icons.Default.Build, contentDescription = "boo")
-                        Text(text = state.value.value?.nbBooComments.toString())
-                    }
+        Column(Modifier.fillMaxSize()) {
+
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                OutlinedButton(onClick = { navController.navigate("actions_screen") }) {
+                    Text(text = "Go to ACTION")
                 }
             }
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(6.dp), horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                IconButton(
-                    modifier = Modifier.background(Color.Blue),
-                    onClick = { navController.navigate("comments_screen/$GOOMBA_COMMENTS") }) {
-                    Column(Modifier.wrapContentSize()) {
-                        Icon(Icons.Default.Warning, contentDescription = "goomba")
-                        Text(text = state.value.value?.nbGoombaComments.toString())
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(6.dp), verticalArrangement = Arrangement.SpaceBetween) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(6.dp), horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(
+                        modifier = Modifier.background(Color.Blue),
+                        onClick = { navController.navigate("comments_screen/$STAR_COMMENTS") }) {
+                        Column(Modifier.wrapContentSize()) {
+                            Icon(Icons.Default.Star, contentDescription = "star")
+                            Text(text = state.value.value?.nbStarComments.toString())
+                        }
+                    }
+                    IconButton(
+                        modifier = Modifier.background(Color.Blue),
+                        onClick = { navController.navigate("comments_screen/$BOO_COMMENTS") }) {
+                        Column(Modifier.wrapContentSize()) {
+                            Icon(Icons.Default.Build, contentDescription = "boo")
+                            Text(text = state.value.value?.nbBooComments.toString())
+                        }
                     }
                 }
-                IconButton(
-                    modifier = Modifier.background(Color.Blue),
-                    onClick = { navController.navigate("comments_screen/$MUSHROOM_COMMENTS") }) {
-                    Column(Modifier.wrapContentSize()) {
-                        Icon(Icons.Default.PlayArrow, contentDescription = "mushroom")
-                        Text(text = state.value.value?.nbMushroomComments.toString())
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(6.dp), horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(
+                        modifier = Modifier.background(Color.Blue),
+                        onClick = { navController.navigate("comments_screen/$GOOMBA_COMMENTS") }) {
+                        Column(Modifier.wrapContentSize()) {
+                            Icon(Icons.Default.Warning, contentDescription = "goomba")
+                            Text(text = state.value.value?.nbGoombaComments.toString())
+                        }
+                    }
+                    IconButton(
+                        modifier = Modifier.background(Color.Blue),
+                        onClick = { navController.navigate("comments_screen/$MUSHROOM_COMMENTS") }) {
+                        Column(Modifier.wrapContentSize()) {
+                            Icon(Icons.Default.PlayArrow, contentDescription = "mushroom")
+                            Text(text = state.value.value?.nbMushroomComments.toString())
+                        }
                     }
                 }
             }

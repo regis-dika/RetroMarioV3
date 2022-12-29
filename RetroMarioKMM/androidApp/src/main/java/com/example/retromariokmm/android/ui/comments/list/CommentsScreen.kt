@@ -39,12 +39,9 @@ fun CommentsScreen(
                 .fillMaxSize()
                 .padding(6.dp)
         ) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
                 OutlinedButton(onClick = { navController.navigate("comment_details_screen/ /$path") }) {
                     Text(text = "New Comment")
-                }
-                OutlinedButton(onClick = { navController.navigate("actions_screen") }) {
-                    Text(text = "Go to ACTION")
                 }
             }
             when (val list = state.value.comments) {
