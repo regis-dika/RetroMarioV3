@@ -1,16 +1,16 @@
 package com.example.retromariokmm.android.ui.comments.list
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.retromariokmm.android.ui.components.FeelingsState
 import com.example.retromariokmm.android.ui.components.FeelingsState.NOT_FEELINGS
 import com.example.retromariokmm.domain.models.Feelings
 import com.example.retromariokmm.domain.models.UserComment
-import com.example.retromariokmm.domain.usecases.comments.StarCommentsListUseCase
+import com.example.retromariokmm.domain.usecases.comments.CommentsListUseCase
 import com.example.retromariokmm.domain.usecases.comments.UpdateLikeCommentUseCase
 import com.example.retromariokmm.domain.usecases.users.CurrentUserUseCase
 import com.example.retromariokmm.utils.*
-import com.example.retromariokmm.utils.ActionState.NOT_STARTED
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,23 +18,32 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class StarCommentsViewModel @Inject constructor(
-    private val starCommentsListUseCase: StarCommentsListUseCase,
+class CommentsViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
+    private val commentsListUseCase: CommentsListUseCase,
     private val currentUserUseCase: CurrentUserUseCase,
     private val updateLikeCommentUseCase: UpdateLikeCommentUseCase
 ) : ViewModel() {
     private val _commentsState: MutableStateFlow<CommentsScreen> = MutableStateFlow(CommentsScreen())
     val commentsState = _commentsState.asStateFlow()
 
+    private lateinit var path: String
+
     init {
-        fetchCommentsList()
+        savedStateHandle.get<String>("path")?.let {
+            if (it.isBlank()) {
+                return@let
+            }
+            path = it
+            fetchCommentsList()
+        }
     }
 
     private fun fetchCommentsList() {
         viewModelScope.launch {
             val currentUserId = currentUserUseCase.invoke()
             if (currentUserId is Success) {
-                starCommentsListUseCase.invoke().collect { resource ->
+                commentsListUseCase.invoke(path).collect { resource ->
                     _commentsState.value = _commentsState.value.copy(
                         comments = when (resource) {
                             is Error -> Error(resource.msg)
@@ -60,7 +69,7 @@ class StarCommentsViewModel @Inject constructor(
 
     fun updateLikeComment(commentId: String, isLiked: Boolean?) {
         viewModelScope.launch {
-            updateLikeCommentUseCase.invoke(commentId, isLiked)
+            updateLikeCommentUseCase.invoke(path, commentId, isLiked)
         }
     }
 }

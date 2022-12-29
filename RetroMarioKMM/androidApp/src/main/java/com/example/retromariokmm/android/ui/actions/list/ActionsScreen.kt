@@ -41,7 +41,7 @@ fun ActionsScreen(navController: NavController, viewModel: ActionsViewModel = hi
                     Text(text = "New Action")
                 }
                 OutlinedButton(onClick = {
-                    //navController.navigate("actions_screen")
+                    navController.navigate("life_difficulty_screen")
                 }) {
                     Text(text = "Go to Updated HealthyScreen")
                 }

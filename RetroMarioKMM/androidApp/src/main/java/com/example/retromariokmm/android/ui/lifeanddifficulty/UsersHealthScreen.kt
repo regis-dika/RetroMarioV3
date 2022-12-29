@@ -71,7 +71,7 @@ fun UserHealthScreen(
             OutlinedButton(onClick = { lifeAndDifficultyViewModel.setLifeAndDifficulty() }) {
                 Text(text = "Valider")
             }
-            OutlinedButton(onClick = { navController.navigate("comments_screen") }) {
+            OutlinedButton(onClick = { navController.navigate("comments_board_screen") }) {
                 Text(text = "Next")
             }
         }

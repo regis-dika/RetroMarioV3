@@ -13,8 +13,6 @@ import com.example.retromariokmm.utils.Loading
 import com.example.retromariokmm.utils.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -35,20 +33,27 @@ class CommentDetailsViewModel @Inject constructor(
     }
 
     private var existingCommentId: String? = null
+    private lateinit var commentPath: String
 
     init {
-        savedStateHandle.get<String>("commentId")?.let {
-            if(it.isBlank()){
+        savedStateHandle.get<String>("commentId")?.let { s ->
+            if (s.isBlank()) {
                 return@let
             }
-            existingCommentId = it
+            existingCommentId = s
             fetchComment()
+        }
+        savedStateHandle.get<String>("path")?.let {
+            if (it.isBlank()) {
+                return@let
+            }
+            commentPath = it
         }
     }
 
     private fun fetchComment() {
         viewModelScope.launch {
-            getCommentByIdUseCase.invoke(existingCommentId!!).collect {
+            getCommentByIdUseCase.invoke(commentPath, existingCommentId!!).collect {
                 when (it) {
                     is Error -> {}
                     is Loading -> {}
@@ -66,17 +71,17 @@ class CommentDetailsViewModel @Inject constructor(
         val commentId = existingCommentId
         viewModelScope.launch {
             if (commentId != null) {
-                updateStarCommentUseCase.invoke(commentId, commentDescription.value).collect {
+                updateStarCommentUseCase.invoke(commentPath, commentId, commentDescription.value).collect {
                     _saveAction.value = when (it) {
-                        is Error -> ActionState.ERROR
+                        is Error -> ERROR
                         is Loading -> PENDING
                         is Success -> SUCCESS
                     }
                 }
             } else {
-                createStarCommentUseCase.invoke(commentDescription.value).collect {
+                createStarCommentUseCase.invoke(commentPath, commentDescription.value).collect {
                     _saveAction.value = when (it) {
-                        is Error -> ActionState.ERROR
+                        is Error -> ERROR
                         is Loading -> PENDING
                         is Success -> SUCCESS
                     }

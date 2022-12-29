@@ -5,10 +5,13 @@ import com.example.retromariokmm.domain.models.RetroUser
 import com.example.retromariokmm.domain.models.UserComment
 import com.example.retromariokmm.utils.Resource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+
 //TODO Add Interface
-class StarCommentsListUseCase(private val repository : FirebaseRetroMarioRepositoryImpl) {
+class CommentsListUseCase(private val repository : FirebaseRetroMarioRepositoryImpl) {
     //TODO Inject repo
-    suspend fun invoke(): Flow<Resource<List<UserComment>>> {
-        return repository.getAllComments()
+     fun invoke(path:String) = flow {
+        emitAll(repository.getAllComments(path))
     }
 }

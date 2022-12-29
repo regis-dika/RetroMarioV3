@@ -21,6 +21,7 @@ import com.example.retromariokmm.utils.ActionState.*
 
 @Composable
 fun CommentDetailsScreen(
+    path : String,
     commentId: String,
     navController: NavController,
     viewModel: CommentDetailsViewModel = hiltViewModel()

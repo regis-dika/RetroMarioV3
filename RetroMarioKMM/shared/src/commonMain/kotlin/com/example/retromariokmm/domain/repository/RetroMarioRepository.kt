@@ -13,11 +13,11 @@ interface RetroMarioRepository {
     suspend fun setLifeDifficulty(life: Int, difficulty: Int): Flow<Resource<Unit>>
 
     //Comments
-    suspend fun getAllComments(): Flow<Resource<List<UserComment>>>
-    suspend fun createStarComment(description: String): Flow<Resource<Unit>>
-    suspend fun updateComment(commentId : String, description :String): Flow<Resource<Unit>>
-    suspend fun updateLikeComment(commentId : String,isLiked :Boolean?)
-    suspend fun getCommentById(commentId : String): Flow<Resource<UserComment>>
+    suspend fun getAllComments(path : String): Flow<Resource<List<UserComment>>>
+    suspend fun createStarComment(path: String,description: String): Flow<Resource<Unit>>
+    suspend fun updateComment(path :String,commentId : String, description :String): Flow<Resource<Unit>>
+    suspend fun updateLikeComment(path: String,commentId : String,isLiked :Boolean?)
+    suspend fun getCommentById(path: String,commentId : String): Flow<Resource<UserComment>>
 
     //Action
     suspend fun getAllActions(): Flow<Resource<List<UserAction>>>

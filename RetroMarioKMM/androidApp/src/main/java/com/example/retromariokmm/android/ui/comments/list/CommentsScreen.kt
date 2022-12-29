@@ -17,14 +17,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.retromariokmm.android.ui.components.CommentUserItem
 import com.example.retromariokmm.android.ui.components.toFeelings
-import com.example.retromariokmm.utils.ActionState.*
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
 import com.example.retromariokmm.utils.Success
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
-fun StarCommentsScreen(navController: NavController, starCommentsViewModel: StarCommentsViewModel = hiltViewModel()) {
+fun CommentsScreen(
+    path: String,
+    navController: NavController,
+    starCommentsViewModel: CommentsViewModel = hiltViewModel()
+) {
     val state = starCommentsViewModel.commentsState.collectAsState()
     Box(
         modifier = Modifier
@@ -37,7 +40,7 @@ fun StarCommentsScreen(navController: NavController, starCommentsViewModel: Star
                 .padding(6.dp)
         ) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                OutlinedButton(onClick = { navController.navigate("comment_details_screen/ ") }) {
+                OutlinedButton(onClick = { navController.navigate("comment_details_screen/ /$path") }) {
                     Text(text = "New Comment")
                 }
                 OutlinedButton(onClick = { navController.navigate("actions_screen") }) {
@@ -63,7 +66,7 @@ fun StarCommentsScreen(navController: NavController, starCommentsViewModel: Star
                                     commentContainer = comment,
                                     backgroundColor = if (comment.isFromCurrentUser) Color.Red else Color.Cyan,
                                     onNoteClick = {
-                                        navController.navigate("comment_details_screen/${comment.userComment.postId}")
+                                        navController.navigate("comment_details_screen/${comment.userComment.postId}/$path")
                                     },
                                     onDeleteClick = { },
                                     modifier = Modifier

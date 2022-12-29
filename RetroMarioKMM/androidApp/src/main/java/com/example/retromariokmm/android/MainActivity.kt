@@ -17,15 +17,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavType
-import androidx.navigation.NavType.Companion
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.retromariokmm.android.ui.actions.details.ActionDetailsScreen
 import com.example.retromariokmm.android.ui.actions.list.ActionsScreen
+import com.example.retromariokmm.android.ui.comments.board.CommentsBoardScreen
 import com.example.retromariokmm.android.ui.comments.details.CommentDetailsScreen
-import com.example.retromariokmm.android.ui.comments.list.StarCommentsScreen
+import com.example.retromariokmm.android.ui.comments.list.CommentsScreen
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserHealthScreen
 import com.example.retromariokmm.android.ui.login.LoginScreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -88,17 +88,31 @@ class MainActivity : ComponentActivity() {
                         composable("life_difficulty_screen") {
                             UserHealthScreen(navController)
                         }
-                        composable("comments_screen") {
-                            StarCommentsScreen(navController = navController)
+                        composable("comments_board_screen") {
+                            CommentsBoardScreen(navController = navController)
                         }
-                        composable("comment_details_screen/{commentId}", arguments = listOf(
+                        composable("comments_screen/{path}", arguments = listOf(
+                            navArgument(name = "path"){
+                                type = NavType.StringType
+                                defaultValue = ""
+                            }
+                        )) { backStackEntry ->
+                            val path = backStackEntry.arguments?.getString("path") ?: ""
+                            CommentsScreen(path,navController = navController)
+                        }
+                        composable("comment_details_screen/{commentId}/{path}", arguments = listOf(
                             navArgument(name = "commentId"){
+                                type = NavType.StringType
+                                defaultValue = ""
+                            },
+                            navArgument(name = "path"){
                                 type = NavType.StringType
                                 defaultValue = ""
                             }
                         )) { backStackEntry ->
                             val commentId = backStackEntry.arguments?.getString("commentId") ?: ""
-                            CommentDetailsScreen(commentId, navController)
+                            val path = backStackEntry.arguments?.getString("path") ?: ""
+                            CommentDetailsScreen(path,commentId, navController)
                         }
                         composable("actions_screen") {
                             ActionsScreen(navController = navController)

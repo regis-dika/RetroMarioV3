@@ -29,7 +29,6 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
     private val firebaseAuth: FirebaseAuth = Firebase.auth
 
     private val userCollection = fireStore.collection("users")
-    private val startCommentsCollection = fireStore.collection("starPostsList")
     private val actionCollection = fireStore.collection("actions")
 
     var currentUser: RetroUser? = null
@@ -99,8 +98,8 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         }
     }
 
-    override suspend fun getAllComments(): Flow<Resource<List<UserComment>>> = callbackFlow {
-        startCommentsCollection.snapshots.collect {
+    override suspend fun getAllComments(path : String): Flow<Resource<List<UserComment>>> = callbackFlow {
+        fireStore.collection(path).snapshots.collect {
             val updatedList = it.documents.map { dc ->
                 dc.toUserComment()
             }
@@ -109,11 +108,11 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         awaitClose()
     }
 
-    override suspend fun createStarComment(description: String) = flow {
+    override suspend fun createStarComment(path: String,description: String) = flow {
         emit(Loading())
         try {
             currentUser?.let {
-                val docRef = startCommentsCollection.document
+                val docRef = fireStore.collection(path).document
                 val createdComment = UserComment(postId = docRef.id, authorId = it.uid, description = description)
                 docRef.set(createdComment)
                 emit(Success(Unit))
@@ -123,11 +122,11 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         }
     }
 
-    override suspend fun updateComment(commentId: String, description: String) = flow {
+    override suspend fun updateComment(path: String,commentId: String, description: String) = flow {
         emit(Loading())
         try {
             currentUser?.let {
-                val docRef = startCommentsCollection.document(commentId)
+                val docRef = fireStore.collection(path).document(commentId)
                 docRef.update(hashMapOf(Pair("description", description), (Pair("authorId", it.uid))))
                 emit(Success(Unit))
             }
@@ -136,10 +135,10 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         }
     }
 
-    override suspend fun updateLikeComment(commentId: String, isLiked: Boolean?) {
+    override suspend fun updateLikeComment(path: String,commentId: String, isLiked: Boolean?) {
         try {
             currentUser?.let {
-                val docRef = startCommentsCollection.document(commentId)
+                val docRef = fireStore.collection(path).document(commentId)
                 val updatedFeelings = Feelings(
                     it.uid,
                     when (isLiked) {
@@ -155,11 +154,11 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         }
     }
 
-    override suspend fun getCommentById(commentId: String) = flow {
+    override suspend fun getCommentById(path: String,commentId: String) = flow {
         emit(Loading())
         try {
             currentUser?.let {
-                val doc = startCommentsCollection.document(commentId).get()
+                val doc = fireStore.collection(path).document(commentId).get()
                 emit(Success(doc.toUserComment()))
             }
         } catch (e: Exception) {

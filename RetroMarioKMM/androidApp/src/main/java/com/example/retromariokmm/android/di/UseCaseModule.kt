@@ -39,7 +39,7 @@ object UseCaseModule {
 
     @Provides
     fun provideStarCommentsUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
-        StarCommentsListUseCase(firebaseRetroMarioRepositoryImpl)
+        CommentsListUseCase(firebaseRetroMarioRepositoryImpl)
 
     @Provides
     fun provideCreateStarCommentUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =

@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 //TODO Add Interface
 class UpdateLikeCommentUseCase(private val repository : FirebaseRetroMarioRepositoryImpl) {
     //TODO Inject repo
-    suspend fun invoke(commentId :String,isLiked : Boolean?){
-        return repository.updateLikeComment(commentId, isLiked)
+    suspend fun invoke(path:String,commentId :String,isLiked : Boolean?){
+        return repository.updateLikeComment(path,commentId, isLiked)
     }
 }

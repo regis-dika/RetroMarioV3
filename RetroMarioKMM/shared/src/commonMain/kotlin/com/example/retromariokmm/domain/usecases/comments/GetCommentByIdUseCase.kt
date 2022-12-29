@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 //TODO Add Interface
 class GetCommentByIdUseCase(private val repository : FirebaseRetroMarioRepositoryImpl) {
     //TODO Inject repo
-    suspend fun invoke(commentId :String): Flow<Resource<UserComment>> {
-        return repository.getCommentById(commentId)
+    suspend fun invoke(path:String,commentId :String): Flow<Resource<UserComment>> {
+        return repository.getCommentById(path,commentId)
     }
 }
