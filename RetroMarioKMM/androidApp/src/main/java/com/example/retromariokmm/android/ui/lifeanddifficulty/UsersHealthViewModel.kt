@@ -37,6 +37,7 @@ class LifeAndDifficultyViewModel @Inject constructor(
                             is Success -> Success(it.value.map { user ->
                                 UserContainer(
                                     user.uid,
+                                    user.firstName,
                                     user.name,
                                     user.bitmap,
                                     user.life,
@@ -89,6 +90,7 @@ data class UserContainer(
     val uid: String,
     val firstName: String,
     val lastName: String,
+    val picture: String,
     val life: Int,
     val difficulty: Int,
     val isCurrentUser: Boolean

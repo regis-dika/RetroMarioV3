@@ -1,9 +1,8 @@
 package com.example.retromariokmm.domain.models
 
-import com.example.retromariokmm.domain.models.UserAction
-
 data class RetroUser(
-    val uid :String = "",
+    val uid: String = "",
+    val firstName: String = "error firstname",
     val name: String = "error name",
     val bitmap: String = "",
     var life: Int = -1,

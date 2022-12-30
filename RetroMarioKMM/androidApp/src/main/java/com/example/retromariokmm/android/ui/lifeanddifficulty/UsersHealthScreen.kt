@@ -94,8 +94,7 @@ fun UserHealthScreen(
                         RetroUserItem(
                             userContainer = user,
                             backgroundColor = if (user.isCurrentUser) Color.Red else Color.Cyan,
-                            onNoteClick = { },
-                            onDeleteClick = { },
+                            onUserClick = { },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(6.dp)
