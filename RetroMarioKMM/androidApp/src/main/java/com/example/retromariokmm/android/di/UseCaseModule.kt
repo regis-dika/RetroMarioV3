@@ -6,6 +6,7 @@ import com.example.retromariokmm.domain.usecases.comments.*
 import com.example.retromariokmm.domain.usecases.login.LoginUseCase
 import com.example.retromariokmm.domain.usecases.users.CurrentUserUseCase
 import com.example.retromariokmm.domain.usecases.users.SetLifeDifficultyUseCase
+import com.example.retromariokmm.domain.usecases.users.UpdateUserUseCase
 import com.example.retromariokmm.domain.usecases.users.UserListUseCase
 import dagger.Module
 import dagger.Provides
@@ -80,4 +81,8 @@ object UseCaseModule {
     @Provides
     fun provideGetActionByIdUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
         GetActionByIdUseCase(firebaseRetroMarioRepositoryImpl)
+
+    @Provides
+    fun provideUpdatedUserUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        UpdateUserUseCase(firebaseRetroMarioRepositoryImpl)
 }

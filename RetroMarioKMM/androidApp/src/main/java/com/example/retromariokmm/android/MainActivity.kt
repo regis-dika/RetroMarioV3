@@ -1,14 +1,17 @@
 package com.example.retromariokmm.android
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -16,11 +19,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import coil.compose.AsyncImage
 import com.example.retromariokmm.android.ui.actions.details.ActionDetailsScreen
 import com.example.retromariokmm.android.ui.actions.list.ActionsScreen
 import com.example.retromariokmm.android.ui.comments.board.CommentsBoardScreen
@@ -72,62 +77,78 @@ fun MyApplicationTheme(
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val viewModel: MainActivityViewModel = hiltViewModel()
+            val state = viewModel.userState.collectAsState()
+
             MyApplicationTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    val navController = rememberNavController()
-                    NavHost(navController = navController, startDestination = "login_screen") {
-                        composable("login_screen") {
-                            LoginScreen(navController)
-                        }
-                        composable("life_difficulty_screen") {
-                            UserHealthScreen(navController)
-                        }
-                        composable("comments_board_screen") {
-                            CommentsBoardScreen(navController = navController)
-                        }
-                        composable("comments_screen/{path}", arguments = listOf(
-                            navArgument(name = "path"){
-                                type = NavType.StringType
-                                defaultValue = ""
-                            }
-                        )) { backStackEntry ->
-                            val path = backStackEntry.arguments?.getString("path") ?: ""
-                            CommentsScreen(path,navController = navController)
-                        }
-                        composable("comment_details_screen/{commentId}/{path}", arguments = listOf(
-                            navArgument(name = "commentId"){
-                                type = NavType.StringType
-                                defaultValue = ""
+                Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            title = {
+                                Text(text = "Salut " + state.value.name)
                             },
-                            navArgument(name = "path"){
-                                type = NavType.StringType
-                                defaultValue = ""
+                            navigationIcon = {
+                                IconButton(modifier = Modifier.clip(CircleShape), onClick = {}) {
+                                    AsyncImage(model = state.value.bitmap, contentDescription = null)
+                                }
+                            },
+                            backgroundColor = MaterialTheme.colors.primary,
+                            contentColor = Color.White,
+                            elevation = 10.dp
+                        )
+                    }, content = {
+                        val navController = rememberNavController()
+                        NavHost(navController = navController, startDestination = "login_screen") {
+                            composable("login_screen") {
+                                LoginScreen(navController)
                             }
-                        )) { backStackEntry ->
-                            val commentId = backStackEntry.arguments?.getString("commentId") ?: ""
-                            val path = backStackEntry.arguments?.getString("path") ?: ""
-                            CommentDetailsScreen(path,commentId, navController)
-                        }
-                        composable("actions_screen") {
-                            ActionsScreen(navController = navController)
-                        }
-                        composable("action_details_screen/{actionId}", arguments = listOf(
-                            navArgument(name = "actionId"){
-                                type = NavType.StringType
-                                defaultValue = ""
+                            composable("life_difficulty_screen") {
+                                UserHealthScreen(navController)
                             }
-                        )) { backStackEntry ->
-                            val actionId = backStackEntry.arguments?.getString("actionId") ?: ""
-                            ActionDetailsScreen(actionId, navController)
+                            composable("comments_board_screen") {
+                                CommentsBoardScreen(navController = navController)
+                            }
+                            composable("comments_screen/{path}", arguments = listOf(
+                                navArgument(name = "path") {
+                                    type = NavType.StringType
+                                    defaultValue = ""
+                                }
+                            )) { backStackEntry ->
+                                val path = backStackEntry.arguments?.getString("path") ?: ""
+                                CommentsScreen(path, navController = navController)
+                            }
+                            composable("comment_details_screen/{commentId}/{path}", arguments = listOf(
+                                navArgument(name = "commentId") {
+                                    type = NavType.StringType
+                                    defaultValue = ""
+                                },
+                                navArgument(name = "path") {
+                                    type = NavType.StringType
+                                    defaultValue = ""
+                                }
+                            )) { backStackEntry ->
+                                val commentId = backStackEntry.arguments?.getString("commentId") ?: ""
+                                val path = backStackEntry.arguments?.getString("path") ?: ""
+                                CommentDetailsScreen(path, commentId, navController)
+                            }
+                            composable("actions_screen") {
+                                ActionsScreen(navController = navController)
+                            }
+                            composable("action_details_screen/{actionId}", arguments = listOf(
+                                navArgument(name = "actionId") {
+                                    type = NavType.StringType
+                                    defaultValue = ""
+                                }
+                            )) { backStackEntry ->
+                                val actionId = backStackEntry.arguments?.getString("actionId") ?: ""
+                                ActionDetailsScreen(actionId, navController)
+                            }
                         }
-                    }
-                }
+                    })
             }
         }
     }
