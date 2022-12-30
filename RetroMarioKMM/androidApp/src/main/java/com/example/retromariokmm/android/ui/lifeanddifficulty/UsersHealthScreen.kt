@@ -93,7 +93,7 @@ fun UserHealthScreen(
                     }) { user ->
                         RetroUserItem(
                             userContainer = user,
-                            backgroundColor = if (user.isCurrentUser) Color.Red else Color.Cyan,
+                            backgroundColor = if (user.isCurrentUser) Color.Gray else Color.White,
                             onUserClick = { },
                             modifier = Modifier
                                 .fillMaxWidth()

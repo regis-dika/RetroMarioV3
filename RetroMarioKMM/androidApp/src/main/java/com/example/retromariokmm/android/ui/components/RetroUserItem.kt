@@ -5,26 +5,20 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.example.retromariokmm.android.MyApplicationTheme
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserContainer
 
 @Composable
 fun RetroUserItem(
     userContainer: UserContainer,
-    backgroundColor: Color = Color.Cyan,
+    backgroundColor: Color = Color.White,
     onUserClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -35,28 +29,28 @@ fun RetroUserItem(
 
     Box(modifier = modifier) {
         Column(modifier = Modifier
-            .clip(RoundedCornerShape(5.dp))
+            .clip(RoundedCornerShape(20.dp))
             .background(backgroundColor)
             .clickable { onUserClick.invoke() }
             .padding(16.dp)) {
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier.fillMaxWidth()
-            ) {//push all elements to the extremitate
-                AsyncImage(
-                    model = userContainer.picture,
-                    contentDescription = "picture",
-                    error = painterResource(com.example.retromariokmm.android.R.drawable.default_profil_picture),
-                    modifier = Modifier.size(60.dp)
-                )
-                Column(modifier = Modifier
-                    .padding(4.dp)) {
-                    Text(text = userContainer.firstName, fontWeight = FontWeight.SemiBold, fontSize = 20.sp)
-                    Text(text = userContainer.lastName, fontWeight = FontWeight.SemiBold, fontSize = 20.sp)
-                }
-            }
-            HealthyBoardItem(life = userContainer.life, difficulty = userContainer.difficulty, onLifeClick = { }) {
-            }
+            RetroProfilItem(
+                picture = userContainer.picture,
+                firstName = userContainer.firstName,
+                lastName = userContainer.lastName,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Green, shape = RoundedCornerShape(15.dp))
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            HealthyBoardItem(
+                life = userContainer.life,
+                difficulty = userContainer.difficulty,
+                onLifeClick = { },
+                onDifficultyClick = {},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(15.dp))
+            )
         }
     }
 }
@@ -66,7 +60,15 @@ fun RetroUserItem(
 fun RetroUserItemPreview() {
     MyApplicationTheme() {
         RetroUserItem(
-            userContainer = UserContainer("", "Régis", "Dika", "https://media.geeksforgeeks.org/wp-content/uploads/20210101144014/gfglogo.png", 1, 10, false),
+            userContainer = UserContainer(
+                "",
+                "Régis",
+                "Dika",
+                "https://media.geeksforgeeks.org/wp-content/uploads/20210101144014/gfglogo.png",
+                1,
+                10,
+                false
+            ),
             onUserClick = { /*TODO*/ })
     }
 }
