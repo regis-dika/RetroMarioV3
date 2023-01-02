@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.retromariokmm.android.ui.components.CustomSliderDialog
 import com.example.retromariokmm.android.ui.components.RetroUserItem
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
@@ -94,7 +95,8 @@ fun UserHealthScreen(
                         RetroUserItem(
                             userContainer = user,
                             backgroundColor = if (user.isCurrentUser) Color.Gray else Color.White,
-                            onUserClick = { },
+                            onLikeClick = {},
+                            onDifficultyClick = {},
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(6.dp)

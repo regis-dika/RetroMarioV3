@@ -19,7 +19,8 @@ import com.example.retromariokmm.android.ui.lifeanddifficulty.UserContainer
 fun RetroUserItem(
     userContainer: UserContainer,
     backgroundColor: Color = Color.White,
-    onUserClick: () -> Unit,
+    onLikeClick:  (Int) -> Unit,
+    onDifficultyClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     //only change when note.created change
@@ -31,7 +32,7 @@ fun RetroUserItem(
         Column(modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
             .background(backgroundColor)
-            .clickable { onUserClick.invoke() }
+            .clickable {}
             .padding(16.dp)) {
             RetroProfilItem(
                 picture = userContainer.picture,
@@ -45,7 +46,9 @@ fun RetroUserItem(
             HealthyBoardItem(
                 life = userContainer.life,
                 difficulty = userContainer.difficulty,
-                onLifeClick = { },
+                onLifeClick = {
+                    onLikeClick.invoke(it)
+                },
                 onDifficultyClick = {},
                 modifier = Modifier
                     .fillMaxWidth()
@@ -69,6 +72,6 @@ fun RetroUserItemPreview() {
                 10,
                 false
             ),
-            onUserClick = { /*TODO*/ })
+           onDifficultyClick = {}, onLikeClick = {})
     }
 }

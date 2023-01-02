@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,8 +25,8 @@ import com.example.retromariokmm.android.R
 fun HealthyBoardItem(
     life: Int = 0,
     difficulty: Int = 0,
-    onLifeClick: (() -> Unit),
-    onDifficultyClick: (() -> Unit),
+    onLifeClick: ((Int) -> @Composable Unit)? = null,
+    onDifficultyClick: ((Int) -> Unit),
     modifier: Modifier = Modifier
 ) {
 
@@ -37,7 +38,7 @@ fun HealthyBoardItem(
                 .fillMaxWidth()
                 .background(Color.Cyan)
                 .clip(RectangleShape),
-            onClick = { onLifeClick.invoke() }) {
+            onClick = { onLifeClick?.invoke(life) }) {
             Column(Modifier.wrapContentSize(), verticalArrangement = Arrangement.Center) {
                 Image(
                     painter = painterResource(id = R.drawable.retro_life_icon),
@@ -59,7 +60,7 @@ fun HealthyBoardItem(
                 .fillMaxWidth()
                 .background(Color.Magenta)
                 .clip(RectangleShape),
-            onClick = { onDifficultyClick.invoke() }) {
+            onClick = { onDifficultyClick.invoke(difficulty) }) {
             Column(Modifier.wrapContentSize(), verticalArrangement = Arrangement.Center) {
                 Image(
                     painter = painterResource(id = R.drawable.retro_difficulty_icon),
@@ -83,6 +84,6 @@ fun HealthyBoardItem(
 @Composable
 fun HealthyBoardItemPreview() {
     MyApplicationTheme() {
-        HealthyBoardItem(onLifeClick = { /*TODO*/ }, onDifficultyClick = {})
+        HealthyBoardItem( onDifficultyClick = {})
     }
 }

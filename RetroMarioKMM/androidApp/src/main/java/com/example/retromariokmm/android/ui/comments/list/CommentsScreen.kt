@@ -61,7 +61,7 @@ fun CommentsScreen(
                             }) { comment ->
                                 CommentUserItem(
                                     commentContainer = comment,
-                                    backgroundColor = if (comment.isFromCurrentUser) Color.Red else Color.Cyan,
+                                    backgroundColor = if (comment.isFromCurrentUser) Color.Yellow else Color.Blue,
                                     onNoteClick = {
                                         navController.navigate("comment_details_screen/${comment.userComment.postId}/$path")
                                     },

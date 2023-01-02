@@ -1,22 +1,21 @@
 package com.example.retromariokmm.android.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorFilter.Companion
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.retromariokmm.android.R
 import com.example.retromariokmm.android.ui.components.FeelingsState.*
 
 @Composable
@@ -52,24 +51,36 @@ fun FeelingsCounterItem(
             NOT_FEELINGS -> Pair(LIKE, DISLIKE)
         }
         IconButton(
-            modifier = Modifier
-                .background(colorPair.value.first)
-                .clip(RectangleShape)
-                .border(2.dp, Color.LightGray),
             onClick = { onLikeClick.invoke(clickPair.value.first) }) {
-            Column(Modifier.wrapContentSize()) {
-                Icon(Icons.Default.ThumbUp, contentDescription = "like")
+            Column(
+                Modifier.wrapContentSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.retro_thumb_up_vector),
+                    contentDescription = "like",
+                    modifier = Modifier
+                        .size(30.dp),
+                    colorFilter = ColorFilter.tint(colorPair.value.first)
+                )
                 Text(text = nbLikes.toString())
             }
         }
         IconButton(
-            modifier = Modifier
-                .background(colorPair.value.second)
-                .clip(RectangleShape)
-                .border(2.dp, Color.LightGray),
             onClick = { onDisLikeClick.invoke(clickPair.value.second) }) {
-            Column(Modifier.wrapContentSize()) {
-                Icon(Icons.Default.Warning, contentDescription = "dislike")
+            Column(
+                Modifier.wrapContentSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.retro_thumb_down_vector),
+                    contentDescription = "dislike",
+                    modifier = Modifier
+                        .size(30.dp),
+                    colorFilter = ColorFilter.tint(colorPair.value.second)
+                )
                 Text(text = nbDislikes.toString())
             }
         }
