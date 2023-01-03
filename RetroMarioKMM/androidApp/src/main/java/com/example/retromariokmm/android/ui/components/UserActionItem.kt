@@ -1,5 +1,6 @@
 package com.example.retromariokmm.android.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -18,11 +19,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.retromariokmm.android.MyApplicationTheme
+import com.example.retromariokmm.android.R
 import com.example.retromariokmm.android.ui.actions.list.ActionContainer
+import com.example.retromariokmm.android.ui.comments.list.CommentContainer
+import com.example.retromariokmm.android.ui.components.FeelingsState.LIKE
 import com.example.retromariokmm.android.ui.components.FeelingsState.NOT_FEELINGS
+import com.example.retromariokmm.domain.models.UserAction
+import com.example.retromariokmm.domain.models.UserComment
 
 @Composable
 fun UserActionItem(
@@ -44,20 +54,20 @@ fun UserActionItem(
     Card(modifier = modifier) {
         Column(modifier = Modifier
             .clip(RoundedCornerShape(5.dp))
-            .background(backgroundColor)
+            .background(backgroundColor, shape = RoundedCornerShape(15.dp))
             .clickable { onActionClick.invoke() }
             .padding(16.dp)) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(
+                Image(
                     modifier = Modifier
-                        .background(color)
                         .clickable(MutableInteractionSource(), null) {
                             onTakeActionClick.invoke(!actionContainer.currentActor)
                         },
-                    imageVector = Icons.Default.Add,
+                    colorFilter = ColorFilter.tint(color),
+                    painter = painterResource(id = R.drawable.retro_person_add),
                     contentDescription = "take action button"
                 )
                 Column(modifier = Modifier
@@ -88,5 +98,22 @@ fun UserActionItem(
             }
 
         }
+    }
+}
+
+@Preview
+@Composable
+fun UserActionItemPreview() {
+    MyApplicationTheme() {
+        UserActionItem(
+            modifier = Modifier
+                .wrapContentSize()
+                .padding(6.dp),
+            actionContainer = ActionContainer(UserAction(title = "First action", description = "Faire des actions", actorList = hashMapOf(Pair("","régis"))),false,""),
+            backgroundColor = Color.Cyan,
+            onActionClick = { },
+            onTakeActionClick = {},
+            onCheckClick = {},
+            onDeleteClick = { })
     }
 }

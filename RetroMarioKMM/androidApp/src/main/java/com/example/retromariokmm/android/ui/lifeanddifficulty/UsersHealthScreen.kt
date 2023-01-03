@@ -94,7 +94,7 @@ fun UserHealthScreen(
                     }) { user ->
                         RetroUserItem(
                             userContainer = user,
-                            backgroundColor = if (user.isCurrentUser) Color.Gray else Color.White,
+                            backgroundColor = if (user.isCurrentUser) Color.LightGray else Color.Gray,
                             onLikeClick = {},
                             onDifficultyClick = {},
                             modifier = Modifier
