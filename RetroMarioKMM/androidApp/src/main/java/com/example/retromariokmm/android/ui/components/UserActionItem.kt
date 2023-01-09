@@ -31,6 +31,7 @@ import com.example.retromariokmm.android.ui.actions.list.ActionContainer
 import com.example.retromariokmm.android.ui.comments.list.CommentContainer
 import com.example.retromariokmm.android.ui.components.FeelingsState.LIKE
 import com.example.retromariokmm.android.ui.components.FeelingsState.NOT_FEELINGS
+import com.example.retromariokmm.domain.models.ActionActor
 import com.example.retromariokmm.domain.models.UserAction
 import com.example.retromariokmm.domain.models.UserComment
 
@@ -70,9 +71,11 @@ fun UserActionItem(
                     painter = painterResource(id = R.drawable.retro_person_add),
                     contentDescription = "take action button"
                 )
-                Column(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(6.dp)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(6.dp)
+                ) {
                     Text(
                         text = actionContainer.userAction.title,
                         fontWeight = FontWeight.Bold,
@@ -83,11 +86,7 @@ fun UserActionItem(
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 15.sp
                     )
-                    Text(
-                        text = actionContainer.actors,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 10.sp
-                    )
+                    actionContainer.actors?.map { it.pictureUrl }?.let { ActionActorsComposable(actorsUrl = it) }
                 }
                 Checkbox(
                     checked = actionContainer.userAction.isCheck,
@@ -109,7 +108,16 @@ fun UserActionItemPreview() {
             modifier = Modifier
                 .wrapContentSize()
                 .padding(6.dp),
-            actionContainer = ActionContainer(UserAction(title = "First action", description = "Faire des actions", actorList = hashMapOf(Pair("","régis"))),false,""),
+            actionContainer = ActionContainer(
+                UserAction(
+                    title = "First action", description = "Faire des actions", actorList = hashMapOf(
+                        Pair(
+                            "",
+                            ActionActor("Régis", "")
+                        )
+                    )
+                ), false, ""
+            ),
             backgroundColor = Color.Cyan,
             onActionClick = { },
             onTakeActionClick = {},

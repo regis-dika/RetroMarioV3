@@ -1,9 +1,6 @@
 package com.example.retromariokmm.data
 
-import com.example.retromariokmm.domain.models.Feelings
-import com.example.retromariokmm.domain.models.RetroUser
-import com.example.retromariokmm.domain.models.UserAction
-import com.example.retromariokmm.domain.models.UserComment
+import com.example.retromariokmm.domain.models.*
 import dev.gitlive.firebase.auth.FirebaseUser
 import dev.gitlive.firebase.firestore.DocumentSnapshot
 
@@ -50,7 +47,7 @@ fun DocumentSnapshot.toUserAction(): UserAction {
         val description = get<String>("description")
         val isCheck = get<Boolean>("isCheck")
         val actorList = if (contains("actorList")) {
-            get<HashMap<String, String>?>("actorList")
+            get<HashMap<String, ActionActor>?>("actorList")
         } else {
             null
         }

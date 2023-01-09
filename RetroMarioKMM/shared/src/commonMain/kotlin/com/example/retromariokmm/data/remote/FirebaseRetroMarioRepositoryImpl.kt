@@ -3,10 +3,7 @@ package com.example.retromariokmm.data.remote
 import com.example.retromariokmm.data.toRetroUser
 import com.example.retromariokmm.data.toUserAction
 import com.example.retromariokmm.data.toUserComment
-import com.example.retromariokmm.domain.models.Feelings
-import com.example.retromariokmm.domain.models.RetroUser
-import com.example.retromariokmm.domain.models.UserAction
-import com.example.retromariokmm.domain.models.UserComment
+import com.example.retromariokmm.domain.models.*
 import com.example.retromariokmm.domain.repository.RetroMarioRepository
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
@@ -227,7 +224,8 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
             currentUser?.let { retroUser ->
                 val docRef = actionCollection.document(actionId)
                 if (takeAction) {
-                    val actorMapUpdated = hashMapOf("actorList" to hashMapOf(retroUser.uid to retroUser.name))
+                    val actionActor = ActionActor(retroUser.firstName,retroUser.bitmap)
+                    val actorMapUpdated = hashMapOf("actorList" to hashMapOf(retroUser.uid to actionActor))
                     docRef.set(actorMapUpdated, merge = true)
                 } else {
                     val currentDoc = docRef.get().toUserAction()
