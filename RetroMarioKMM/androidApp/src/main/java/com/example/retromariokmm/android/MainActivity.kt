@@ -31,6 +31,7 @@ import com.example.retromariokmm.android.ui.actions.list.ActionsScreen
 import com.example.retromariokmm.android.ui.comments.board.CommentsBoardScreen
 import com.example.retromariokmm.android.ui.comments.details.CommentDetailsScreen
 import com.example.retromariokmm.android.ui.comments.list.CommentsScreen
+import com.example.retromariokmm.android.ui.components.CustomSliderDialog
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserHealthScreen
 import com.example.retromariokmm.android.ui.login.LoginScreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -89,7 +90,9 @@ class MainActivity : ComponentActivity() {
                     topBar = {
                         TopAppBar(
                             title = {
-                                Text(text = "Salut " + state.value.name)
+                                state.value.name?.let {
+                                    Text(text = "Salut " + state.value.name)
+                                }
                             },
                             navigationIcon = {
                                 IconButton(modifier = Modifier.clip(CircleShape), onClick = {}) {
@@ -107,6 +110,7 @@ class MainActivity : ComponentActivity() {
                                 LoginScreen(navController)
                             }
                             composable("life_difficulty_screen") {
+                                viewModel.getCurrentUser()
                                 UserHealthScreen(navController)
                             }
                             composable("comments_board_screen") {

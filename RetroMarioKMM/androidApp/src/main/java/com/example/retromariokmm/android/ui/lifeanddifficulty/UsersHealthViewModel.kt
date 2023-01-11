@@ -20,7 +20,7 @@ class LifeAndDifficultyViewModel @Inject constructor(
     private val currentUserUseCase: CurrentUserUseCase
 ) : ViewModel() {
 
-    private val _usersState = MutableStateFlow(UsersStateScreen(Loading(), -1, -1, NOT_STARTED))
+    private val _usersState = MutableStateFlow(UsersStateScreen(Loading(), NOT_STARTED))
     val usersState = _usersState.asStateFlow()
 
     init {
@@ -37,8 +37,8 @@ class LifeAndDifficultyViewModel @Inject constructor(
                             is Success -> Success(it.value.map { user ->
                                 UserContainer(
                                     user.uid,
-                                    user.firstName,
-                                    user.name,
+                                    user.firstName ?: "error name",
+                                    user.name ?: "error name",
                                     user.bitmap,
                                     user.life,
                                     user.difficulty,
@@ -54,19 +54,9 @@ class LifeAndDifficultyViewModel @Inject constructor(
         }
     }
 
-    fun onLifeChange(life: Int) {
-        _usersState.value = _usersState.value.copy(life = life)
-    }
-
-    fun onDifficultyChange(difficulty: Int) {
-        _usersState.value = _usersState.value.copy(difficulty = difficulty)
-    }
-
-    fun setLifeAndDifficulty() {
-        val currentLife = usersState.value.life
-        val currentDifficulty = usersState.value.difficulty
+    fun setLifeAndDifficulty(life: Int,difficulty: Int) {
         viewModelScope.launch {
-            setLifeDifficultyUseCase.invoke(currentLife, currentDifficulty).collect {
+            setLifeDifficultyUseCase.invoke(life, difficulty).collect {
                 _usersState.value = _usersState.value.copy(
                     lifeAndDifficultyAction = when (it) {
                         is Error -> ERROR
@@ -81,8 +71,6 @@ class LifeAndDifficultyViewModel @Inject constructor(
 
 data class UsersStateScreen(
     val userContainerList: Resource<List<UserContainer>>,
-    val life: Int,
-    val difficulty: Int,
     val lifeAndDifficultyAction: ActionState
 )
 

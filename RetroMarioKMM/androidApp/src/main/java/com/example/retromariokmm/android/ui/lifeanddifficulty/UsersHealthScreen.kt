@@ -6,10 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Snackbar
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -39,39 +36,30 @@ fun UserHealthScreen(
     val difficulty = remember() {
         mutableStateOf("0")
     }
+
+    val lifeSliderState = remember() {
+        mutableStateOf(false)
+    }
+    val difficultySliderState = remember() {
+        mutableStateOf(false)
+    }
+
+    if (lifeSliderState.value) {
+        CustomSliderDialog(title = "Life", value = life.value.toInt()) {
+            lifeSliderState.value = false
+            lifeAndDifficultyViewModel.setLifeAndDifficulty(it, 6)
+        }
+    }
+    if (difficultySliderState.value) {
+        CustomSliderDialog(title = "Difficulty", value = difficulty.value.toInt()) {}
+    }
+
     Column(
         Modifier
             .fillMaxSize()
             .padding(4.dp)
     ) {
-        BasicTextField(
-            value = life.value,
-            onValueChange = {
-                life.value = it
-                if (it.isNotEmpty()) {
-                    lifeAndDifficultyViewModel.onLifeChange(it.toInt())
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Cyan)
-        )
-        BasicTextField(
-            value = difficulty.value,
-            onValueChange = {
-                difficulty.value = it
-                if (it.isNotEmpty()) {
-                    lifeAndDifficultyViewModel.onDifficultyChange(it.toInt())
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Cyan)
-        )
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            OutlinedButton(onClick = { lifeAndDifficultyViewModel.setLifeAndDifficulty() }) {
-                Text(text = "Valider")
-            }
             OutlinedButton(onClick = { navController.navigate("comments_board_screen") }) {
                 Text(text = "Next")
             }
@@ -95,8 +83,18 @@ fun UserHealthScreen(
                         RetroUserItem(
                             userContainer = user,
                             backgroundColor = if (user.isCurrentUser) Color.LightGray else Color.Gray,
-                            onLikeClick = {},
-                            onDifficultyClick = {},
+                            onLikeClick = { nbrL ->
+                                if (user.isCurrentUser) {
+                                    life.value = nbrL.toString()
+                                    lifeSliderState.value = true
+                                }
+                            },
+                            onDifficultyClick = { nbrD ->
+                                if (user.isCurrentUser) {
+                                    difficulty.value = nbrD.toString()
+                                    difficultySliderState.value = true
+                                }
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(6.dp)

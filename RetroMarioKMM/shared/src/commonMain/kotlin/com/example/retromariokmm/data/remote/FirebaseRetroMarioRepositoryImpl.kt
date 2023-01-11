@@ -224,7 +224,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
             currentUser?.let { retroUser ->
                 val docRef = actionCollection.document(actionId)
                 if (takeAction) {
-                    val actionActor = ActionActor(retroUser.firstName,retroUser.bitmap)
+                    val actionActor = retroUser.firstName?.let { ActionActor(it,retroUser.bitmap) }
                     val actorMapUpdated = hashMapOf("actorList" to hashMapOf(retroUser.uid to actionActor))
                     docRef.set(actorMapUpdated, merge = true)
                 } else {

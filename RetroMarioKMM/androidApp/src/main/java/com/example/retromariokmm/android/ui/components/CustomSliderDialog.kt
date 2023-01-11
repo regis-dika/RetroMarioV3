@@ -6,7 +6,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion
@@ -17,16 +20,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun CustomSliderDialog(value: Int) {
+fun CustomSliderDialog(
+    title: String = "Title",
+    value: Int,
+    onSaveClick: (Int) -> Unit
+) {
 
-    var sliderPosition by remember { mutableStateOf(value.toFloat()) }
+    val sliderPosition: MutableState<Float> = remember { mutableStateOf(value.toFloat()) }
 
-    Text(text = sliderPosition.toString(), style = MaterialTheme.typography.body1)
-
-
-    Dialog(onDismissRequest = { }) {
+    Dialog(onDismissRequest = {
+    }) {
         Surface(
             shape = RoundedCornerShape(16.dp),
             color = Companion.White
@@ -35,6 +39,12 @@ fun CustomSliderDialog(value: Int) {
                 contentAlignment = Alignment.Center
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
+                    Text(color = Companion.Black, text = title, style = MaterialTheme.typography.h1)
+                    Text(
+                        color = Companion.Black,
+                        text = sliderPosition.value.toString(),
+                        style = MaterialTheme.typography.body1
+                    )
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -43,6 +53,7 @@ fun CustomSliderDialog(value: Int) {
                     ) {
                         Text(
                             text = "Set value",
+                            color = Companion.Black,
                             style = TextStyle(
                                 fontSize = 24.sp,
                                 fontFamily = androidx.compose.ui.text.font.FontFamily.Cursive,
@@ -61,14 +72,14 @@ fun CustomSliderDialog(value: Int) {
                     }
 
                     Spacer(modifier = Modifier.height(20.dp))
-                    RangeSlider(
+                    Slider(
                         steps = 10,
-                        values = 0f..10f,
-                        onValueChange = { sliderPosition = it.endInclusive },
+                        value = sliderPosition.value,
+                        onValueChange = {
+                            sliderPosition.value = it
+                        },
                         valueRange = 0f..10f,
                         onValueChangeFinished = {
-                            // launch some business logic update with the state you hold
-                            // viewModel.updateSelectedSliderValue(sliderPosition)
                         },
                         colors = SliderDefaults.colors(
                             thumbColor = androidx.compose.ui.graphics.Color.LightGray,
@@ -80,6 +91,7 @@ fun CustomSliderDialog(value: Int) {
                     Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
                         Button(
                             onClick = {
+                                onSaveClick.invoke(sliderPosition.value.toInt())
                             },
                             shape = RoundedCornerShape(50.dp),
                             modifier = Modifier

@@ -17,7 +17,7 @@ class MainActivityViewModel @Inject constructor(
     private val _userState: MutableStateFlow<RetroUser> = MutableStateFlow(RetroUser())
     val userState get() = _userState.asStateFlow()
 
-    init {
+    fun getCurrentUser() {
         viewModelScope.launch {
             updateUserUseCase.invoke().collect {
                 _userState.value =
