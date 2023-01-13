@@ -5,11 +5,11 @@ import com.example.retromariokmm.utils.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class SetLifeDifficultyUseCase(private val repository : FirebaseRetroMarioRepositoryImpl) {
+class UpdateDifficultyUseCase(private val repository : FirebaseRetroMarioRepositoryImpl) {
     //TODO Inject repo
 
-    suspend fun invoke(life: Int, difficulty:Int): Flow<Resource<Unit>> {
-        return repository.setLifeDifficulty(life,difficulty).map {
+    suspend fun invoke(difficulty:Int): Flow<Resource<Unit>> {
+        return repository.updateDifficulty(difficulty).map {
             it
         }
     }

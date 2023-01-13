@@ -3,7 +3,8 @@ package com.example.retromariokmm.android.ui.lifeanddifficulty
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.retromariokmm.domain.usecases.users.CurrentUserUseCase
-import com.example.retromariokmm.domain.usecases.users.SetLifeDifficultyUseCase
+import com.example.retromariokmm.domain.usecases.users.UpdateDifficultyUseCase
+import com.example.retromariokmm.domain.usecases.users.UpdateLifeUseCase
 import com.example.retromariokmm.domain.usecases.users.UserListUseCase
 import com.example.retromariokmm.utils.*
 import com.example.retromariokmm.utils.ActionState.*
@@ -16,11 +17,12 @@ import javax.inject.Inject
 @HiltViewModel
 class LifeAndDifficultyViewModel @Inject constructor(
     private val userListUseCase: UserListUseCase,
-    private val setLifeDifficultyUseCase: SetLifeDifficultyUseCase,
+    private val updateLifeUseCase: UpdateLifeUseCase,
+    private val updateDifficultyUseCase: UpdateDifficultyUseCase,
     private val currentUserUseCase: CurrentUserUseCase
 ) : ViewModel() {
 
-    private val _usersState = MutableStateFlow(UsersStateScreen(Loading(), NOT_STARTED))
+    private val _usersState = MutableStateFlow(UsersStateScreen(Loading(), NOT_STARTED,NOT_STARTED))
     val usersState = _usersState.asStateFlow()
 
     init {
@@ -54,11 +56,25 @@ class LifeAndDifficultyViewModel @Inject constructor(
         }
     }
 
-    fun setLifeAndDifficulty(life: Int,difficulty: Int) {
+    fun setLife(life: Int) {
         viewModelScope.launch {
-            setLifeDifficultyUseCase.invoke(life, difficulty).collect {
+            updateLifeUseCase.invoke(life).collect {
                 _usersState.value = _usersState.value.copy(
-                    lifeAndDifficultyAction = when (it) {
+                    lifeAction = when (it) {
+                        is Error -> ERROR
+                        is Loading -> PENDING
+                        is Success -> SUCCESS
+                    }
+                )
+            }
+        }
+    }
+
+    fun setDifficulty(difficulty: Int) {
+        viewModelScope.launch {
+            updateDifficultyUseCase.invoke(difficulty).collect {
+                _usersState.value = _usersState.value.copy(
+                    difficultyAction = when (it) {
                         is Error -> ERROR
                         is Loading -> PENDING
                         is Success -> SUCCESS
@@ -71,7 +87,8 @@ class LifeAndDifficultyViewModel @Inject constructor(
 
 data class UsersStateScreen(
     val userContainerList: Resource<List<UserContainer>>,
-    val lifeAndDifficultyAction: ActionState
+    val lifeAction: ActionState,
+    val difficultyAction: ActionState
 )
 
 data class UserContainer(

@@ -7,7 +7,7 @@ import com.example.retromariokmm.utils.Resource
 class LoginUseCase(private val repository : FirebaseRetroMarioRepositoryImpl) {
     //TODO Inject repo
 
-    suspend fun invoke(email: String, password: String): Resource<RetroUser> {
+    suspend fun invoke(email: String, password: String): Resource<Unit> {
         return repository.signIn(email, password)
     }
 }

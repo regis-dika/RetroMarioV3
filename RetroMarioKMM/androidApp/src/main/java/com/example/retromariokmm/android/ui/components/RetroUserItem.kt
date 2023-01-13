@@ -47,7 +47,9 @@ fun RetroUserItem(
                 onLifeClick = {
                     onLikeClick.invoke(it)
                 },
-                onDifficultyClick = {},
+                onDifficultyClick = {
+                    onDifficultyClick.invoke(it)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(15.dp))
@@ -70,6 +72,6 @@ fun RetroUserItemPreview() {
                 10,
                 false
             ),
-           onDifficultyClick = {}, onLikeClick = {})
+            onDifficultyClick = {}, onLikeClick = {})
     }
 }

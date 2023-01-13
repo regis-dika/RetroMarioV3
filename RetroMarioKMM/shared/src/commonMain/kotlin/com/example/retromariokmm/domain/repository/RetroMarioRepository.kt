@@ -10,7 +10,8 @@ interface RetroMarioRepository {
     suspend fun createUser(email: String, password: String): Resource<Unit>
     suspend fun signIn(email: String, password: String): Resource<Unit>
     fun getRetroUsers(): Flow<Resource<List<RetroUser>>>
-    suspend fun setLifeDifficulty(life: Int, difficulty: Int): Flow<Resource<Unit>>
+    suspend fun updateLife(life: Int): Flow<Resource<Unit>>
+    suspend fun updateDifficulty(life: Int): Flow<Resource<Unit>>
 
     //Comments
     suspend fun getAllComments(path : String): Flow<Resource<List<UserComment>>>

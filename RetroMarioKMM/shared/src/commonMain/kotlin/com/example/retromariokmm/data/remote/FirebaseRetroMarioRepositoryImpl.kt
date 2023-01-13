@@ -82,11 +82,22 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         awaitClose()
     }
 
-    override suspend fun setLifeDifficulty(life: Int, difficulty: Int) = flow {
+    override suspend fun updateLife(life: Int) = flow {
         emit(Loading())
         try {
             currentUser?.let {
                 userCollection.document(it.uid).update(hashMapOf(Pair("life", life)))
+            }
+            emit(Success(Unit))
+        } catch (e: Exception) {
+            emit(Error(e.toString()))
+        }
+    }
+
+    override suspend fun updateDifficulty(difficulty: Int) = flow {
+        emit(Loading())
+        try {
+            currentUser?.let {
                 userCollection.document(it.uid).update(hashMapOf(Pair("difficulty", difficulty)))
             }
             emit(Success(Unit))
@@ -95,7 +106,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         }
     }
 
-    override suspend fun getAllComments(path : String): Flow<Resource<List<UserComment>>> = callbackFlow {
+    override suspend fun getAllComments(path: String): Flow<Resource<List<UserComment>>> = callbackFlow {
         fireStore.collection(path).snapshots.collect {
             val updatedList = it.documents.map { dc ->
                 dc.toUserComment()
@@ -105,7 +116,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         awaitClose()
     }
 
-    override suspend fun createStarComment(path: String,description: String) = flow {
+    override suspend fun createStarComment(path: String, description: String) = flow {
         emit(Loading())
         try {
             currentUser?.let {
@@ -119,7 +130,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         }
     }
 
-    override suspend fun updateComment(path: String,commentId: String, description: String) = flow {
+    override suspend fun updateComment(path: String, commentId: String, description: String) = flow {
         emit(Loading())
         try {
             currentUser?.let {
@@ -132,7 +143,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         }
     }
 
-    override suspend fun updateLikeComment(path: String,commentId: String, isLiked: Boolean?) {
+    override suspend fun updateLikeComment(path: String, commentId: String, isLiked: Boolean?) {
         try {
             currentUser?.let {
                 val docRef = fireStore.collection(path).document(commentId)
@@ -151,7 +162,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         }
     }
 
-    override suspend fun getCommentById(path: String,commentId: String) = flow {
+    override suspend fun getCommentById(path: String, commentId: String) = flow {
         emit(Loading())
         try {
             currentUser?.let {
@@ -224,7 +235,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
             currentUser?.let { retroUser ->
                 val docRef = actionCollection.document(actionId)
                 if (takeAction) {
-                    val actionActor = retroUser.firstName?.let { ActionActor(it,retroUser.bitmap) }
+                    val actionActor = retroUser.firstName?.let { ActionActor(it, retroUser.bitmap) }
                     val actorMapUpdated = hashMapOf("actorList" to hashMapOf(retroUser.uid to actionActor))
                     docRef.set(actorMapUpdated, merge = true)
                 } else {

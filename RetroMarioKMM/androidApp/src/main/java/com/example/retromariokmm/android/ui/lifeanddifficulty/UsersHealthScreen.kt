@@ -45,13 +45,16 @@ fun UserHealthScreen(
     }
 
     if (lifeSliderState.value) {
-        CustomSliderDialog(title = "Life", value = life.value.toInt()) {
+        CustomSliderDialog(title = "Life", value = life.value.toInt()) {life ->
             lifeSliderState.value = false
-            lifeAndDifficultyViewModel.setLifeAndDifficulty(it, 6)
+            lifeAndDifficultyViewModel.setLife(life)
         }
     }
     if (difficultySliderState.value) {
-        CustomSliderDialog(title = "Difficulty", value = difficulty.value.toInt()) {}
+        CustomSliderDialog(title = "Difficulty", value = difficulty.value.toInt()) { difficulty ->
+            difficultySliderState.value = false
+            lifeAndDifficultyViewModel.setDifficulty(difficulty)
+        }
     }
 
     Column(
