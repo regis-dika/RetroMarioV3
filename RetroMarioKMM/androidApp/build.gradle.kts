@@ -53,4 +53,9 @@ dependencies {
 
     //coil
     implementation("io.coil-kt:coil-compose:2.2.2")
+
+    //firebase dynamic links
+    implementation("com.google.firebase:firebase-dynamic-links-ktx:21.1.0")
+
+
 }
