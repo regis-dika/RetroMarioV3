@@ -10,9 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.retromariokmm.android.helper.generateSharingLink
 import com.example.retromariokmm.android.ui.login.LoginState.*
+import com.example.retromariokmm.utils.PREFIX
 
 @Composable
 fun LoginScreen(
@@ -22,7 +25,7 @@ fun LoginScreen(
     val credentialsState = viewModel.loginCredentials.collectAsState()
     val loginState = viewModel.loginState.collectAsState()
 
-    //naviagtion not good handle if use in when with no launchEffect
+    //navigation not good handle if use in when with no launchEffect
     LaunchedEffect(key1 = loginState.value){
         if(loginState.value is Success){
             navController.navigate("retros_screen")
@@ -31,6 +34,16 @@ fun LoginScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
+        OutlinedButton(onClick = {
+            // Using the function we created to generate Sharing Link.
+            generateSharingLink(
+                deepLink = "${PREFIX}/post/12".toUri(),
+            ) { generatedLink ->
+                println(generatedLink)
+            }
+        }) {
+            Text(text = "create deeplink")
+        }
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
