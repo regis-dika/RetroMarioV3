@@ -1,14 +1,16 @@
 package com.example.retromariokmm.data.remote
 
+import com.example.retromariokmm.data.toRetro
 import com.example.retromariokmm.data.toRetroUser
 import com.example.retromariokmm.data.toUserAction
 import com.example.retromariokmm.data.toUserComment
 import com.example.retromariokmm.domain.models.*
 import com.example.retromariokmm.domain.repository.RetroMarioRepository
-import com.example.retromariokmm.utils.*
+import com.example.retromariokmm.utils.Error
+import com.example.retromariokmm.utils.Loading
+import com.example.retromariokmm.utils.Resource
+import com.example.retromariokmm.utils.Success
 import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.auth.ActionCodeSettings
-import dev.gitlive.firebase.auth.AndroidPackageName
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.FieldValue
@@ -38,19 +40,27 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
     override suspend fun createRetro(title: String, description: String) = flow {
         emit(Loading())
         try {
-            currentUser?.let {
+            if(currentUser != null){
                 val newDocument = retroCollection.document
                 val retro = Retro(newDocument.id, title, description)
                 retroCollection.document(newDocument.id).set(retro)
+                emit(Success(newDocument.id))
+            }else{
+                emit(Error<String>("current user null"))
             }
-            emit(Success(Unit))
         } catch (e: Exception) {
-            emit(Error(e.toString()))
+            emit(Error<String>(e.toString()))
         }
     }
 
-    override suspend fun getMyRetros(): Flow<Resource<List<Retro>>> {
-        TODO("Not yet implemented")
+    override suspend fun getMyRetros() = callbackFlow {
+        retroCollection.snapshots.collect {
+            val updatedList = it.documents.map { dc ->
+                dc.toRetro()
+            }
+            trySend(Success(updatedList))
+        }
+        awaitClose()
     }
 
     override suspend fun updateRetro(): Flow<Resource<Unit>> {
@@ -61,7 +71,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         emit(Loading())
         try {
             currentUser?.let {
-                retroCollection.document(retroId).update(Pair("users",FieldValue.arrayUnion(it.uid)))
+                retroCollection.document(retroId).update(Pair("users", FieldValue.arrayUnion(it.uid)))
             }
             emit(Success(Unit))
         } catch (e: Exception) {

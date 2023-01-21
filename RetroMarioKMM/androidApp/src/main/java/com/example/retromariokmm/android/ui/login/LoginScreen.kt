@@ -25,7 +25,7 @@ fun LoginScreen(
     //naviagtion not good handle if use in when with no launchEffect
     LaunchedEffect(key1 = loginState.value){
         if(loginState.value is Success){
-            navController.navigate("retro_creation")
+            navController.navigate("retros_screen")
 
         }
     }

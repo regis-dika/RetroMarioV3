@@ -17,7 +17,7 @@ interface RetroMarioRepository {
 
     //retros
     suspend fun getMyRetros(): Flow<Resource<List<Retro>>>
-    suspend fun createRetro(title: String,description: String): Flow<Resource<Unit>>
+    suspend fun createRetro(title: String,description: String): Flow<Resource<String>>
     suspend fun updateRetro(): Flow<Resource<Unit>>
     suspend fun addCurrentUserToRetroWithLink(retroId :String): Flow<Resource<Unit>>
 
