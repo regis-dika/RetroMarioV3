@@ -1,5 +1,6 @@
 package com.example.retromariokmm.data.remote
 
+import com.example.retromariokmm.data.toRetro
 import com.example.retromariokmm.data.toRetroUser
 import com.example.retromariokmm.data.toUserAction
 import com.example.retromariokmm.data.toUserComment
@@ -12,6 +13,7 @@ import com.example.retromariokmm.utils.Success
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
+import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.channels.awaitClose
@@ -25,6 +27,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
     private val fireStore: FirebaseFirestore = Firebase.firestore
     private val firebaseAuth: FirebaseAuth = Firebase.auth
 
+    private val retroCollection = fireStore.collection("retros")
     private val userCollection = fireStore.collection("users")
     private val actionCollection = fireStore.collection("actions")
 
@@ -33,6 +36,48 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         private set(value) {
             field = value
         }
+
+    override suspend fun createRetro(title: String, description: String) = flow {
+        emit(Loading())
+        try {
+            if(currentUser != null){
+                val newDocument = retroCollection.document
+                val retro = Retro(newDocument.id, title, description)
+                retroCollection.document(newDocument.id).set(retro)
+                emit(Success(newDocument.id))
+            }else{
+                emit(Error<String>("current user null"))
+            }
+        } catch (e: Exception) {
+            emit(Error<String>(e.toString()))
+        }
+    }
+
+    override suspend fun getMyRetros() = callbackFlow {
+        retroCollection.snapshots.collect {
+            val updatedList = it.documents.map { dc ->
+                dc.toRetro()
+            }
+            trySend(Success(updatedList))
+        }
+        awaitClose()
+    }
+
+    override suspend fun updateRetro(): Flow<Resource<Unit>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun addCurrentUserToRetroWithLink(retroId: String) = flow {
+        emit(Loading())
+        try {
+            currentUser?.let {
+                retroCollection.document(retroId).update(Pair("users", FieldValue.arrayUnion(it.uid)))
+            }
+            emit(Success(Unit))
+        } catch (e: Exception) {
+            emit(Error(e.toString()))
+        }
+    }
 
     override suspend fun createUser(email: String, password: String): Resource<Unit> {
         return try {

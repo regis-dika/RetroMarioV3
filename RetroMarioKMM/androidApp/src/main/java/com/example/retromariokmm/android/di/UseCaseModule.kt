@@ -4,6 +4,9 @@ import com.example.retromariokmm.data.remote.FirebaseRetroMarioRepositoryImpl
 import com.example.retromariokmm.domain.usecases.actions.*
 import com.example.retromariokmm.domain.usecases.comments.*
 import com.example.retromariokmm.domain.usecases.login.LoginUseCase
+import com.example.retromariokmm.domain.usecases.retros.AddUserToRetroRetroUseCase
+import com.example.retromariokmm.domain.usecases.retros.CreateRetroUseCase
+import com.example.retromariokmm.domain.usecases.retros.GetAllRetrosUseCase
 import com.example.retromariokmm.domain.usecases.users.*
 import dagger.Module
 import dagger.Provides
@@ -30,6 +33,7 @@ object UseCaseModule {
     @Provides
     fun provideUpdateLifeUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
         UpdateLifeUseCase(firebaseRetroMarioRepositoryImpl)
+
     @Provides
     fun provideUpdateDifficultyUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
         UpdateDifficultyUseCase(firebaseRetroMarioRepositoryImpl)
@@ -85,4 +89,16 @@ object UseCaseModule {
     @Provides
     fun provideUpdatedUserUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
         UpdateUserUseCase(firebaseRetroMarioRepositoryImpl)
+
+    @Provides
+    fun provideCreateRetroUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        CreateRetroUseCase(firebaseRetroMarioRepositoryImpl)
+
+    @Provides
+    fun provideAddUserToRetroUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        AddUserToRetroRetroUseCase(firebaseRetroMarioRepositoryImpl)
+
+    @Provides
+    fun provideGetAllRetrosUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        GetAllRetrosUseCase(firebaseRetroMarioRepositoryImpl)
 }

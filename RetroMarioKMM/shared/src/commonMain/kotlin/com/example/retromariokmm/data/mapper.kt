@@ -4,6 +4,24 @@ import com.example.retromariokmm.domain.models.*
 import dev.gitlive.firebase.auth.FirebaseUser
 import dev.gitlive.firebase.firestore.DocumentSnapshot
 
+fun DocumentSnapshot.toRetro(): Retro {
+
+    return try {
+        val retroId = get<String>("retroId").toString()
+        val title = get<String>("title")
+        val description = get<String>("description")
+        val users = get<List<String>>("users")
+        val actions = get<List<UserAction>>("actions")
+        val booComments = get<List<UserComment>>("booComments")
+        val starComments = get<List<UserComment>>("starComments")
+        val goumbaComments = get<List<UserComment>>("goumbaComments")
+        val mushroomComments = get<List<UserComment>>("mushroomComments")
+        Retro(retroId, title, description, users, starComments, booComments, goumbaComments, mushroomComments, actions)
+    } catch (e: Exception) {
+        Retro()
+    }
+}
+
 fun DocumentSnapshot.toRetroUser(): RetroUser {
 
     return try {
