@@ -1,5 +1,5 @@
 package com.example.retromariokmm.domain.models
-
+@kotlinx.serialization.Serializable
 data class RetroUser(
     val uid: String = "",
     val firstName: String? = null,

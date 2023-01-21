@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.retromariokmm.android.ui.login.LoginState.Idle
 import com.example.retromariokmm.domain.models.RetroUser
 import com.example.retromariokmm.domain.usecases.login.LoginUseCase
+import com.example.retromariokmm.domain.usecases.retros.AddUserToRetroRetroUseCase
+import com.example.retromariokmm.domain.usecases.retros.CreateRetroUseCase
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
 import com.example.retromariokmm.utils.Success
@@ -17,6 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginScreenViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
+    private val createRetroUseCase: CreateRetroUseCase,
+    private val addUserToRetroRetroUseCase: AddUserToRetroRetroUseCase
 ) : ViewModel() {
 
     private val _loginState: MutableStateFlow<LoginState> = MutableStateFlow(Idle)

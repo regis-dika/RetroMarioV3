@@ -1,5 +1,6 @@
 package com.example.retromariokmm.domain.repository
 
+import com.example.retromariokmm.domain.models.Retro
 import com.example.retromariokmm.utils.Resource
 import com.example.retromariokmm.domain.models.RetroUser
 import com.example.retromariokmm.domain.models.UserAction
@@ -7,11 +8,18 @@ import com.example.retromariokmm.domain.models.UserComment
 import kotlinx.coroutines.flow.Flow
 
 interface RetroMarioRepository {
+    //users
     suspend fun createUser(email: String, password: String): Resource<Unit>
     suspend fun signIn(email: String, password: String): Resource<Unit>
     fun getRetroUsers(): Flow<Resource<List<RetroUser>>>
     suspend fun updateLife(life: Int): Flow<Resource<Unit>>
     suspend fun updateDifficulty(life: Int): Flow<Resource<Unit>>
+
+    //retros
+    suspend fun getMyRetros(): Flow<Resource<List<Retro>>>
+    suspend fun createRetro(title: String,description: String): Flow<Resource<Unit>>
+    suspend fun updateRetro(): Flow<Resource<Unit>>
+    suspend fun addCurrentUserToRetroWithLink(retroId :String): Flow<Resource<Unit>>
 
     //Comments
     suspend fun getAllComments(path : String): Flow<Resource<List<UserComment>>>
@@ -20,7 +28,7 @@ interface RetroMarioRepository {
     suspend fun updateLikeComment(path: String,commentId : String,isLiked :Boolean?)
     suspend fun getCommentById(path: String,commentId : String): Flow<Resource<UserComment>>
 
-    //Action
+    //Actions
     suspend fun getAllActions(): Flow<Resource<List<UserAction>>>
     suspend fun createAction(title: String,description: String): Flow<Resource<Unit>>
     suspend fun getActionById(actionId : String): Flow<Resource<UserAction>>

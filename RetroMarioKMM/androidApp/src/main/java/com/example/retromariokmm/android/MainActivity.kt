@@ -34,6 +34,7 @@ import com.example.retromariokmm.android.ui.comments.list.CommentsScreen
 import com.example.retromariokmm.android.ui.components.CustomSliderDialog
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserHealthScreen
 import com.example.retromariokmm.android.ui.login.LoginScreen
+import com.example.retromariokmm.android.ui.retros.creation.RetroCreationScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @Composable
@@ -108,6 +109,9 @@ class MainActivity : ComponentActivity() {
                         NavHost(navController = navController, startDestination = "login_screen") {
                             composable("login_screen") {
                                 LoginScreen(navController)
+                            }
+                            composable("retro_creation") {
+                                RetroCreationScreen(navController)
                             }
                             composable("life_difficulty_screen") {
                                 viewModel.getCurrentUser()
