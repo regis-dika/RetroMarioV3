@@ -7,5 +7,5 @@ const val BOO_COMMENTS = "booPostsList"
 const val MUSHROOM_COMMENTS = "mushroomPostsList"
 const val GOOMBA_COMMENTS = "goombaPostsList"
 
-const val PREFIX = "https://retromariokmm.page.link"
+const val BASE_URL = "https://retromariokmm.page.link/retro"
 

@@ -27,7 +27,7 @@ fun RetroCreationScreen(
         is Loading -> CircularProgressIndicator()
         is Success -> {
             Column(Modifier.fillMaxSize()) {
-                Text(text = res.value.retroId)
+                state.value.value?.urlToShare?.let { Text(text = it) }
             }
         }
     }

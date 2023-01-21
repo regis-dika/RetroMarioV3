@@ -1,6 +1,7 @@
 package com.example.retromariokmm.android
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,6 +26,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import coil.compose.AsyncImage
 import com.example.retromariokmm.android.ui.actions.details.ActionDetailsScreen
 import com.example.retromariokmm.android.ui.actions.list.ActionsScreen
@@ -36,6 +38,7 @@ import com.example.retromariokmm.android.ui.lifeanddifficulty.UserHealthScreen
 import com.example.retromariokmm.android.ui.login.LoginScreen
 import com.example.retromariokmm.android.ui.retros.creation.RetroCreationScreen
 import com.example.retromariokmm.android.ui.retros.list.RetroScreen
+import com.example.retromariokmm.utils.BASE_URL
 import dagger.hilt.android.AndroidEntryPoint
 
 @Composable
@@ -108,7 +111,12 @@ class MainActivity : ComponentActivity() {
                     }, content = {
                         val navController = rememberNavController()
                         NavHost(navController = navController, startDestination = "login_screen") {
-                            composable("login_screen") {
+                            composable(route = "login_screen", deepLinks = listOf(
+                                navDeepLink {
+                                    uriPattern = "$BASE_URL/{retroid}"
+                                    action = Intent.ACTION_VIEW
+                                }
+                            )) {
                                 LoginScreen(navController)
                             }
                             composable("retros_screen") {

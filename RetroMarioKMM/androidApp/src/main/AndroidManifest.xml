@@ -10,12 +10,15 @@
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- the host should contain your domain. The pattern should be same as it's mentioned without any special char -->
+
                 <data
-                    android:host="example.com"
-                    android:scheme="https"/>
+                    android:host="retromariokmm.page.link"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

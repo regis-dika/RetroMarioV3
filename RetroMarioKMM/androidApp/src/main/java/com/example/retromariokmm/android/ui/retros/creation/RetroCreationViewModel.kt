@@ -1,13 +1,12 @@
 package com.example.retromariokmm.android.ui.retros.creation
 
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.retromariokmm.android.helper.generateSharingLink
 import com.example.retromariokmm.domain.usecases.retros.AddUserToRetroRetroUseCase
 import com.example.retromariokmm.domain.usecases.retros.CreateRetroUseCase
-import com.example.retromariokmm.utils.Error
-import com.example.retromariokmm.utils.Loading
-import com.example.retromariokmm.utils.Resource
-import com.example.retromariokmm.utils.Success
+import com.example.retromariokmm.utils.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,4 +38,6 @@ class RetroCreationViewModel @Inject constructor(
 
 data class RetroCreationContainer(
     val retroId: String
-)
+){
+    val urlToShare get() = "$BASE_URL/$retroId"
+}

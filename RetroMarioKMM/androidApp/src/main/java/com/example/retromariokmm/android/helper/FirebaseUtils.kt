@@ -1,7 +1,7 @@
 package com.example.retromariokmm.android.helper
 
 import android.net.Uri
-import com.example.retromariokmm.utils.PREFIX
+import com.example.retromariokmm.utils.BASE_URL
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.dynamiclinks.ktx.androidParameters
 
@@ -15,7 +15,7 @@ fun generateSharingLink(
 
         // [domainUriPrefix] will be the domain name you added when setting up Dynamic Links at Firebase Console.
         // You can find it in the Dynamic Links dashboard.
-        domainUriPrefix = PREFIX
+        domainUriPrefix = BASE_URL
 
         // Required
         androidParameters {
