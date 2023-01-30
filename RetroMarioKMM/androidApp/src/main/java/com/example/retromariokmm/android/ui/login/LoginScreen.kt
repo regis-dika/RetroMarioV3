@@ -16,6 +16,7 @@ import com.example.retromariokmm.android.ui.login.LoginState.*
 
 @Composable
 fun LoginScreen(
+    retroId: String?,
     navController: NavController,
     viewModel: LoginScreenViewModel = hiltViewModel()
 ) {
@@ -23,8 +24,8 @@ fun LoginScreen(
     val loginState = viewModel.loginState.collectAsState()
 
     //navigation not good handle if use in when with no launchEffect
-    LaunchedEffect(key1 = loginState.value){
-        if(loginState.value is Success){
+    LaunchedEffect(key1 = loginState.value) {
+        if (loginState.value is Success) {
             navController.navigate("retros_screen")
 
         }
@@ -53,7 +54,14 @@ fun LoginScreen(
                 viewModel.onPasswordChange(it)
             })
 
-        OutlinedButton(modifier = Modifier.background(Companion.Blue), onClick = { viewModel.onLogin() }) {
+        if (retroId != null) {
+            Snackbar(modifier = Modifier.fillMaxWidth()) {
+                Text(text = retroId)
+            }
+        }
+        
+        OutlinedButton(onClick = {viewModel.onLogin()}) {
+            Text(text = "Go to login")
         }
 
         when (val result = loginState.value) {
