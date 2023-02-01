@@ -16,7 +16,7 @@ import com.example.retromariokmm.android.ui.login.LoginState.*
 
 @Composable
 fun LoginScreen(
-    retroId: String?,
+    retroId: String? = null,
     navController: NavController,
     viewModel: LoginScreenViewModel = hiltViewModel()
 ) {
@@ -27,9 +27,13 @@ fun LoginScreen(
     LaunchedEffect(key1 = loginState.value) {
         if (loginState.value is Success) {
             navController.navigate("retros_screen")
-
+        }
+        if (loginState.value is SuccessLoginAndAddUser) {
+            navController.navigate("life_difficulty_screen")
         }
     }
+
+    viewModel.onRetroIdAvailable(retroId)
 
     Column(modifier = Modifier.fillMaxSize()) {
         OutlinedTextField(
@@ -59,8 +63,8 @@ fun LoginScreen(
                 Text(text = retroId)
             }
         }
-        
-        OutlinedButton(onClick = {viewModel.onLogin()}) {
+
+        OutlinedButton(onClick = { viewModel.onLogin() }) {
             Text(text = "Go to login")
         }
 
@@ -72,6 +76,11 @@ fun LoginScreen(
             Loading -> CircularProgressIndicator()
             is Success -> Snackbar() {
                 Text(text = "Successful Login")
+            }
+            is SuccessLoginAndAddUser -> {
+                Snackbar() {
+                    Text(text = "Successful Login from deeplink")
+                }
             }
         }
     }

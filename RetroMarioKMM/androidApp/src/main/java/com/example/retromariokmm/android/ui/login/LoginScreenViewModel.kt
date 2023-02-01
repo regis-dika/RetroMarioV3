@@ -3,10 +3,8 @@ package com.example.retromariokmm.android.ui.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.retromariokmm.android.ui.login.LoginState.Idle
-import com.example.retromariokmm.domain.models.RetroUser
 import com.example.retromariokmm.domain.usecases.login.LoginUseCase
 import com.example.retromariokmm.domain.usecases.retros.AddUserToRetroRetroUseCase
-import com.example.retromariokmm.domain.usecases.retros.CreateRetroUseCase
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
 import com.example.retromariokmm.utils.Success
@@ -19,7 +17,6 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginScreenViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
-    private val createRetroUseCase: CreateRetroUseCase,
     private val addUserToRetroRetroUseCase: AddUserToRetroRetroUseCase
 ) : ViewModel() {
 
@@ -32,15 +29,32 @@ class LoginScreenViewModel @Inject constructor(
     fun onLogin() {
         val email = loginCredentials.value.email
         val password = loginCredentials.value.password
+        val retroId = loginCredentials.value.retroId
 
         viewModelScope.launch {
             val result = loginUseCase.invoke(email, password)
-            _loginState.value = when (result) {
-                is Error -> LoginState.Error(result.msg)
-                is Loading -> LoginState.Loading
-                is Success -> LoginState.Success
+            if (retroId != null) {
+                if (result is Success) {
+                    addUserToRetroRetroUseCase.invoke(retroId).collect { addUserResult ->
+                        _loginState.value = when (addUserResult) {
+                            is Error -> LoginState.Error(addUserResult.msg)
+                            is Loading -> LoginState.Loading
+                            is Success -> LoginState.SuccessLoginAndAddUser
+                        }
+                    }
+                }
+            } else {
+                _loginState.value = when (result) {
+                    is Error -> LoginState.Error(result.msg)
+                    is Loading -> LoginState.Loading
+                    is Success -> LoginState.Success
+                }
             }
         }
+    }
+
+    fun onRetroIdAvailable(retroId: String?) {
+        _loginCredentials.value = _loginCredentials.value.copy(retroId = retroId)
     }
 
     fun onEmailChange(email: String) {
@@ -50,16 +64,19 @@ class LoginScreenViewModel @Inject constructor(
     fun onPasswordChange(password: String) {
         _loginCredentials.value = _loginCredentials.value.copy(password = password)
     }
+
 }
 
 sealed interface LoginState {
     object Idle : LoginState
     object Loading : LoginState
     object Success : LoginState
+    object SuccessLoginAndAddUser : LoginState
     data class Error(val msg: String) : LoginState
 }
 
 data class LoginCredentials(
     val email: String,
-    val password: String
+    val password: String,
+    val retroId: String? = null
 )
