@@ -16,19 +16,24 @@ import com.example.retromariokmm.android.ui.login.LoginState.*
 
 @Composable
 fun LoginScreen(
+    retroId: String? = null,
     navController: NavController,
     viewModel: LoginScreenViewModel = hiltViewModel()
 ) {
     val credentialsState = viewModel.loginCredentials.collectAsState()
     val loginState = viewModel.loginState.collectAsState()
 
-    //naviagtion not good handle if use in when with no launchEffect
-    LaunchedEffect(key1 = loginState.value){
-        if(loginState.value is Success){
+    //navigation not good handle if use in when with no launchEffect
+    LaunchedEffect(key1 = loginState.value) {
+        if (loginState.value is Success) {
             navController.navigate("retros_screen")
-
+        }
+        if (loginState.value is SuccessLoginAndAddUser) {
+            navController.navigate("life_difficulty_screen")
         }
     }
+
+    viewModel.onRetroIdAvailable(retroId)
 
     Column(modifier = Modifier.fillMaxSize()) {
         OutlinedTextField(
@@ -53,7 +58,14 @@ fun LoginScreen(
                 viewModel.onPasswordChange(it)
             })
 
-        OutlinedButton(modifier = Modifier.background(Companion.Blue), onClick = { viewModel.onLogin() }) {
+        if (retroId != null) {
+            Snackbar(modifier = Modifier.fillMaxWidth()) {
+                Text(text = retroId)
+            }
+        }
+
+        OutlinedButton(onClick = { viewModel.onLogin() }) {
+            Text(text = "Go to login")
         }
 
         when (val result = loginState.value) {
@@ -64,6 +76,11 @@ fun LoginScreen(
             Loading -> CircularProgressIndicator()
             is Success -> Snackbar() {
                 Text(text = "Successful Login")
+            }
+            is SuccessLoginAndAddUser -> {
+                Snackbar() {
+                    Text(text = "Successful Login from deeplink")
+                }
             }
         }
     }

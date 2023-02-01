@@ -1,7 +1,10 @@
 package com.example.retromariokmm.android
 
 import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -31,11 +34,13 @@ import com.example.retromariokmm.android.ui.actions.list.ActionsScreen
 import com.example.retromariokmm.android.ui.comments.board.CommentsBoardScreen
 import com.example.retromariokmm.android.ui.comments.details.CommentDetailsScreen
 import com.example.retromariokmm.android.ui.comments.list.CommentsScreen
-import com.example.retromariokmm.android.ui.components.CustomSliderDialog
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserHealthScreen
 import com.example.retromariokmm.android.ui.login.LoginScreen
 import com.example.retromariokmm.android.ui.retros.creation.RetroCreationScreen
 import com.example.retromariokmm.android.ui.retros.list.RetroScreen
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData
+import com.google.firebase.dynamiclinks.ktx.dynamicLinks
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 
 @Composable
@@ -80,6 +85,27 @@ fun MyApplicationTheme(
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    private var incomeDeeplink: Uri? = null
+    override fun onStart() {
+        super.onStart()
+        Firebase.dynamicLinks
+            .getDynamicLink(intent)
+            .addOnSuccessListener(this) { pendingDynamicLinkData: PendingDynamicLinkData? ->
+                // Get deep link from result (may be null if no link is found)
+                if (pendingDynamicLinkData != null) {
+                    incomeDeeplink = pendingDynamicLinkData.link
+                }
+
+                // Handle the deep link. For example, open the linked
+                // content, or apply promotional credit to the user's
+                // account.
+                // ...
+
+            }
+            .addOnFailureListener(this) { e -> Log.w(TAG, "getDynamicLink:onFailure", e) }
+
+    }
+
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,64 +131,70 @@ class MainActivity : ComponentActivity() {
                             contentColor = Color.White,
                             elevation = 10.dp
                         )
-                    }, content = {
-                        val navController = rememberNavController()
-                        NavHost(navController = navController, startDestination = "login_screen") {
-                            composable("login_screen") {
-                                LoginScreen(navController)
-                            }
-                            composable("retros_screen") {
-                                RetroScreen(navController)
-                            }
-                            composable("retro_creation") {
-                                RetroCreationScreen(navController)
-                            }
-                            composable("life_difficulty_screen") {
-                                viewModel.getCurrentUser()
-                                UserHealthScreen(navController)
-                            }
-                            composable("comments_board_screen") {
-                                CommentsBoardScreen(navController = navController)
-                            }
-                            composable("comments_screen/{path}", arguments = listOf(
-                                navArgument(name = "path") {
-                                    type = NavType.StringType
-                                    defaultValue = ""
-                                }
-                            )) { backStackEntry ->
-                                val path = backStackEntry.arguments?.getString("path") ?: ""
-                                CommentsScreen(path, navController = navController)
-                            }
-                            composable("comment_details_screen/{commentId}/{path}", arguments = listOf(
-                                navArgument(name = "commentId") {
-                                    type = NavType.StringType
-                                    defaultValue = ""
-                                },
-                                navArgument(name = "path") {
-                                    type = NavType.StringType
-                                    defaultValue = ""
-                                }
-                            )) { backStackEntry ->
-                                val commentId = backStackEntry.arguments?.getString("commentId") ?: ""
-                                val path = backStackEntry.arguments?.getString("path") ?: ""
-                                CommentDetailsScreen(path, commentId, navController)
-                            }
-                            composable("actions_screen") {
-                                ActionsScreen(navController = navController)
-                            }
-                            composable("action_details_screen/{actionId}", arguments = listOf(
-                                navArgument(name = "actionId") {
-                                    type = NavType.StringType
-                                    defaultValue = ""
-                                }
-                            )) { backStackEntry ->
-                                val actionId = backStackEntry.arguments?.getString("actionId") ?: ""
-                                ActionDetailsScreen(actionId, navController)
-                            }
+                    }) {
+                    val navController = rememberNavController()
+                    NavHost(navController = navController, startDestination = "login_screen") {
+                        composable(route = "login_screen") {
+                            val retroId = if (incomeDeeplink == null) null else getLastBitFromUrl(incomeDeeplink!!.path)
+                            LoginScreen(retroId, navController)
                         }
-                    })
+                        composable("retros_screen") {
+                            RetroScreen(navController)
+                        }
+                        composable("retro_creation") {
+                            RetroCreationScreen(navController)
+                        }
+                        composable("life_difficulty_screen") {
+                            viewModel.getCurrentUser()
+                            UserHealthScreen(navController)
+                        }
+                        composable("comments_board_screen") {
+                            CommentsBoardScreen(navController = navController)
+                        }
+                        composable("comments_screen/{path}", arguments = listOf(
+                            navArgument(name = "path") {
+                                type = NavType.StringType
+                                defaultValue = ""
+                            }
+                        )) { backStackEntry ->
+                            val path = backStackEntry.arguments?.getString("path") ?: ""
+                            CommentsScreen(path, navController = navController)
+                        }
+                        composable("comment_details_screen/{commentId}/{path}", arguments = listOf(
+                            navArgument(name = "commentId") {
+                                type = NavType.StringType
+                                defaultValue = ""
+                            },
+                            navArgument(name = "path") {
+                                type = NavType.StringType
+                                defaultValue = ""
+                            }
+                        )) { backStackEntry ->
+                            val commentId = backStackEntry.arguments?.getString("commentId") ?: ""
+                            val path = backStackEntry.arguments?.getString("path") ?: ""
+                            CommentDetailsScreen(path, commentId, navController)
+                        }
+                        composable("actions_screen") {
+                            ActionsScreen(navController = navController)
+                        }
+                        composable("action_details_screen/{actionId}", arguments = listOf(
+                            navArgument(name = "actionId") {
+                                type = NavType.StringType
+                                defaultValue = ""
+                            }
+                        )) { backStackEntry ->
+                            val actionId = backStackEntry.arguments?.getString("actionId") ?: ""
+                            ActionDetailsScreen(actionId, navController)
+                        }
+                    }
+                }
             }
         }
+    }
+
+    private fun getLastBitFromUrl(url: String?): String? {
+        // return url.replaceFirst("[^?]*/(.*?)(?:\\?.*)","$1);" <-- incorrect
+        return url?.replaceFirst(".*/([^/?]+).*".toRegex(), "$1")
     }
 }
 
