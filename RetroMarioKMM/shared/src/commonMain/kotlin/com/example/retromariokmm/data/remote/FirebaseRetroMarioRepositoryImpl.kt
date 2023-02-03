@@ -17,10 +17,7 @@ import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 
 class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
 
@@ -37,15 +34,21 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
             field = value
         }
 
+    var currentRetroSession: Retro? = null
+        get() = field
+        private set(value) {
+            field = value
+        }
+
     override suspend fun createRetro(title: String, description: String) = flow {
         emit(Loading())
         try {
-            if(currentUser != null){
+            if (currentUser != null) {
                 val newDocument = retroCollection.document
                 val retro = Retro(newDocument.id, title, description)
                 retroCollection.document(newDocument.id).set(retro)
                 emit(Success(newDocument.id))
-            }else{
+            } else {
                 emit(Error<String>("current user null"))
             }
         } catch (e: Exception) {
@@ -53,11 +56,15 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         }
     }
 
+    override suspend fun connectToRetro(retroId: String) {
+        currentRetroSession = retroCollection.document(retroId).get().toRetro()
+    }
+
     override suspend fun getMyRetros() = callbackFlow {
         retroCollection.snapshots.collect {
             val updatedList = it.documents.map { dc ->
                 dc.toRetro()
-            }
+            }.filter { retro -> retro.users.contains(currentUser?.uid) }.map { it }
             trySend(Success(updatedList))
         }
         awaitClose()
@@ -84,7 +91,8 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
             val result = firebaseAuth.createUserWithEmailAndPassword(email, password)
             val user = result.user
             if (user != null) {
-                currentUser = getRetroUsers().firstOrNull { it is Success }?.value?.first { it.uid == user.uid }
+                currentUser =
+                    getRetroUsers().firstOrNull { it is Success }?.value?.first { it.uid == user.uid }
                 if (currentUser != null) {
                     Success(Unit)
                 } else {
@@ -103,7 +111,8 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password)
             val user = result.user
             if (user != null) {
-                currentUser = getRetroUsers().firstOrNull { it is Success }?.value?.first { it.uid == user.uid }
+                currentUser =
+                    getRetroUsers().firstOrNull { it is Success }?.value?.first { it.uid == user.uid }
                 if (currentUser != null) {
                     Success(Unit)
                 } else {
@@ -118,12 +127,27 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
     }
 
     override fun getRetroUsers(): Flow<Resource<List<RetroUser>>> = callbackFlow {
-        userCollection.snapshots.collect {
-            val updatedList = it.documents.map { dc ->
-                dc.toRetroUser()
+        val userIdList = currentRetroSession?.users
+        if (userIdList != null) {
+            userIdList.let {
+                userCollection.snapshots.collect {
+                    val updatedList = it.documents.filter { ds ->
+                        userIdList.contains(ds.id)
+                    }.map { dc ->
+                        dc.toRetroUser()
+                    }
+                    trySend(Success(updatedList))
+                }
             }
-            trySend(Success(updatedList))
+        } else {
+            userCollection.snapshots.collect {
+                val updatedList = it.documents.map { dc ->
+                    dc.toRetroUser()
+                }
+                trySend(Success(updatedList))
+            }
         }
+
         awaitClose()
     }
 

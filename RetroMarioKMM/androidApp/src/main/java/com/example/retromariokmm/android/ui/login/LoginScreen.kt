@@ -8,7 +8,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -32,8 +31,6 @@ fun LoginScreen(
             navController.navigate("life_difficulty_screen")
         }
     }
-
-    viewModel.onRetroIdAvailable(retroId)
 
     Column(modifier = Modifier.fillMaxSize()) {
         OutlinedTextField(
@@ -59,14 +56,19 @@ fun LoginScreen(
             })
 
         if (retroId != null) {
+            viewModel.onRetroIdAvailable(retroId)
             Snackbar(modifier = Modifier.fillMaxWidth()) {
                 Text(text = retroId)
             }
+            OutlinedButton(onClick = { viewModel.onLoginWithRetroId() }) {
+                Text(text = "Go to login with id ")
+            }
+        } else {
+            OutlinedButton(onClick = { viewModel.onLogin() }) {
+                Text(text = "Go to login")
+            }
         }
 
-        OutlinedButton(onClick = { viewModel.onLogin() }) {
-            Text(text = "Go to login")
-        }
 
         when (val result = loginState.value) {
             is Error -> Snackbar() {

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 //TODO Add Interface
-class UpdateUserUseCase(private val repository: FirebaseRetroMarioRepositoryImpl) {
+class GetUserUseCase(private val repository: FirebaseRetroMarioRepositoryImpl) {
     //TODO Inject repo
     fun invoke() = flow {
         emitAll(repository.getRetroUsers().map {
