@@ -17,7 +17,10 @@ import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 
 class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
 
@@ -176,26 +179,33 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
     }
 
     override suspend fun getAllComments(path: String): Flow<Resource<List<UserComment>>> = callbackFlow {
-        fireStore.collection(path).snapshots.collect {
-            val updatedList = it.documents.map { dc ->
-                dc.toUserComment()
+        currentRetroSession?.let {
+            retroCollection.document(it.retroId).collection(path).snapshots.collect { qs ->
+                val updatedList = qs.documents.map { dc ->
+                    dc.toUserComment()
+                }
+                trySend(Success(updatedList))
             }
-            trySend(Success(updatedList))
         }
         awaitClose()
     }
 
     override suspend fun createStarComment(path: String, description: String) = flow {
         emit(Loading())
-        try {
-            currentUser?.let {
-                val docRef = fireStore.collection(path).document
-                val createdComment = UserComment(postId = docRef.id, authorId = it.uid, description = description)
-                docRef.set(createdComment)
-                emit(Success(Unit))
+        val retroId = currentRetroSession?.retroId
+        if (retroId != null) {
+            try {
+                currentUser?.let {
+                    val docRef = retroCollection.document(retroId).collection(path).document
+                    val createdComment = UserComment(postId = docRef.id, authorId = it.uid, description = description)
+                    docRef.set(createdComment)
+                    emit(Success(Unit))
+                }
+            } catch (e: Exception) {
+                emit(Error<Unit>(e.toString()))
             }
-        } catch (e: Exception) {
-            emit(Error<Unit>(e.toString()))
+        } else {
+            emit(Error<Unit>("No Retro id available"))
         }
     }
 
