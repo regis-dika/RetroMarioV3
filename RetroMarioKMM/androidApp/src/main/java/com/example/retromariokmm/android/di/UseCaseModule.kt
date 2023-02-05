@@ -4,10 +4,7 @@ import com.example.retromariokmm.data.remote.FirebaseRetroMarioRepositoryImpl
 import com.example.retromariokmm.domain.usecases.actions.*
 import com.example.retromariokmm.domain.usecases.comments.*
 import com.example.retromariokmm.domain.usecases.login.LoginUseCase
-import com.example.retromariokmm.domain.usecases.retros.AddUserToRetroRetroUseCase
-import com.example.retromariokmm.domain.usecases.retros.ConnectUserToRetroUseCase
-import com.example.retromariokmm.domain.usecases.retros.CreateRetroUseCase
-import com.example.retromariokmm.domain.usecases.retros.GetAllRetrosUseCase
+import com.example.retromariokmm.domain.usecases.retros.*
 import com.example.retromariokmm.domain.usecases.users.*
 import dagger.Module
 import dagger.Provides
@@ -106,4 +103,11 @@ object UseCaseModule {
     @Provides
     fun provideConnectToRetroUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
         ConnectUserToRetroUseCase(firebaseRetroMarioRepositoryImpl)
+
+    @Provides
+    fun provideAddUserAndConnectToRetroUseCase(
+        addUserToRetroRetroUseCase: AddUserToRetroRetroUseCase,
+        connectUserToRetroUseCase: ConnectUserToRetroUseCase
+    ) =
+        AddMeAndConnectToRetroUseCase(addUserToRetroRetroUseCase, connectUserToRetroUseCase)
 }
