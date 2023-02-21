@@ -35,7 +35,7 @@ class RetroListViewModel @Inject constructor(
                         is Loading -> Loading()
                         is Success -> Success(it.value.map { retro ->
                             RetroContainer(
-                                retro.retroId,
+                                retro.id,
                                 retro.title,
                                 retro.description
                             )

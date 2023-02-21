@@ -60,13 +60,13 @@ fun ActionsScreen(navController: NavController, viewModel: ActionsViewModel = hi
                     } else {
                         LazyColumn() {
                             items(list.value, key = {
-                                it.userAction.actionId
+                                it.userAction.id
                             }) { action ->
                                 UserActionItem(
                                     actionContainer = action,
                                     backgroundColor = if (action.isFromCurrentUser) Color.Red else Color.Cyan,
                                     onActionClick = {
-                                        navController.navigate("action_details_screen/${action.userAction.actionId}")
+                                        navController.navigate("action_details_screen/${action.userAction.id}")
                                     },
                                     onDeleteClick = { },
                                     modifier = Modifier
@@ -74,10 +74,10 @@ fun ActionsScreen(navController: NavController, viewModel: ActionsViewModel = hi
                                         .padding(6.dp)
                                         .animateItemPlacement(),
                                     onCheckClick = {
-                                        viewModel.onCheck(action.userAction.actionId, it)
+                                        viewModel.onCheck(action.userAction.id, it)
                                     },
                                     onTakeActionClick = {
-                                        viewModel.onTakenAction(action.userAction.actionId, it)
+                                        viewModel.onTakenAction(action.userAction.id, it)
                                     }
                                 )
                             }

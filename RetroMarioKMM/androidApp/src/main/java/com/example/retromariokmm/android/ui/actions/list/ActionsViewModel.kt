@@ -7,7 +7,6 @@ import com.example.retromariokmm.domain.usecases.actions.ActionListUseCase
 import com.example.retromariokmm.domain.usecases.actions.UpdateActionActorListUseCase
 import com.example.retromariokmm.domain.usecases.actions.UpdateActionCheckStateUseCase
 import com.example.retromariokmm.domain.usecases.users.CurrentUserUseCase
-import com.example.retromariokmm.domain.usecases.users.UserListUseCase
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
 import com.example.retromariokmm.utils.Resource
@@ -44,7 +43,7 @@ class ActionsViewModel @Inject constructor(
                         is Success -> Success(resource.value.map {
                             ActionContainer(
                                 it,
-                                userId.value.uid == it.authorId,
+                                userId.value.uid == it.creatorId,
                                 userId.value.uid
                             )
                         })

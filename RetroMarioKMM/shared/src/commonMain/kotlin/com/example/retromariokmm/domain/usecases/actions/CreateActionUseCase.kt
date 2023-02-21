@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 //TODO Add Interface
 class CreateActionUseCase(private val repository : FirebaseRetroMarioRepositoryImpl) {
     //TODO Inject repo
-    suspend fun invoke(title:String,description :String): Flow<Resource<Unit>> {
+    suspend fun invoke(title:String,description :String): Flow<Resource<String>> {
         return repository.createAction(title,description)
     }
 }

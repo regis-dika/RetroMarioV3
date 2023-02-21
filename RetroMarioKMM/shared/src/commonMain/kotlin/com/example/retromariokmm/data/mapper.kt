@@ -7,7 +7,8 @@ import dev.gitlive.firebase.firestore.DocumentSnapshot
 fun DocumentSnapshot.toRetro(): Retro {
 
     return try {
-        val retroId = get<String>("retroId").toString()
+        val retroId = get<String>("id").toString()
+        val creatorId = get<String>("creatorId").toString()
         val title = get<String>("title")
         val description = get<String>("description")
         val users = get<List<String>>("users")
@@ -16,7 +17,7 @@ fun DocumentSnapshot.toRetro(): Retro {
         val starComments = get<List<UserComment>>("starComments")
         val goumbaComments = get<List<UserComment>>("goumbaComments")
         val mushroomComments = get<List<UserComment>>("mushroomComments")
-        Retro(retroId, title, description, users, starComments, booComments, goumbaComments, mushroomComments, actions)
+        Retro(retroId,creatorId,title, description, users, starComments, booComments, goumbaComments, mushroomComments, actions)
     } catch (e: Exception) {
         Retro()
     }
@@ -43,8 +44,8 @@ fun DocumentSnapshot.toRetroUser(): RetroUser {
 fun DocumentSnapshot.toUserComment(): UserComment {
 
     return try {
-        val postId = get<String>("postId").toString()
-        val authorId = get<String>("authorId")
+        val postId = get<String>("id").toString()
+        val authorId = get<String>("creatorId")
         val description = get<String>("description")
         val feelings = get<HashMap<String, Feelings>?>("feelings")
         UserComment(
@@ -59,8 +60,8 @@ fun DocumentSnapshot.toUserComment(): UserComment {
 fun DocumentSnapshot.toUserAction(): UserAction {
 
     return try {
-        val actionId = get<String>("actionId")
-        val authorId = get<String>("authorId")
+        val actionId = get<String>("id")
+        val authorId = get<String>("creatorId")
         val title = get<String>("title")
         val description = get<String>("description")
         val isCheck = get<Boolean>("isCheck")

@@ -46,18 +46,19 @@ class CommentsViewModel @Inject constructor(
                 commentsListUseCase.invoke(path).collect { resource ->
                     _commentsState.value = _commentsState.value.copy(
                         comments = when (resource) {
-                            is Error -> Error(resource.msg)
-                            is Loading -> Loading()
+                            is Error<*> -> Error(resource.msg)
+                            is Loading<*> -> Loading()
                             is Success -> Success(resource.value.map { userComment ->
                                 CommentContainer(
                                     userComment = userComment,
-                                    isFromCurrentUser = userComment.authorId == currentUserId.value.uid,
+                                    isFromCurrentUser = userComment.creatorId == currentUserId.value.uid,
                                     feelingsFromCurrentUser = userComment.feelings?.map { it }
                                         ?.firstOrNull() { it.key == currentUserId.value.uid }?.value?.toFeelingState()
                                         ?: NOT_FEELINGS
 
                                 )
                             })
+                            else -> Error("incomptaible state")
                         }
                     )
                 }
