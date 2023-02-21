@@ -6,10 +6,7 @@ import com.example.retromariokmm.data.toUserAction
 import com.example.retromariokmm.data.toUserComment
 import com.example.retromariokmm.domain.models.*
 import com.example.retromariokmm.domain.repository.RetroMarioRepository
-import com.example.retromariokmm.utils.Error
-import com.example.retromariokmm.utils.Loading
-import com.example.retromariokmm.utils.Resource
-import com.example.retromariokmm.utils.Success
+import com.example.retromariokmm.utils.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
@@ -182,17 +179,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         }
     }
 
-    override suspend fun getCommentById(path: String, commentId: String) = flow {
-        emit(Loading())
-        try {
-            currentUser?.let {
-                val doc = fireStore.collection(path).document(commentId).get()
-                emit(Success(doc.toUserComment()))
-            }
-        } catch (e: Exception) {
-            emit(Error<UserComment>(e.toString()))
-        }
-    }
+    override suspend fun getCommentById(path: String, commentId: String) = getDocument<UserComment>(path, commentId)
 
     override suspend fun getAllActions(): Flow<Resource<List<UserAction>>> = getUpdatedCollection(
         retroCollection.document(currentRetroSession?.id ?: "")
@@ -209,17 +196,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
             newObject = UserAction(title = title, description = description)
         )
 
-    override suspend fun getActionById(actionId: String) = flow {
-        emit(Loading())
-        try {
-            currentUser?.let {
-                val doc = actionCollection.document(actionId).get()
-                emit(Success(doc.toUserAction()))
-            }
-        } catch (e: Exception) {
-            emit(Error<UserAction>(e.toString()))
-        }
-    }
+    override suspend fun getActionById(actionId: String) = getDocument<UserAction>("actions", actionId)
 
     override suspend fun updateAction(actionId: String, title: String, description: String) =
         updateDocument(
@@ -297,6 +274,32 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
             }
             awaitClose()
         }
+
+    fun <T : IdentifiedObject> getDocument(path: String, docId: String): Flow<Resource<T>> = flow {
+        emit(Loading())
+
+        val retroId = currentRetroSession?.id
+        if (retroId != null) {
+            try {
+                if (currentUser != null) {
+                    val doc = retroCollection.document(retroId).collection(path).document(docId).get()
+                    val pojo = when (path) {
+                        BOO_COMMENTS, STAR_COMMENTS, MUSHROOM_COMMENTS, GOOMBA_COMMENTS -> doc.toUserComment()
+                        "actions" -> doc.toUserAction()
+                        "retro" -> doc.toRetro()
+                        else -> doc.toRetro()
+                    }
+                    emit(Success(pojo as T))
+                } else {
+                    emit(Error("Error no current user"))
+                }
+            } catch (e: Exception) {
+                emit(Error(e.toString()))
+            }
+        } else {
+            emit(Error("Error no current retro"))
+        }
+    }
 
     fun updateDocument(docRef: Pair<String, String>? = null, hasMap: HashMap<String, Any>) = flow {
         emit(Loading())
