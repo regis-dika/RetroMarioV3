@@ -14,6 +14,7 @@ import com.example.retromariokmm.utils.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -57,7 +58,12 @@ class ActionsViewModel @Inject constructor(
 
     fun onCheck(actionId: String, isCheck: Boolean) {
         viewModelScope.launch {
-            updateActionCheckStateUseCase.invoke(actionId, isCheck)
+            updateActionCheckStateUseCase.invoke(actionId, isCheck).collect {
+                _actionsState.value = when (it) {
+                    is Error -> Error("Error on check change")
+                    else -> _actionsState.value
+                }
+            }
         }
     }
 

@@ -160,24 +160,20 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         hashMapOf(Pair("description", description))
     )
 
-    override suspend fun updateLikeComment(path: String, commentId: String, isLiked: Boolean?) {
-        try {
-            currentUser?.let {
-                val docRef = fireStore.collection(path).document(commentId)
-                val updatedFeelings = Feelings(
-                    it.uid,
+    override suspend fun updateLikeComment(path: String, commentId: String, isLiked: Boolean?) = updateDocument(
+        Pair(path, commentId), hashMapOf(
+            "feelings" to hashMapOf(
+                currentUser?.uid to Feelings(
+                    currentUser?.uid ?: "",
                     when (isLiked) {
                         true -> 1
                         false -> -1
                         else -> 0
                     }
                 )
-                val hashMap = hashMapOf("feelings" to hashMapOf(it.uid to updatedFeelings))
-                docRef.set(hashMap, merge = true)
-            }
-        } catch (e: Exception) {
-        }
-    }
+            )
+        )
+    )
 
     override suspend fun getCommentById(path: String, commentId: String) = getDocument<UserComment>(path, commentId)
 
@@ -226,16 +222,8 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         }
     }
 
-    override suspend fun updateActionCheckState(actionId: String, isCheck: Boolean) {
-        try {
-            currentUser?.let {
-                val docRef = actionCollection.document(actionId)
-                val actorMap = hashMapOf("isCheck" to isCheck)
-                docRef.set(actorMap, merge = true)
-            }
-        } catch (e: Exception) {
-        }
-    }
+    override suspend fun updateActionCheckState(actionId: String, isCheck: Boolean) =
+        updateDocument(Pair("actions", actionId), hashMapOf("isCheck" to isCheck))
 
     //generic function
 

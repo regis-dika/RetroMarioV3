@@ -70,7 +70,14 @@ class CommentsViewModel @Inject constructor(
 
     fun updateLikeComment(commentId: String, isLiked: Boolean?) {
         viewModelScope.launch {
-            updateLikeCommentUseCase.invoke(path, commentId, isLiked)
+            updateLikeCommentUseCase.invoke(path, commentId, isLiked).collect {
+                _commentsState.value = _commentsState.value.copy(
+                    comments = when (it) {
+                        is Error -> Error("Error on lime change")
+                        else -> _commentsState.value.comments
+                    }
+                )
+            }
         }
     }
 }

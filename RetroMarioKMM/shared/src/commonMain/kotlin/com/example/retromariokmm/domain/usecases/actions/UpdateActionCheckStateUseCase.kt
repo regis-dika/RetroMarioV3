@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 //TODO Add Interface
 class UpdateActionCheckStateUseCase(private val repository: FirebaseRetroMarioRepositoryImpl) {
     //TODO Inject repo
-    suspend fun invoke(actionId: String, isChecked: Boolean) {
+    suspend fun invoke(actionId: String, isChecked: Boolean) :Flow<Resource<Unit>>{
         return repository.updateActionCheckState(actionId, isChecked)
     }
 }
