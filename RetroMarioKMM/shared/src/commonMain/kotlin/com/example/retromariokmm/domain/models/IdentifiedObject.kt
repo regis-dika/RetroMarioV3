@@ -1,7 +1,7 @@
 package com.example.retromariokmm.domain.models
 
 @kotlinx.serialization.Serializable
-sealed interface IdentifiedObject {
-    val id: String
-    val creatorId: String
+sealed class IdentifiedObject {
+    abstract val id: String
+    abstract val creatorId: String
 }
