@@ -2,7 +2,7 @@ package com.example.retromariokmm.android.ui.retros.creation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.retromariokmm.domain.usecases.retros.AddUserToRetroRetroUseCase
+import com.example.retromariokmm.domain.usecases.retros.AddMeAndConnectToRetroUseCase
 import com.example.retromariokmm.domain.usecases.retros.CreateRetroUseCase
 import com.example.retromariokmm.utils.*
 import com.example.retromariokmm.utils.ActionState.*
@@ -16,7 +16,7 @@ import kotlin.random.Random
 @HiltViewModel
 class RetroCreationViewModel @Inject constructor(
     private val createRetroUseCase: CreateRetroUseCase,
-    private val addUserToRetroRetroUseCase: AddUserToRetroRetroUseCase
+    private val addMeAndConnectToRetroUseCase: AddMeAndConnectToRetroUseCase
 ) : ViewModel() {
 
     private val _retroCreationState: MutableStateFlow<RetroCreationContainer> =
@@ -25,7 +25,7 @@ class RetroCreationViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            createRetroUseCase.invoke(Random.nextInt(8).toString(), "Blablabla").collect {
+            createRetroUseCase.invoke(Random.nextInt(8).toString(), "Poulets").collect {
                 _retroCreationState.value = _retroCreationState.value.copy(
                     retroId =
                     when (it) {
@@ -41,7 +41,7 @@ class RetroCreationViewModel @Inject constructor(
     fun addMeToThisRetro() {
         val retroId = retroCreationState.value.retroId.value ?: ""
         viewModelScope.launch {
-            addUserToRetroRetroUseCase.invoke(retroId).collect {
+            addMeAndConnectToRetroUseCase.invoke(retroId).collect {
                 _retroCreationState.value = _retroCreationState.value.copy(
                     addMeToTheRetroAction = when (it) {
                         is Error -> ERROR

@@ -1,11 +1,9 @@
 package com.example.retromariokmm.domain.models
 
-import kotlinx.serialization.Serializable
-
-@Serializable
+@kotlinx.serialization.Serializable
 data class UserComment(
-    val postId: String = "",
-    val authorId: String = "",
+    override val id: String = "",
+    override val creatorId: String = "",
     val description: String = "",
     val feelings: HashMap<String, Feelings>? = null
-)
+) : IdentifiedObject()

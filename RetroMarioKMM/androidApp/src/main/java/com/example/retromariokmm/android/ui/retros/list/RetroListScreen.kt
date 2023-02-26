@@ -1,24 +1,32 @@
 package com.example.retromariokmm.android.ui.retros.list
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.retromariokmm.utils.ActionState.*
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
 import com.example.retromariokmm.utils.Success
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RetroScreen(navController: NavController, viewModel: RetroListViewModel = hiltViewModel()) {
-    val state = viewModel.retrosState.collectAsState(initial = Loading())
+    val state = viewModel.retrosState.collectAsState()
+
+    //navigation not good handle if use in when with no launchEffect
+    LaunchedEffect(key1 = state.value.connectAction) {
+        if (state.value.connectAction == SUCCESS) {
+            navController.navigate("life_difficulty_screen")
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -36,13 +44,18 @@ fun RetroScreen(navController: NavController, viewModel: RetroListViewModel = hi
                     Text(text = "New Retro")
                 }
                 OutlinedButton(onClick = {
-                    //navController.navigate("life_difficulty_screen")
                 }) {
                     Text(text = "Go to Updated HealthyScreen")
                 }
             }
+            when (state.value.connectAction) {
+                NOT_STARTED -> {}
+                PENDING -> CircularProgressIndicator()
+                SUCCESS -> {}
+                ERROR -> {}
+            }
 
-            when (val list = state.value) {
+            when (val list = state.value.list) {
                 is Error -> Snackbar() {
                     Text(text = list.msg)
                 }
@@ -61,6 +74,9 @@ fun RetroScreen(navController: NavController, viewModel: RetroListViewModel = hi
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .padding(6.dp)
+                                        .clickable {
+                                            viewModel.connectToRetro(retro.retroId)
+                                        }
                                 ) {
                                     Column {
                                         Text(text = retro.title)

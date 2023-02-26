@@ -22,24 +22,28 @@ class CommentsBoardViewModel @Inject constructor(
         ), commentsListUseCase.invoke(MUSHROOM_COMMENTS)
     ) { starRes, booRes, goombaRes, mushroomRes ->
         val star = when (starRes) {
-            is Error -> return@combine Error(starRes.msg)
-            is Loading -> return@combine Loading()
+            is Error<*> -> return@combine Error(starRes.msg)
+            is Loading<*> -> return@combine Loading()
             is Success -> starRes.value.size
+            else -> return@combine Error("incomptaible state")
         }
         val boo = when (booRes) {
-            is Error -> return@combine Error(booRes.msg)
-            is Loading -> return@combine Loading()
+            is Error<*> -> return@combine Error(booRes.msg)
+            is Loading<*> -> return@combine Loading()
             is Success -> booRes.value.size
+            else -> return@combine Error("incomptaible state")
         }
         val goomba = when (goombaRes) {
-            is Error -> return@combine Error(goombaRes.msg)
-            is Loading -> return@combine Loading()
+            is Error<*> -> return@combine Error(goombaRes.msg)
+            is Loading<*> -> return@combine Loading()
             is Success -> goombaRes.value.size
+            else -> return@combine Error("incomptaible state")
         }
         val mushroom = when (mushroomRes) {
-            is Error -> return@combine Error(mushroomRes.msg)
-            is Loading -> return@combine Loading()
+            is Error<*> -> return@combine Error(mushroomRes.msg)
+            is Loading<*> -> return@combine Loading()
             is Success -> mushroomRes.value.size
+            else -> return@combine Error("incomptaible state")
         }
         Success(CommentBoardState(star, boo, goomba, mushroom))
 

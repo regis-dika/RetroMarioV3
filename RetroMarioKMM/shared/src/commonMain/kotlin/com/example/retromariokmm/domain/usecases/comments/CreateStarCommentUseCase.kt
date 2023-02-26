@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 //TODO Add Interface
 class CreateStarCommentUseCase(private val repository : FirebaseRetroMarioRepositoryImpl) {
     //TODO Inject repo
-    suspend fun invoke(path :String,description :String): Flow<Resource<Unit>> {
+    suspend fun invoke(path :String,description :String): Flow<Resource<String>> {
         return repository.createStarComment(path,description)
     }
 }

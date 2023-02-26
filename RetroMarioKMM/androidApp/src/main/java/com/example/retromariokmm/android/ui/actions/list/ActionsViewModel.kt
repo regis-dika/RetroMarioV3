@@ -7,7 +7,6 @@ import com.example.retromariokmm.domain.usecases.actions.ActionListUseCase
 import com.example.retromariokmm.domain.usecases.actions.UpdateActionActorListUseCase
 import com.example.retromariokmm.domain.usecases.actions.UpdateActionCheckStateUseCase
 import com.example.retromariokmm.domain.usecases.users.CurrentUserUseCase
-import com.example.retromariokmm.domain.usecases.users.UserListUseCase
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
 import com.example.retromariokmm.utils.Resource
@@ -15,6 +14,7 @@ import com.example.retromariokmm.utils.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -44,7 +44,7 @@ class ActionsViewModel @Inject constructor(
                         is Success -> Success(resource.value.map {
                             ActionContainer(
                                 it,
-                                userId.value.uid == it.authorId,
+                                userId.value.uid == it.creatorId,
                                 userId.value.uid
                             )
                         })
@@ -58,7 +58,12 @@ class ActionsViewModel @Inject constructor(
 
     fun onCheck(actionId: String, isCheck: Boolean) {
         viewModelScope.launch {
-            updateActionCheckStateUseCase.invoke(actionId, isCheck)
+            updateActionCheckStateUseCase.invoke(actionId, isCheck).collect {
+                _actionsState.value = when (it) {
+                    is Error -> Error("Error on check change")
+                    else -> _actionsState.value
+                }
+            }
         }
     }
 

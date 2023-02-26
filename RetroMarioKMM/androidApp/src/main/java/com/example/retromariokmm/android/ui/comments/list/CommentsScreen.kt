@@ -57,13 +57,13 @@ fun CommentsScreen(
                     } else {
                         LazyColumn() {
                             items(list.value, key = {
-                                it.userComment.postId
+                                it.userComment.id
                             }) { comment ->
                                 CommentUserItem(
                                     commentContainer = comment,
                                     backgroundColor = if (comment.isFromCurrentUser) Color.Yellow else Color.Blue,
                                     onNoteClick = {
-                                        navController.navigate("comment_details_screen/${comment.userComment.postId}/$path")
+                                        navController.navigate("comment_details_screen/${comment.userComment.id}/$path")
                                     },
                                     onDeleteClick = { },
                                     modifier = Modifier
@@ -72,13 +72,13 @@ fun CommentsScreen(
                                         .animateItemPlacement(),
                                     onLikeClick = {
                                         starCommentsViewModel.updateLikeComment(
-                                            comment.userComment.postId,
+                                            comment.userComment.id,
                                             it.toFeelings()
                                         )
                                     },
                                     onDisLikeClick = {
                                         starCommentsViewModel.updateLikeComment(
-                                            comment.userComment.postId,
+                                            comment.userComment.id,
                                             it.toFeelings()
                                         )
                                     }

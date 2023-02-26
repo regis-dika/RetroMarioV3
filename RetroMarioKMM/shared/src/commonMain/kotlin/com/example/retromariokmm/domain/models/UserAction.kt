@@ -1,13 +1,11 @@
 package com.example.retromariokmm.domain.models
 
-import kotlinx.serialization.Serializable
-
-@Serializable
+@kotlinx.serialization.Serializable
 data class UserAction(
-    val actionId : String = "",
-    val authorId : String = "",
-    val title : String = "",
-    val description : String  = "",
-    val isCheck : Boolean = false,
-    val actorList : HashMap<String,ActionActor>? = null
-)
+    override val id: String = "",
+    override val creatorId: String = "",
+    val title: String = "",
+    val description: String = "",
+    val isCheck: Boolean = false,
+    val actorList: HashMap<String, ActionActor>? = null
+) : IdentifiedObject()

@@ -6,15 +6,13 @@ import com.example.retromariokmm.data.toUserAction
 import com.example.retromariokmm.data.toUserComment
 import com.example.retromariokmm.domain.models.*
 import com.example.retromariokmm.domain.repository.RetroMarioRepository
-import com.example.retromariokmm.utils.Error
-import com.example.retromariokmm.utils.Loading
-import com.example.retromariokmm.utils.Resource
-import com.example.retromariokmm.utils.Success
+import com.example.retromariokmm.utils.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.FirebaseFirestore
+import dev.gitlive.firebase.firestore.QuerySnapshot
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -29,9 +27,14 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
 
     private val retroCollection = fireStore.collection("retros")
     private val userCollection = fireStore.collection("users")
-    private val actionCollection = fireStore.collection("actions")
 
     var currentUser: RetroUser? = null
+        get() = field
+        private set(value) {
+            field = value
+        }
+
+    var currentRetroSession: Retro? = null
         get() = field
         private set(value) {
             field = value
@@ -40,12 +43,12 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
     override suspend fun createRetro(title: String, description: String) = flow {
         emit(Loading())
         try {
-            if(currentUser != null){
+            if (currentUser != null) {
                 val newDocument = retroCollection.document
-                val retro = Retro(newDocument.id, title, description)
+                val retro = Retro(id = newDocument.id, title = title, description = description)
                 retroCollection.document(newDocument.id).set(retro)
                 emit(Success(newDocument.id))
-            }else{
+            } else {
                 emit(Error<String>("current user null"))
             }
         } catch (e: Exception) {
@@ -53,11 +56,15 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         }
     }
 
+    override suspend fun connectToRetro(retroId: String) {
+        currentRetroSession = retroCollection.document(retroId).get().toRetro()
+    }
+
     override suspend fun getMyRetros() = callbackFlow {
         retroCollection.snapshots.collect {
             val updatedList = it.documents.map { dc ->
                 dc.toRetro()
-            }
+            }.filter { retro -> retro.users.contains(currentUser?.uid) }.map { it }
             trySend(Success(updatedList))
         }
         awaitClose()
@@ -70,8 +77,9 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
     override suspend fun addCurrentUserToRetroWithLink(retroId: String) = flow {
         emit(Loading())
         try {
-            currentUser?.let {
-                retroCollection.document(retroId).update(Pair("users", FieldValue.arrayUnion(it.uid)))
+            currentUser?.let { user ->
+                retroCollection.document(retroId).collection("users").document(user.uid).set(user, merge = true)
+                retroCollection.document(retroId).update(Pair("users", FieldValue.arrayUnion(user.uid)))
             }
             emit(Success(Unit))
         } catch (e: Exception) {
@@ -84,7 +92,8 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
             val result = firebaseAuth.createUserWithEmailAndPassword(email, password)
             val user = result.user
             if (user != null) {
-                currentUser = getRetroUsers().firstOrNull { it is Success }?.value?.first { it.uid == user.uid }
+                currentUser =
+                    getRetroUsers().firstOrNull { it is Success }?.value?.first { it.uid == user.uid }
                 if (currentUser != null) {
                     Success(Unit)
                 } else {
@@ -103,7 +112,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password)
             val user = result.user
             if (user != null) {
-                currentUser = getRetroUsers().firstOrNull { it is Success }?.value?.first { it.uid == user.uid }
+                currentUser = fetchRetroUsers().firstOrNull { it is Success }?.value?.firstOrNull { it.uid == user.uid }
                 if (currentUser != null) {
                     Success(Unit)
                 } else {
@@ -117,7 +126,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         }
     }
 
-    override fun getRetroUsers(): Flow<Resource<List<RetroUser>>> = callbackFlow {
+    fun fetchRetroUsers(): Flow<Resource<List<RetroUser>>> = callbackFlow {
         userCollection.snapshots.collect {
             val updatedList = it.documents.map { dc ->
                 dc.toRetroUser()
@@ -127,182 +136,211 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         awaitClose()
     }
 
-    override suspend fun updateLife(life: Int) = flow {
-        emit(Loading())
-        try {
-            currentUser?.let {
-                userCollection.document(it.uid).update(hashMapOf(Pair("life", life)))
-            }
-            emit(Success(Unit))
-        } catch (e: Exception) {
-            emit(Error(e.toString()))
+    override fun getRetroUsers(): Flow<Resource<List<RetroUser>>> = getUpdatedCollection<RetroUser>("users") {
+        it.documents.map { dc ->
+            dc.toRetroUser()
         }
     }
 
-    override suspend fun updateDifficulty(difficulty: Int) = flow {
-        emit(Loading())
-        try {
-            currentUser?.let {
-                userCollection.document(it.uid).update(hashMapOf(Pair("difficulty", difficulty)))
-            }
-            emit(Success(Unit))
-        } catch (e: Exception) {
-            emit(Error(e.toString()))
+    override suspend fun updateLife(life: Int) =
+        updateDocument(docRef = Pair("users", currentUser?.uid ?: ""), hashMapOf(Pair("life", life)))
+
+    override suspend fun updateDifficulty(difficulty: Int) =
+        updateDocument(docRef = Pair("users", currentUser?.uid ?: ""), hashMapOf(Pair("difficulty", difficulty)))
+
+    override suspend fun getAllComments(path: String) = getUpdatedCollection<UserComment>(
+        path
+    ) { qs ->
+        qs.documents.map { dc ->
+            dc.toUserComment()
         }
     }
 
-    override suspend fun getAllComments(path: String): Flow<Resource<List<UserComment>>> = callbackFlow {
-        fireStore.collection(path).snapshots.collect {
-            val updatedList = it.documents.map { dc ->
-                dc.toUserComment()
-            }
-            trySend(Success(updatedList))
-        }
-        awaitClose()
-    }
+    override suspend fun createStarComment(path: String, description: String) =
+        createCollectionFlow(
+            path,
+            UserComment(description = description)
+        )
 
-    override suspend fun createStarComment(path: String, description: String) = flow {
-        emit(Loading())
-        try {
-            currentUser?.let {
-                val docRef = fireStore.collection(path).document
-                val createdComment = UserComment(postId = docRef.id, authorId = it.uid, description = description)
-                docRef.set(createdComment)
-                emit(Success(Unit))
-            }
-        } catch (e: Exception) {
-            emit(Error<Unit>(e.toString()))
-        }
-    }
+    override suspend fun updateComment(path: String, commentId: String, description: String) = updateDocument(
+        Pair(path, commentId),
+        hashMapOf(Pair("description", description))
+    )
 
-    override suspend fun updateComment(path: String, commentId: String, description: String) = flow {
-        emit(Loading())
-        try {
-            currentUser?.let {
-                val docRef = fireStore.collection(path).document(commentId)
-                docRef.update(hashMapOf(Pair("description", description), (Pair("authorId", it.uid))))
-                emit(Success(Unit))
-            }
-        } catch (e: Exception) {
-            emit(Error<Unit>(e.toString()))
-        }
-    }
-
-    override suspend fun updateLikeComment(path: String, commentId: String, isLiked: Boolean?) {
-        try {
-            currentUser?.let {
-                val docRef = fireStore.collection(path).document(commentId)
-                val updatedFeelings = Feelings(
-                    it.uid,
+    override suspend fun updateLikeComment(path: String, commentId: String, isLiked: Boolean?) = updateDocument(
+        Pair(path, commentId), hashMapOf(
+            "feelings" to hashMapOf(
+                currentUser?.uid to Feelings(
+                    currentUser?.uid ?: "",
                     when (isLiked) {
                         true -> 1
                         false -> -1
                         else -> 0
                     }
                 )
-                val hashMap = hashMapOf("feelings" to hashMapOf(it.uid to updatedFeelings))
-                docRef.set(hashMap, merge = true)
-            }
-        } catch (e: Exception) {
-        }
-    }
+            )
+        )
+    )
 
-    override suspend fun getCommentById(path: String, commentId: String) = flow {
-        emit(Loading())
-        try {
-            currentUser?.let {
-                val doc = fireStore.collection(path).document(commentId).get()
-                emit(Success(doc.toUserComment()))
-            }
-        } catch (e: Exception) {
-            emit(Error<UserComment>(e.toString()))
-        }
-    }
+    override suspend fun getCommentById(path: String, commentId: String) = getDocument<UserComment>(path, commentId)
 
-    override suspend fun getAllActions(): Flow<Resource<List<UserAction>>> = callbackFlow {
-        actionCollection.snapshots.collect {
-            val updatedList = it.documents.map { dc ->
+    override suspend fun getAllActions(): Flow<Resource<List<UserAction>>> =
+        getUpdatedCollection("actions") { querysnapshot ->
+            querysnapshot.documents.map { dc ->
                 dc.toUserAction()
             }
-            trySend(Success(updatedList))
         }
-        awaitClose()
-    }
 
-    override suspend fun createAction(title: String, description: String) = flow {
-        emit(Loading())
-        try {
-            currentUser?.let {
-                val docRef = actionCollection.document
-                val createdComment =
-                    UserAction(actionId = docRef.id, authorId = it.uid, title = title, description = description)
-                docRef.set(createdComment)
-                emit(Success(Unit))
-            }
-        } catch (e: Exception) {
-            emit(Error<Unit>(e.toString()))
-        }
-    }
+    override suspend fun createAction(title: String, description: String) =
+        createCollectionFlow(
+            path = "actions",
+            newObject = UserAction(title = title, description = description)
+        )
 
-    override suspend fun getActionById(actionId: String) = flow {
-        emit(Loading())
-        try {
-            currentUser?.let {
-                val doc = actionCollection.document(actionId).get()
-                emit(Success(doc.toUserAction()))
-            }
-        } catch (e: Exception) {
-            emit(Error<UserAction>(e.toString()))
-        }
-    }
+    override suspend fun getActionById(actionId: String) = getDocument<UserAction>("actions", actionId)
 
-    override suspend fun updateAction(actionId: String, title: String, description: String) = flow {
-        emit(Loading())
-        try {
-            currentUser?.let {
-                val docRef = actionCollection.document(actionId)
-                docRef.update(
-                    hashMapOf(
-                        Pair("title", title),
-                        Pair("description", description),
-                        (Pair("authorId", it.uid))
-                    )
-                )
-                emit(Success(Unit))
-            }
-        } catch (e: Exception) {
-            emit(Error<Unit>(e.toString()))
-        }
-    }
+    override suspend fun updateAction(actionId: String, title: String, description: String) =
+        updateDocument(
+            Pair("actions", actionId), hashMapOf(
+                Pair("title", title),
+                Pair("description", description)
+            )
+        )
 
     override suspend fun updateActorList(actionId: String, takeAction: Boolean) {
-        try {
-            currentUser?.let { retroUser ->
-                val docRef = actionCollection.document(actionId)
-                if (takeAction) {
-                    val actionActor = retroUser.firstName?.let { ActionActor(it, retroUser.bitmap) }
-                    val actorMapUpdated = hashMapOf("actorList" to hashMapOf(retroUser.uid to actionActor))
-                    docRef.set(actorMapUpdated, merge = true)
-                } else {
-                    val currentDoc = docRef.get().toUserAction()
-                    currentDoc.actorList?.remove(retroUser.uid)
-                    val docActorListRemoved = currentDoc.copy(actorList = currentDoc.actorList)
-                    docRef.set(docActorListRemoved)
+        val retroId = currentRetroSession?.id
+        if (retroId != null) {
+            try {
+                currentUser?.let { retroUser ->
+                    val docRef = retroCollection.document(retroId).collection("actions").document(actionId)
+                    if (takeAction) {
+                        val actionActor = retroUser.firstName?.let { ActionActor(it, retroUser.bitmap) }
+                        val actorMapUpdated = hashMapOf("actorList" to hashMapOf(retroUser.uid to actionActor))
+                        docRef.set(actorMapUpdated, merge = true)
+                    } else {
+                        val currentDoc = docRef.get().toUserAction()
+                        currentDoc.actorList?.remove(retroUser.uid)
+                        val docActorListRemoved = currentDoc.copy(actorList = currentDoc.actorList)
+                        docRef.set(docActorListRemoved)
+                    }
                 }
+            } catch (e: Exception) {
+                print(e.toString())
             }
-        } catch (e: Exception) {
-            readln()
+        } else {
+            print("error no current retro")
         }
     }
 
-    override suspend fun updateActionCheckState(actionId: String, isCheck: Boolean) {
-        try {
-            currentUser?.let {
-                val docRef = actionCollection.document(actionId)
-                val actorMap = hashMapOf("isCheck" to isCheck)
-                docRef.set(actorMap, merge = true)
+    override suspend fun updateActionCheckState(actionId: String, isCheck: Boolean) =
+        updateDocument(Pair("actions", actionId), hashMapOf("isCheck" to isCheck))
+
+//generic function
+
+    fun createCollectionFlow(path: String, newObject: IdentifiedObject) =
+        flow {
+            val retroId = currentRetroSession?.id
+            if (retroId != null) {
+                if (currentUser != null) {
+                    emit(Loading())
+                    try {
+                        val newDocument = retroCollection.document(retroId).collection(path).document
+
+                        val obj = when (newObject) {
+                            is Retro -> newObject.copy(id = newDocument.id, creatorId = currentUser!!.uid)
+                            is UserComment -> newObject.copy(id = newDocument.id, creatorId = currentUser!!.uid)
+                            is UserAction -> newObject.copy(id = newDocument.id, creatorId = currentUser!!.uid)
+                        }
+                        newDocument.set(obj)
+                        emit(Success(newDocument.id))
+                    } catch (e: Exception) {
+                        emit(Error<String>(e.toString()))
+                    }
+                } else {
+                    emit(Error<String>("current user null"))
+                }
+            } else {
+                emit(Error("Error no current retro"))
             }
-        } catch (e: Exception) {
+        }
+
+    fun <T> getUpdatedCollection(path: String?, transform: ((QuerySnapshot) -> List<T>)) =
+        callbackFlow {
+            val retroId = currentRetroSession?.id
+            if (retroId != null) {
+                // retrieve collection from root
+                if (path == null) {
+                    retroCollection.snapshots.collect {
+                        val updatedList = transform.invoke(it)
+                        trySend(Success(updatedList))
+                    }
+                } else {
+                    retroCollection.document(retroId).collection(path).snapshots.collect {
+                        val updatedList = transform.invoke(it)
+                        trySend(Success(updatedList))
+                    }
+                }
+            } else {
+                trySend(Error<List<T>>("Error no current retro"))
+            }
+            awaitClose()
+        }
+
+    fun <T : IdentifiedObject> getDocument(path: String, docId: String): Flow<Resource<T>> = flow {
+        emit(Loading())
+
+        val retroId = currentRetroSession?.id
+        if (retroId != null) {
+            try {
+                if (currentUser != null) {
+                    val doc = retroCollection.document(retroId).collection(path).document(docId).get()
+                    val pojo = when (path) {
+                        BOO_COMMENTS, STAR_COMMENTS, MUSHROOM_COMMENTS, GOOMBA_COMMENTS -> doc.toUserComment()
+                        "actions" -> doc.toUserAction()
+                        "retro" -> doc.toRetro()
+                        else -> doc.toRetro()
+                    }
+                    emit(Success(pojo as T))
+                } else {
+                    emit(Error("Error no current user"))
+                }
+            } catch (e: Exception) {
+                emit(Error(e.toString()))
+            }
+        } else {
+            emit(Error("Error no current retro"))
+        }
+    }
+
+    fun updateDocument(docRef: Pair<String, String>? = null, hasMap: HashMap<String, Any>) = flow {
+        emit(Loading())
+        val mutableHashMap: MutableMap<String, Any> = hasMap
+
+        val retroId = currentRetroSession?.id
+        if (retroId != null) {
+            val retroDocRef = retroCollection.document(retroId)
+            try {
+                if (currentUser != null) {
+                    mutableHashMap["authorId"] = currentUser!!.uid
+                    mutableHashMap.toMap()
+
+                    // add document ref in addition
+                    if (docRef == null) {
+                        retroDocRef.update(hasMap)
+                    } else {
+                        retroDocRef.collection(docRef.first)
+                            .document(docRef.second)
+                            .update(hasMap)
+                    }
+                    emit(Success(Unit))
+                } else {
+                    emit(Error("Error no current user"))
+                }
+            } catch (e: Exception) {
+                emit(Error(e.toString()))
+            }
+        } else {
+            emit(Error("Error no current retro"))
         }
     }
 }
