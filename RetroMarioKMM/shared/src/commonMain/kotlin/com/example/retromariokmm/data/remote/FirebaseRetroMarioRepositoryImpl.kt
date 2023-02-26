@@ -27,7 +27,6 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
 
     private val retroCollection = fireStore.collection("retros")
     private val userCollection = fireStore.collection("users")
-    private val actionCollection = fireStore.collection("actions")
 
     var currentUser: RetroUser? = null
         get() = field
@@ -46,7 +45,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         try {
             if (currentUser != null) {
                 val newDocument = retroCollection.document
-                val retro = Retro(newDocument.id, title, description)
+                val retro = Retro(id = newDocument.id, title = title, description = description)
                 retroCollection.document(newDocument.id).set(retro)
                 emit(Success(newDocument.id))
             } else {

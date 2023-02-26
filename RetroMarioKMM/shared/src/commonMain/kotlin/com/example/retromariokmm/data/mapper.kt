@@ -11,22 +11,12 @@ fun DocumentSnapshot.toRetro(): Retro {
         val title = get<String>("title")
         val description = get<String>("description")
         val users = get<List<String>>("users")
-        val actions = get<List<UserAction>>("actions")
-        val booComments = get<List<UserComment>>("booComments")
-        val starComments = get<List<UserComment>>("starComments")
-        val goumbaComments = get<List<UserComment>>("goumbaComments")
-        val mushroomComments = get<List<UserComment>>("mushroomComments")
         Retro(
             retroId,
             creatorId,
             title,
             description,
-            users,
-            starComments,
-            booComments,
-            goumbaComments,
-            mushroomComments,
-            actions
+            users
         )
     } catch (e: Exception) {
         Retro()
