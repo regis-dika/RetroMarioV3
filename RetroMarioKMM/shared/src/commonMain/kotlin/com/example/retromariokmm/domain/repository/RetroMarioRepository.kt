@@ -32,6 +32,7 @@ interface RetroMarioRepository {
 
     //Actions
     suspend fun getAllActions(): Flow<Resource<List<UserAction>>>
+    suspend fun getActionFromRetro(retroId: String): Flow<Resource<List<UserAction>>>
     suspend fun createAction(title: String, description: String): Flow<Resource<String>>
     suspend fun getActionById(actionId: String): Flow<Resource<UserAction>>
     suspend fun updateAction(actionId: String, title: String, description: String): Flow<Resource<Unit>>

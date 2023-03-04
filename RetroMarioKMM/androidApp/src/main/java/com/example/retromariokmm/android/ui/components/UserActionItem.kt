@@ -73,7 +73,7 @@ fun UserActionItem(
                 )
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
                         .padding(6.dp)
                 ) {
                     Text(

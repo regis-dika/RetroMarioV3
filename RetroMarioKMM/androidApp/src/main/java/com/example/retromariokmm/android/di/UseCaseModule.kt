@@ -105,6 +105,10 @@ object UseCaseModule {
         ConnectUserToRetroUseCase(firebaseRetroMarioRepositoryImpl)
 
     @Provides
+    fun provideActionListFromRetroUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        ActionListFromRetroUseCase(firebaseRetroMarioRepositoryImpl)
+
+    @Provides
     fun provideAddUserAndConnectToRetroUseCase(
         addUserToRetroRetroUseCase: AddUserToRetroRetroUseCase,
         connectUserToRetroUseCase: ConnectUserToRetroUseCase

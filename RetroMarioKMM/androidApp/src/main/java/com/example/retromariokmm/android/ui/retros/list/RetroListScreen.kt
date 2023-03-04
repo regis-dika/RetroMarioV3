@@ -1,10 +1,12 @@
 package com.example.retromariokmm.android.ui.retros.list
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Snackbar
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -12,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.retromariokmm.android.ui.components.RetroItem
 import com.example.retromariokmm.utils.ActionState.*
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
@@ -70,19 +73,15 @@ fun RetroScreen(navController: NavController, viewModel: RetroListViewModel = hi
                             items(list.value, key = {
                                 it.retroId
                             }) { retro ->
-                                Card(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(6.dp)
-                                        .clickable {
-                                            viewModel.connectToRetro(retro.retroId)
-                                        }
-                                ) {
-                                    Column {
-                                        Text(text = retro.title)
-                                        Text(text = retro.description)
-                                    }
-                                }
+                                RetroItem(
+                                    this@LazyColumn,
+                                    title = retro.title,
+                                    date = "14/01/2023",
+                                    actions = retro.actionsList,
+                                    onCheckClick = {},
+                                    onResumeBtnClick = { viewModel.connectToRetro(retro.retroId) }, onCardClick = {
+                                        viewModel.getActionsFromRetro(retroId = retro.retroId)
+                                    })
                             }
                         }
                     }
