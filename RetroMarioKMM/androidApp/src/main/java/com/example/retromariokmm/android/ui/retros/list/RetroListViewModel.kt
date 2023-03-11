@@ -92,5 +92,6 @@ data class RetroContainer(
     val retroId: String,
     val title: String,
     val description: String,
-    val actionsList: List<UserAction> = emptyList()
+    val actionsList: List<UserAction> = emptyList(),
+    val isExpanded : Boolean = false
 )
