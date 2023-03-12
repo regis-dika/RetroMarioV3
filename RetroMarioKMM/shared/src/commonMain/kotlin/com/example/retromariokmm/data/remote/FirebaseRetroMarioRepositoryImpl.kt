@@ -15,10 +15,7 @@ import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.QuerySnapshot
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 
 class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
 
@@ -190,6 +187,15 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
                 dc.toUserAction()
             }
         }
+
+    override suspend fun getActionFromRetro(retroId: String): Flow<Resource<List<UserAction>>> {
+        return retroCollection.document(retroId).collection("actions").snapshots.map { querysnapshot ->
+            val actionList = querysnapshot.documents.map { dc ->
+                dc.toUserAction()
+            }
+            Success(actionList)
+        }
+    }
 
     override suspend fun createAction(title: String, description: String) =
         createCollectionFlow(
