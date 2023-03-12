@@ -39,7 +39,9 @@ fun NestedScrolling(
     ) {
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             list.forEach { retroContainer ->
-                RetroItem(retroContainer, onCardClick, onResumeClick, isExpanded.value)
+                RetroItem(retroContainer, onCardClick, onResumeClick, isExpanded.value) {
+                    isExpanded.value = it
+                }
             }
         }
     }
@@ -49,16 +51,18 @@ fun LazyListScope.RetroItem(
     retroContainer: RetroContainer,
     onCardClick: (String) -> Unit,
     onResumeClick: (String) -> Unit,
-    isExpanded: Boolean
+    isExpanded : Boolean,
+    onExpendedListener : ((Boolean) -> Unit)
 ) {
     item {
         cardHeaderWithExpandedState1(
             retroContainer.retroId,
             retroContainer.title,
             onCardClick,
-            onResumeClick,
-            isExpanded
-        )
+            onResumeClick
+        ){
+            onExpendedListener.invoke(it)
+        }
     }
     if (isExpanded) {
         items(retroContainer.actionsList) { action ->
@@ -86,7 +90,7 @@ fun cardHeaderWithExpandedState(
     title: String,
     onCardClick: (String) -> Unit,
     onResumeClick: (String) -> Unit,
-    isExpanded: Boolean
+    onIsExpandedClick: ((Boolean) -> Unit)
 ) {
     val isExpanded = rememberSaveable {
         mutableStateOf(false)
@@ -97,6 +101,7 @@ fun cardHeaderWithExpandedState(
             .fillMaxWidth()
             .clickable {
                 isExpanded.value = !isExpanded.value
+                onIsExpandedClick.invoke(isExpanded.value)
                 if (isExpanded.value) {
                     onCardClick.invoke(retroId)
                 }
