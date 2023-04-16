@@ -52,16 +52,34 @@ fun UserHealthScreen(
                     CircularProgressIndicator()
                 }
                 is Success -> LazyColumn() {
-                    items(list.value, key = {
+                    item {
+                        val currentUser = list.value.firstOrNull { it.isCurrentUser }
+                        if (currentUser != null) {
+                            val l = currentUser.life
+                            val d = currentUser.difficulty
+                            val userHealth = MainUser(l, d, {
+                                lifeAndDifficultyViewModel.setLife(it)
+                            }, {
+                                lifeAndDifficultyViewModel.setDifficulty(it)
+                            })
+                            RetroUserItem(
+                                userContainer = currentUser,
+                                userHealth,
+                                onSaveChange = {
+                                    lifeAndDifficultyViewModel.saveHealth()
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(6.dp)
+                            )
+                        }
+                    }
+                    items(list.value.filter { !it.isCurrentUser }, key = {
                         it.uid
                     }) { user ->
                         val l = user.life
                         val d = user.difficulty
-                        val userHealth = if (user.isCurrentUser) MainUser(l, d, {
-                            lifeAndDifficultyViewModel.setLife(it)
-                        }, {
-                            lifeAndDifficultyViewModel.setDifficulty(it)
-                        }) else OtherUser(l, d)
+                        val userHealth = OtherUser(l, d)
                         RetroUserItem(
                             userContainer = user,
                             userHealth,
