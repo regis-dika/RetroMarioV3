@@ -47,7 +47,7 @@ class LifeAndDifficultyViewModel @Inject constructor(
                                     user.difficulty,
                                     user.uid == currentUser.value.uid
                                 )
-                            }.sortedBy { it.life })
+                            }.sortedBy { it.isCurrentUser }.sortedBy { it.life })
                             is Loading -> (Loading())
                             is Error -> Error(it.msg)
                         },
