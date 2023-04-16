@@ -11,6 +11,7 @@ import com.example.retromariokmm.utils.ActionState.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,7 +23,7 @@ class LifeAndDifficultyViewModel @Inject constructor(
     private val currentUserUseCase: CurrentUserUseCase
 ) : ViewModel() {
 
-    private val _usersState = MutableStateFlow(UsersStateScreen(Loading(), NOT_STARTED,NOT_STARTED))
+    private val _usersState = MutableStateFlow(UsersStateScreen(Loading()))
     val usersState = _usersState.asStateFlow()
 
     init {
@@ -49,7 +50,9 @@ class LifeAndDifficultyViewModel @Inject constructor(
                             }.sortedBy { it.life })
                             is Loading -> (Loading())
                             is Error -> Error(it.msg)
-                        }
+                        },
+                        currentLife = currentUser.value.life,
+                        currentDifficulty = currentUser.value.difficulty
                     )
                 }
             }
@@ -57,27 +60,38 @@ class LifeAndDifficultyViewModel @Inject constructor(
     }
 
     fun setLife(life: Int) {
-        viewModelScope.launch {
-            updateLifeUseCase.invoke(life).collect {
-                _usersState.value = _usersState.value.copy(
-                    lifeAction = when (it) {
-                        is Error -> ERROR
-                        is Loading -> PENDING
-                        is Success -> SUCCESS
-                    }
-                )
-            }
-        }
+        _usersState.value = _usersState.value.copy(currentLife = life)
     }
 
     fun setDifficulty(difficulty: Int) {
+        _usersState.value = _usersState.value.copy(currentDifficulty = difficulty)
+    }
+
+    fun saveHealth() {
         viewModelScope.launch {
-            updateDifficultyUseCase.invoke(difficulty).collect {
+            combine(
+                updateLifeUseCase.invoke(usersState.value.currentLife),
+                updateDifficultyUseCase.invoke(usersState.value.currentDifficulty)
+            ) { l, d ->
+                val life = when (l) {
+                    is Error -> ERROR
+                    is Loading -> PENDING
+                    is Success -> SUCCESS
+                }
+                val difficulty = when (d) {
+                    is Error -> ERROR
+                    is Loading -> PENDING
+                    is Success -> SUCCESS
+                }
+                Pair(life, difficulty)
+            }.collect {
                 _usersState.value = _usersState.value.copy(
-                    difficultyAction = when (it) {
-                        is Error -> ERROR
-                        is Loading -> PENDING
-                        is Success -> SUCCESS
+                    lifeAndDifficultyAction = when {
+                        it.first == SUCCESS && it.second == SUCCESS -> SUCCESS
+                        it.first == PENDING || it.second == PENDING -> PENDING
+                        it.first == ERROR || it.second == ERROR -> ERROR
+                        else -> ERROR
+
                     }
                 )
             }
@@ -87,8 +101,9 @@ class LifeAndDifficultyViewModel @Inject constructor(
 
 data class UsersStateScreen(
     val userContainerList: Resource<List<UserContainer>>,
-    val lifeAction: ActionState,
-    val difficultyAction: ActionState
+    val currentLife: Int = 0,
+    val currentDifficulty: Int = 0,
+    val lifeAndDifficultyAction: ActionState = NOT_STARTED,
 )
 
 data class UserContainer(

@@ -4,21 +4,24 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.runtime.Composable
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Text
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.retromariokmm.android.MyApplicationTheme
+import com.example.retromariokmm.android.ui.components.HealthyBoardModel.MainUser
+import com.example.retromariokmm.android.ui.components.HealthyBoardModel.OtherUser
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserContainer
 
 @Composable
 fun RetroUserItem(
     userContainer: UserContainer,
-    backgroundColor: Color = Color.White,
-    onLikeClick: (Int) -> Unit,
-    onDifficultyClick: (Int) -> Unit,
+    healthyBoardModel: HealthyBoardModel,
+    onSaveChange:(() -> Unit),
     modifier: Modifier = Modifier
 ) {
     //only change when note.created change
@@ -26,6 +29,14 @@ fun RetroUserItem(
         DateTimeUtil.formatNoteDate(note.created)
     }*/
 
+    var isEditable by remember {
+        mutableStateOf(false)
+    }
+
+    val backgroundColor = when(healthyBoardModel){
+        is MainUser -> Color.LightGray
+        is OtherUser -> Color.Gray
+    }
     Box(modifier = modifier) {
         Column(modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
@@ -41,19 +52,20 @@ fun RetroUserItem(
                     .background(Color.Green, shape = RoundedCornerShape(15.dp))
             )
             Spacer(modifier = Modifier.height(8.dp))
-            HealthyBoardItem(
-                life = userContainer.life,
-                difficulty = userContainer.difficulty,
-                onLifeClick = {
-                    onLikeClick.invoke(it)
-                },
-                onDifficultyClick = {
-                    onDifficultyClick.invoke(it)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(15.dp))
-            )
+            when(healthyBoardModel){
+                is MainUser -> {
+                    HealthyMainBoardItem(mainUser = healthyBoardModel, isEditable)
+                    OutlinedButton(onClick = {
+                        if(isEditable){
+                            onSaveChange.invoke()
+                        }
+                        isEditable = !isEditable
+                    }) {
+                        Text(text = if (isEditable) "Valider" else "Editer")
+                    }
+                }
+                is OtherUser -> HealthyOtherBoardItem(otherUser = healthyBoardModel)
+            }
         }
     }
 }
@@ -72,6 +84,6 @@ fun RetroUserItemPreview() {
                 10,
                 false
             ),
-            onDifficultyClick = {}, onLikeClick = {})
+            OtherUser(),{})
     }
 }

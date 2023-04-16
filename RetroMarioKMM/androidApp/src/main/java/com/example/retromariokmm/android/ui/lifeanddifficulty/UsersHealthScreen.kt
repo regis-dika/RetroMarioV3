@@ -1,22 +1,21 @@
 package com.example.retromariokmm.android.ui.lifeanddifficulty
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.retromariokmm.android.ui.components.CustomSliderDialog
+import com.example.retromariokmm.android.ui.components.HealthyBoardModel.MainUser
+import com.example.retromariokmm.android.ui.components.HealthyBoardModel.OtherUser
 import com.example.retromariokmm.android.ui.components.RetroUserItem
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
@@ -29,33 +28,6 @@ fun UserHealthScreen(
     lifeAndDifficultyViewModel: LifeAndDifficultyViewModel = hiltViewModel()
 ) {
     val state = lifeAndDifficultyViewModel.usersState.collectAsState()
-
-    val life = remember() {
-        mutableStateOf("0")
-    }
-    val difficulty = remember() {
-        mutableStateOf("0")
-    }
-
-    val lifeSliderState = remember() {
-        mutableStateOf(false)
-    }
-    val difficultySliderState = remember() {
-        mutableStateOf(false)
-    }
-
-    if (lifeSliderState.value) {
-        CustomSliderDialog(title = "Life", value = life.value.toInt()) {life ->
-            lifeSliderState.value = false
-            lifeAndDifficultyViewModel.setLife(life)
-        }
-    }
-    if (difficultySliderState.value) {
-        CustomSliderDialog(title = "Difficulty", value = difficulty.value.toInt()) { difficulty ->
-            difficultySliderState.value = false
-            lifeAndDifficultyViewModel.setDifficulty(difficulty)
-        }
-    }
 
     Column(
         Modifier
@@ -80,23 +52,39 @@ fun UserHealthScreen(
                     CircularProgressIndicator()
                 }
                 is Success -> LazyColumn() {
-                    items(list.value, key = {
+                    item {
+                        val currentUser = list.value.firstOrNull { it.isCurrentUser }
+                        if (currentUser != null) {
+                            val l = currentUser.life
+                            val d = currentUser.difficulty
+                            val userHealth = MainUser(l, d, {
+                                lifeAndDifficultyViewModel.setLife(it)
+                            }, {
+                                lifeAndDifficultyViewModel.setDifficulty(it)
+                            })
+                            RetroUserItem(
+                                userContainer = currentUser,
+                                userHealth,
+                                onSaveChange = {
+                                    lifeAndDifficultyViewModel.saveHealth()
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(6.dp)
+                            )
+                        }
+                    }
+                    items(list.value.filter { !it.isCurrentUser }, key = {
                         it.uid
                     }) { user ->
+                        val l = user.life
+                        val d = user.difficulty
+                        val userHealth = OtherUser(l, d)
                         RetroUserItem(
                             userContainer = user,
-                            backgroundColor = if (user.isCurrentUser) Color.LightGray else Color.Gray,
-                            onLikeClick = { nbrL ->
-                                if (user.isCurrentUser) {
-                                    life.value = nbrL.toString()
-                                    lifeSliderState.value = true
-                                }
-                            },
-                            onDifficultyClick = { nbrD ->
-                                if (user.isCurrentUser) {
-                                    difficulty.value = nbrD.toString()
-                                    difficultySliderState.value = true
-                                }
+                            userHealth,
+                            onSaveChange = {
+                                lifeAndDifficultyViewModel.saveHealth()
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
