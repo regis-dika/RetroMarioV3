@@ -84,23 +84,23 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         }
     }
 
-    override suspend fun createUser(email: String, password: String): Resource<Unit> {
-        return try {
+    override suspend fun createUser(email: String, password: String, firstName: String, lastname: String) = flow {
+        try {
             val result = firebaseAuth.createUserWithEmailAndPassword(email, password)
             val user = result.user
             if (user != null) {
-                currentUser =
-                    getRetroUsers().firstOrNull { it is Success }?.value?.first { it.uid == user.uid }
+                currentUser = RetroUser(user.uid, firstName, lastname)
+                userCollection.document(user.uid).set(currentUser)
                 if (currentUser != null) {
-                    Success(Unit)
+                    emit(Success(Unit))
                 } else {
-                    Error("current user is null")
+                    emit(Error("current user is null"))
                 }
             } else {
-                Error("error user is null")
+                emit(Error("error user is null"))
             }
         } catch (e: Exception) {
-            Error(e.toString())
+            emit(Error(e.toString()))
         }
     }
 
