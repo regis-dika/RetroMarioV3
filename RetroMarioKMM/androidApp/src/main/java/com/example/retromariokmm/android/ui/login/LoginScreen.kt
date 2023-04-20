@@ -32,7 +32,10 @@ fun LoginScreen(
         }
     }
 
+    val registerBtn = if(retroId == null) "Register" else "Register with id"
+
     Column(modifier = Modifier.fillMaxSize()) {
+        Text(text = "Email")
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -45,6 +48,7 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(2.dp))
 
+        Text(text = "Password")
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -61,15 +65,18 @@ fun LoginScreen(
                 Text(text = retroId)
             }
             OutlinedButton(onClick = { viewModel.onLoginWithRetroId() }) {
-                Text(text = "Go to login with id ")
+                Text(text = "Go to login with id")
             }
         } else {
             OutlinedButton(onClick = { viewModel.onLogin() }) {
                 Text(text = "Go to login")
             }
         }
-
-
+        OutlinedButton(onClick = {
+            navController.navigate("register_screen/${retroId}")
+        }) {
+            Text(text = registerBtn)
+        }
         when (val result = loginState.value) {
             is Error -> Snackbar() {
                 Text(text = result.msg)

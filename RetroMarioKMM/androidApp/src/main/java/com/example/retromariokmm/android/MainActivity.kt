@@ -36,6 +36,7 @@ import com.example.retromariokmm.android.ui.comments.details.CommentDetailsScree
 import com.example.retromariokmm.android.ui.comments.list.CommentsScreen
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserHealthScreen
 import com.example.retromariokmm.android.ui.login.LoginScreen
+import com.example.retromariokmm.android.ui.register.RegisterScreen
 import com.example.retromariokmm.android.ui.retros.creation.RetroCreationScreen
 import com.example.retromariokmm.android.ui.retros.list.RetroScreen
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData
@@ -137,6 +138,15 @@ class MainActivity : ComponentActivity() {
                         composable(route = "login_screen") {
                             val retroId = if (incomeDeeplink == null) null else getLastBitFromUrl(incomeDeeplink!!.path)
                             LoginScreen(retroId, navController)
+                        }
+                        composable("register_screen/{retroId}", arguments = listOf(
+                            navArgument(name = "retroId") {
+                                type = NavType.StringType
+                                defaultValue = ""
+                            }
+                        )) {navBackEntry ->
+                            val retroId = navBackEntry.arguments?.getString("retroId")
+                            RegisterScreen(retroId,navController)
                         }
                         composable("retros_screen") {
                             RetroScreen(navController)
