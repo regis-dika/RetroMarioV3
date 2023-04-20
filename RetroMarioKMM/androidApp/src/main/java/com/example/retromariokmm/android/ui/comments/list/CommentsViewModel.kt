@@ -8,12 +8,15 @@ import com.example.retromariokmm.android.ui.components.FeelingsState.NOT_FEELING
 import com.example.retromariokmm.domain.models.Feelings
 import com.example.retromariokmm.domain.models.UserComment
 import com.example.retromariokmm.domain.usecases.comments.CommentsListUseCase
+import com.example.retromariokmm.domain.usecases.comments.CreateCommentUseCase
 import com.example.retromariokmm.domain.usecases.comments.UpdateLikeCommentUseCase
 import com.example.retromariokmm.domain.usecases.users.CurrentUserUseCase
 import com.example.retromariokmm.utils.*
+import com.example.retromariokmm.utils.ActionState.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,9 +24,16 @@ import javax.inject.Inject
 class CommentsViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val commentsListUseCase: CommentsListUseCase,
+    private val createCommentUseCase: CreateCommentUseCase,
     private val currentUserUseCase: CurrentUserUseCase,
     private val updateLikeCommentUseCase: UpdateLikeCommentUseCase
 ) : ViewModel() {
+    private val commentDescription = savedStateHandle.getStateFlow("commentDescription", "")
+    private val _saveAction = MutableStateFlow(NOT_STARTED)
+
+    val newCommentState = combine(commentDescription, _saveAction) { description, save ->
+        NewCommentState(description, save)
+    }
     private val _commentsState: MutableStateFlow<CommentsScreen> = MutableStateFlow(CommentsScreen())
     val commentsState = _commentsState.asStateFlow()
 
@@ -68,6 +78,25 @@ class CommentsViewModel @Inject constructor(
         }
     }
 
+    fun onCurrentCommentChange(updatedDescription: String) {
+        savedStateHandle["commentDescription"] = updatedDescription
+    }
+
+    fun createComment() {
+        viewModelScope.launch {
+            createCommentUseCase.invoke(path, commentDescription.value).collect {
+                _saveAction.value = when (it) {
+                    is Error -> ERROR
+                    is Loading -> PENDING
+                    is Success -> {
+                        onCurrentCommentChange("")
+                        SUCCESS
+                    }
+                }
+            }
+        }
+    }
+
     fun updateLikeComment(commentId: String, isLiked: Boolean?) {
         viewModelScope.launch {
             updateLikeCommentUseCase.invoke(path, commentId, isLiked).collect {
@@ -83,13 +112,18 @@ class CommentsViewModel @Inject constructor(
 }
 
 data class CommentsScreen(
-    val comments: Resource<List<CommentContainer>> = Loading()
+    val comments: Resource<List<CommentContainer>> = Loading(),
+)
+
+data class NewCommentState(
+    val description: String = "",
+    val saveActionState: ActionState = NOT_STARTED
 )
 
 data class CommentContainer(
     val userComment: UserComment,
     val isFromCurrentUser: Boolean = false,
-    val feelingsFromCurrentUser: FeelingsState = FeelingsState.NOT_FEELINGS
+    val feelingsFromCurrentUser: FeelingsState = NOT_FEELINGS
 ) {
     val nbLikes get() = userComment.feelings?.filter { it.value.state == 1L }?.map { it.value }
     val nbDisLikes get() = userComment.feelings?.filter { it.value.state == -1L }?.map { it.value }
@@ -99,6 +133,6 @@ fun Feelings.toFeelingState(): FeelingsState {
     return when (this.state) {
         1L -> FeelingsState.LIKE
         -1L -> FeelingsState.DISLIKE
-        else -> FeelingsState.NOT_FEELINGS
+        else -> NOT_FEELINGS
     }
 }

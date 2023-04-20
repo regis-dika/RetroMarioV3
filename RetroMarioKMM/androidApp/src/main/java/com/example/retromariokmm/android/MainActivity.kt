@@ -32,7 +32,6 @@ import coil.compose.AsyncImage
 import com.example.retromariokmm.android.ui.actions.details.ActionDetailsScreen
 import com.example.retromariokmm.android.ui.actions.list.ActionsScreen
 import com.example.retromariokmm.android.ui.comments.board.CommentsBoardScreen
-import com.example.retromariokmm.android.ui.comments.details.CommentDetailsScreen
 import com.example.retromariokmm.android.ui.comments.list.CommentsScreen
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserHealthScreen
 import com.example.retromariokmm.android.ui.login.LoginScreen
@@ -169,20 +168,6 @@ class MainActivity : ComponentActivity() {
                         )) { backStackEntry ->
                             val path = backStackEntry.arguments?.getString("path") ?: ""
                             CommentsScreen(path, navController = navController)
-                        }
-                        composable("comment_details_screen/{commentId}/{path}", arguments = listOf(
-                            navArgument(name = "commentId") {
-                                type = NavType.StringType
-                                defaultValue = ""
-                            },
-                            navArgument(name = "path") {
-                                type = NavType.StringType
-                                defaultValue = ""
-                            }
-                        )) { backStackEntry ->
-                            val commentId = backStackEntry.arguments?.getString("commentId") ?: ""
-                            val path = backStackEntry.arguments?.getString("path") ?: ""
-                            CommentDetailsScreen(path, commentId, navController)
                         }
                         composable("actions_screen") {
                             ActionsScreen(navController = navController)
