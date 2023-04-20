@@ -31,7 +31,7 @@ fun CommentsScreen(
 ) {
     val commentsState = commentsViewModel.commentsState.collectAsState()
     val newCommentState = commentsViewModel.newCommentState.collectAsState(initial = NewCommentState())
-    
+
     Box(
         modifier = Modifier
             .fillMaxSize()
