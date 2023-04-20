@@ -97,7 +97,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
                     emit(Error("current user is null"))
                 }
             } else {
-                emit(Error("error user is null"))
+                emit(Error("error user  is null"))
             }
         } catch (e: Exception) {
             emit(Error(e.toString()))
