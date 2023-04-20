@@ -1,14 +1,14 @@
 package com.example.retromariokmm.android.ui.comments.list
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Snackbar
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,6 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.retromariokmm.android.ui.components.CommentUserItem
 import com.example.retromariokmm.android.ui.components.toFeelings
+import com.example.retromariokmm.utils.ActionState.*
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
 import com.example.retromariokmm.utils.Success
@@ -26,9 +27,11 @@ import com.example.retromariokmm.utils.Success
 fun CommentsScreen(
     path: String,
     navController: NavController,
-    starCommentsViewModel: CommentsViewModel = hiltViewModel()
+    commentsViewModel: CommentsViewModel = hiltViewModel()
 ) {
-    val state = starCommentsViewModel.commentsState.collectAsState()
+    val commentsState = commentsViewModel.commentsState.collectAsState()
+    val newCommentState = commentsViewModel.newCommentState.collectAsState(initial = NewCommentState())
+    
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -39,12 +42,30 @@ fun CommentsScreen(
                 .fillMaxSize()
                 .padding(6.dp)
         ) {
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(6.dp)
+                    .background(Color.LightGray),
+                value = newCommentState.value.description,
+                onValueChange = {
+                    commentsViewModel.onCurrentCommentChange(it)
+                })
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                OutlinedButton(onClick = { navController.navigate("comment_details_screen/ /$path") }) {
-                    Text(text = "New Comment")
+                OutlinedButton(onClick = { commentsViewModel.createComment() }) {
+                    Text(text = "Valider")
                 }
             }
-            when (val list = state.value.comments) {
+            when (newCommentState.value.saveActionState) {
+                ERROR -> Snackbar() {
+                    Text(text = "Error on create comment")
+                }
+                PENDING -> {
+                    CircularProgressIndicator()
+                }
+                else -> {}
+            }
+            when (val list = commentsState.value.comments) {
                 is Error -> Snackbar() {
                     Text(text = list.msg)
                 }
@@ -71,13 +92,13 @@ fun CommentsScreen(
                                         .padding(6.dp)
                                         .animateItemPlacement(),
                                     onLikeClick = {
-                                        starCommentsViewModel.updateLikeComment(
+                                        commentsViewModel.updateLikeComment(
                                             comment.userComment.id,
                                             it.toFeelings()
                                         )
                                     },
                                     onDisLikeClick = {
-                                        starCommentsViewModel.updateLikeComment(
+                                        commentsViewModel.updateLikeComment(
                                             comment.userComment.id,
                                             it.toFeelings()
                                         )

@@ -3,7 +3,7 @@ package com.example.retromariokmm.android.ui.comments.details
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.retromariokmm.domain.usecases.comments.CreateStarCommentUseCase
+import com.example.retromariokmm.domain.usecases.comments.CreateCommentUseCase
 import com.example.retromariokmm.domain.usecases.comments.GetCommentByIdUseCase
 import com.example.retromariokmm.domain.usecases.comments.UpdateStarCommentUseCase
 import com.example.retromariokmm.utils.ActionState
@@ -21,7 +21,7 @@ import javax.inject.Inject
 class CommentDetailsViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getCommentByIdUseCase: GetCommentByIdUseCase,
-    private val createStarCommentUseCase: CreateStarCommentUseCase,
+    private val createCommentUseCase: CreateCommentUseCase,
     private val updateStarCommentUseCase: UpdateStarCommentUseCase
 ) : ViewModel() {
 
@@ -80,7 +80,7 @@ class CommentDetailsViewModel @Inject constructor(
                     }
                 }
             } else {
-                createStarCommentUseCase.invoke(commentPath, commentDescription.value).collect {
+                createCommentUseCase.invoke(commentPath, commentDescription.value).collect {
                     _saveAction.value = when (it) {
                         is Error -> ERROR
                         is Loading -> PENDING

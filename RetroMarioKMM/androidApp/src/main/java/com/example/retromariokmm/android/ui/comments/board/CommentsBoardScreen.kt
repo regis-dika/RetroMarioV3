@@ -32,7 +32,7 @@ fun CommentsBoardScreen(navController: NavController, viewModel: CommentsBoardVi
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(6.dp), verticalArrangement = Arrangement.SpaceBetween
+                    .padding(6.dp), verticalArrangement = Arrangement.SpaceAround
             ) {
                 Row(
                     Modifier
@@ -40,18 +40,18 @@ fun CommentsBoardScreen(navController: NavController, viewModel: CommentsBoardVi
                         .padding(6.dp), horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     BoardItem(
-                        modifier = Modifier.size(70.dp)
-                            .background(Color.Blue, shape = RoundedCornerShape(20.dp))
+                        modifier = Modifier
                             .clickable { navController.navigate("comments_screen/$STAR_COMMENTS") },
                         imageId = com.example.retromariokmm.android.R.drawable.retro_board_item_star,
-                        nbrElements = state.value.value?.nbStarComments.toString()
+                        title = "Past Success",
+                        nbrElements = state.value.value?.nbStarComments ?: 0
                     )
                     BoardItem(
-                        modifier = Modifier.size(70.dp)
-                            .background(Color.Blue, shape = RoundedCornerShape(20.dp))
+                        modifier = Modifier
                             .clickable { navController.navigate("comments_screen/$BOO_COMMENTS") },
                         imageId = com.example.retromariokmm.android.R.drawable.retro_board_item_boo,
-                        nbrElements = state.value.value?.nbBooComments.toString()
+                        title = "Futur Risk",
+                        nbrElements = state.value.value?.nbBooComments ?: 0
                     )
                 }
                 Row(
@@ -60,18 +60,18 @@ fun CommentsBoardScreen(navController: NavController, viewModel: CommentsBoardVi
                         .padding(6.dp), horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     BoardItem(
-                        modifier = Modifier.size(70.dp)
-                            .background(Color.Blue, shape = RoundedCornerShape(20.dp))
+                        modifier = Modifier
                             .clickable { navController.navigate("comments_screen/$GOOMBA_COMMENTS") },
                         imageId = com.example.retromariokmm.android.R.drawable.retro_board_item_goomba,
-                        nbrElements = state.value.value?.nbGoombaComments.toString()
+                        title = "Past Failed",
+                        nbrElements = state.value.value?.nbGoombaComments ?: 0
                     )
                     BoardItem(
-                        modifier = Modifier.size(70.dp)
-                            .background(Color.Blue, shape = RoundedCornerShape(20.dp))
+                        modifier = Modifier
                             .clickable { navController.navigate("comments_screen/$MUSHROOM_COMMENTS") },
                         imageId = com.example.retromariokmm.android.R.drawable.retro_board_item_mushroom,
-                        nbrElements = state.value.value?.nbMushroomComments.toString()
+                        title = "Futur opportunities",
+                        nbrElements = state.value.value?.nbMushroomComments ?: 0
                     )
 
                 }
