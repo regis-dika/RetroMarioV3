@@ -1,23 +1,17 @@
 package com.example.retromariokmm.android.ui.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Checkbox
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
@@ -27,18 +21,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.retromariokmm.android.MyApplicationTheme
 import com.example.retromariokmm.android.R
+import com.example.retromariokmm.android.helper.RetroBorder
 import com.example.retromariokmm.android.ui.actions.list.ActionContainer
-import com.example.retromariokmm.android.ui.comments.list.CommentContainer
-import com.example.retromariokmm.android.ui.components.FeelingsState.LIKE
-import com.example.retromariokmm.android.ui.components.FeelingsState.NOT_FEELINGS
 import com.example.retromariokmm.domain.models.ActionActor
 import com.example.retromariokmm.domain.models.UserAction
-import com.example.retromariokmm.domain.models.UserComment
 
 @Composable
 fun UserActionItem(
     actionContainer: ActionContainer,
-    backgroundColor: Color,
     onActionClick: () -> Unit,
     onTakeActionClick: (Boolean) -> Unit,
     onCheckClick: (Boolean) -> Unit,
@@ -50,13 +40,10 @@ fun UserActionItem(
         DateTimeUtil.formatNoteDate(note.created)
     }*/
 
-    val color = if (actionContainer.currentActor) Color.Blue else Color.LightGray
-
     Card(modifier = modifier) {
         Column(modifier = Modifier
-            .clip(RoundedCornerShape(5.dp))
-            .background(backgroundColor, shape = RoundedCornerShape(15.dp))
             .clickable { onActionClick.invoke() }
+            .RetroBorder()
             .padding(16.dp)) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -67,7 +54,6 @@ fun UserActionItem(
                         .clickable(MutableInteractionSource(), null) {
                             onTakeActionClick.invoke(!actionContainer.currentActor)
                         },
-                    colorFilter = ColorFilter.tint(color),
                     painter = painterResource(id = R.drawable.retro_person_add),
                     contentDescription = "take action button"
                 )
@@ -118,7 +104,6 @@ fun UserActionItemPreview() {
                     )
                 ), false, ""
             ),
-            backgroundColor = Color.Cyan,
             onActionClick = { },
             onTakeActionClick = {},
             onCheckClick = {},

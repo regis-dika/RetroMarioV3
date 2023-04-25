@@ -1,6 +1,8 @@
 package com.example.retromariokmm.android.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,9 +12,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.retromariokmm.android.MyApplicationTheme
+import com.example.retromariokmm.android.helper.RetroBorder
 import com.example.retromariokmm.android.ui.components.HealthyBoardModel.MainUser
 import com.example.retromariokmm.android.ui.components.HealthyBoardModel.OtherUser
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserContainer
@@ -21,7 +25,7 @@ import com.example.retromariokmm.android.ui.lifeanddifficulty.UserContainer
 fun RetroUserItem(
     userContainer: UserContainer,
     healthyBoardModel: HealthyBoardModel,
-    onSaveChange:(() -> Unit),
+    onSaveChange: (() -> Unit),
     modifier: Modifier = Modifier
 ) {
     //only change when note.created change
@@ -33,30 +37,29 @@ fun RetroUserItem(
         mutableStateOf(false)
     }
 
-    val backgroundColor = when(healthyBoardModel){
-        is MainUser -> Color.LightGray
-        is OtherUser -> Color.Gray
-    }
-    Box(modifier = modifier) {
-        Column(modifier = Modifier
-            .clip(RoundedCornerShape(20.dp))
-            .background(backgroundColor)
-            .clickable {}
-            .padding(16.dp)) {
+    Box(
+        modifier = modifier
+            .padding(8.dp)
+            .RetroBorder()
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
             RetroProfilItem(
                 picture = userContainer.picture,
                 firstName = userContainer.firstName,
                 lastName = userContainer.lastName,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.Green, shape = RoundedCornerShape(15.dp))
+                    .background(color = Color.Transparent, shape = RoundedCornerShape(15.dp))
             )
             Spacer(modifier = Modifier.height(8.dp))
-            when(healthyBoardModel){
+            when (healthyBoardModel) {
                 is MainUser -> {
                     HealthyMainBoardItem(mainUser = healthyBoardModel, isEditable)
                     OutlinedButton(onClick = {
-                        if(isEditable){
+                        if (isEditable) {
                             onSaveChange.invoke()
                         }
                         isEditable = !isEditable
@@ -84,6 +87,6 @@ fun RetroUserItemPreview() {
                 10,
                 false
             ),
-            OtherUser(),{})
+            OtherUser(), {})
     }
 }

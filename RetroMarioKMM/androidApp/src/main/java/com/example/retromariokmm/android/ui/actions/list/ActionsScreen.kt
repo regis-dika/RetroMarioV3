@@ -64,7 +64,6 @@ fun ActionsScreen(navController: NavController, viewModel: ActionsViewModel = hi
                             }) { action ->
                                 UserActionItem(
                                     actionContainer = action,
-                                    backgroundColor = if (action.isFromCurrentUser) Color.Red else Color.Cyan,
                                     onActionClick = {
                                         navController.navigate("action_details_screen/${action.userAction.id}")
                                     },

@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight.Companion
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.retromariokmm.android.MyApplicationTheme
+import com.example.retromariokmm.android.helper.RetroBorder
 import com.example.retromariokmm.android.ui.components.HealthyBoardModel.OtherUser
 
 @Composable
@@ -27,12 +28,13 @@ fun BoardItem(
     nbrElements: Int
 ) {
     Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(8.dp)
+        modifier = modifier.RetroBorder(),
     ) {
-        Row(modifier = Modifier
-            .wrapContentWidth()
-            .padding(8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
+        Row(
+            modifier = Modifier
+                .wrapContentWidth()
+                .padding(8.dp), horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
             Image(
                 modifier = Modifier
                     .size(50.dp)

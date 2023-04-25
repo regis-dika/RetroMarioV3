@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.text.font.FontWeight
@@ -20,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.retromariokmm.android.MyApplicationTheme
+import com.example.retromariokmm.android.helper.RetroBorder
 import com.example.retromariokmm.android.ui.comments.list.CommentContainer
 import com.example.retromariokmm.android.ui.components.FeelingsState.LIKE
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserContainer
@@ -28,7 +30,6 @@ import com.example.retromariokmm.domain.models.UserComment
 @Composable
 fun CommentUserItem(
     commentContainer: CommentContainer,
-    backgroundColor: Color,
     onNoteClick: () -> Unit,
     onLikeClick: (FeelingsState) -> Unit,
     onDisLikeClick: (FeelingsState) -> Unit,
@@ -40,10 +41,8 @@ fun CommentUserItem(
         DateTimeUtil.formatNoteDate(note.created)
     }*/
 
-    Box(modifier = modifier) {
+    Box(modifier = modifier.RetroBorder()) {
         Column(modifier = Modifier
-            .clip(RoundedCornerShape(10.dp))
-            .background(backgroundColor)
             .clickable { onNoteClick.invoke() }
             .padding(16.dp)) {
             Row(
@@ -83,6 +82,6 @@ fun CommentUserItemPreview() {
                 UserComment("", "", "Faire des trfucs stylé", null),
                 false,
                 LIKE
-            ), Color.Red, {}, {}, {}, {})
+            ), {}, {}, {}, {})
     }
 }
