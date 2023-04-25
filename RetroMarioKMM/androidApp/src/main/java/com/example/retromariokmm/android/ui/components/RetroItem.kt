@@ -3,9 +3,9 @@ package com.example.retromariokmm.android.ui.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedButton
@@ -14,97 +14,64 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.retromariokmm.android.ui.retros.list.RetroContainer
-import com.example.retromariokmm.android.ui.components.cardHeaderWithExpandedState as cardHeaderWithExpandedState1
+import com.example.retromariokmm.domain.models.UserAction
 
 @Composable
-fun NestedScrolling(
-    list: List<RetroContainer>,
-    modifier: Modifier = Modifier,
-    onCardClick: ((String) -> Unit),
-    onResumeClick: ((String) -> Unit)
-) {
-    var isExpanded = rememberSaveable() {
-        mutableStateOf(false)
-    }
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(6.dp)
-    ) {
-        LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            list.forEach { retroContainer ->
-                RetroItem(retroContainer, onCardClick, onResumeClick, isExpanded.value) {
-                    isExpanded.value = it
-                }
-            }
-        }
-    }
-}
-
-fun LazyListScope.RetroItem(
+fun RetroItem(
     retroContainer: RetroContainer,
     onCardClick: (String) -> Unit,
     onResumeClick: (String) -> Unit,
-    isExpanded : Boolean,
-    onExpendedListener : ((Boolean) -> Unit)
-) {
-    item {
-        cardHeaderWithExpandedState1(
-            retroContainer.retroId,
-            retroContainer.title,
-            onCardClick,
-            onResumeClick
-        ){
-            onExpendedListener.invoke(it)
-        }
-    }
-    if (isExpanded) {
-        items(retroContainer.actionsList) { action ->
-            ActionCheckable(
-                actionTitle = action.title,
-                actionDescription = action.description,
-                isCheck = action.isCheck,
-                onCheckClick = {})
-        }
-    }
-    item {
-        AnimatedVisibility(visible = isExpanded) {
-            Box(contentAlignment = Alignment.CenterEnd) {
-                OutlinedButton(onClick = { onResumeClick.invoke(retroContainer.retroId) }) {
-                    Text(text = "Reprendre")
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun cardHeaderWithExpandedState(
-    retroId: String,
-    title: String,
-    onCardClick: (String) -> Unit,
-    onResumeClick: (String) -> Unit,
-    onIsExpandedClick: ((Boolean) -> Unit)
 ) {
     val isExpanded = rememberSaveable {
         mutableStateOf(false)
     }
 
+    LaunchedEffect(isExpanded.value) {
+        if (isExpanded.value) {
+            onCardClick.invoke(retroContainer.retroId)
+        }
+    }
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp)
+        ) {
+            CardHeaderWithExpandedState(title = retroContainer.title, isExpanded = isExpanded.value) {
+                isExpanded.value = !isExpanded.value
+            }
+            AnimatedVisibility(visible = isExpanded.value) {
+                RetroCardExpanded(
+                    list = retroContainer.actionsList,
+                    onResumeClick = { onResumeClick.invoke(retroContainer.retroId) })
+            }
+        }
+    }
+}
+
+@Composable
+fun CardHeaderWithExpandedState(
+    title: String,
+    isExpanded: Boolean,
+    onCardClick: (Boolean) -> Unit,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                isExpanded.value = !isExpanded.value
-                onIsExpandedClick.invoke(isExpanded.value)
-                if (isExpanded.value) {
-                    onCardClick.invoke(retroId)
-                }
+                onCardClick.invoke(!isExpanded)
             }, horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row() {
@@ -117,9 +84,36 @@ fun cardHeaderWithExpandedState(
                 Text(text = "14/02/2023")
             }
         }
-        AnimatedVisibility(visible = isExpanded.value) {
+        AnimatedVisibility(visible = isExpanded) {
             Box() {
                 Icon(imageVector = Icons.Default.Delete, contentDescription = "delete retro")
+            }
+        }
+    }
+}
+
+@Composable
+fun RetroCardExpanded(list: List<UserAction>, onResumeClick: () -> Unit, modifier: Modifier = Modifier) {
+    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.SpaceAround) {
+        if (list.isEmpty()) {
+            Text(text = "No action taken for this retro")
+        } else {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                items(list) { action ->
+                    ActionCheckable(
+                        actionTitle = action.title,
+                        actionDescription = action.description,
+                        isCheck = action.isCheck,
+                        onCheckClick = {})
+                }
+            }
+        }
+        Box(contentAlignment = Alignment.CenterEnd) {
+            OutlinedButton(onClick = { onResumeClick.invoke() }) {
+                Text(text = "Reprendre")
             }
         }
     }
