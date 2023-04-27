@@ -23,23 +23,36 @@ class RetroCreationViewModel @Inject constructor(
         MutableStateFlow(RetroCreationContainer())
     val retroCreationState = _retroCreationState.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            createRetroUseCase.invoke(Random.nextInt(8).toString(), "Poulets").collect {
-                _retroCreationState.value = _retroCreationState.value.copy(
-                    retroId =
-                    when (it) {
-                        is Error -> Error(it.msg)
-                        is Loading -> Loading()
-                        is Success -> Success(it.value)
+    fun createRetro() {
+        val title = retroCreationState.value.sprintTitle
+        val description = retroCreationState.value.sprintDescription
+        if (title.isNotBlank() && description.isNotBlank()) {
+            viewModelScope.launch {
+                createRetroUseCase.invoke(title, description)
+                    .collect {
+                        _retroCreationState.value = _retroCreationState.value.copy(
+                            retroId =
+                            when (it) {
+                                is Error -> Error(it.msg)
+                                is Loading -> Loading()
+                                is Success -> Success(it.value)
+                            }
+                        )
                     }
-                )
             }
         }
     }
 
+    fun onTitle(title: String) {
+        _retroCreationState.value = _retroCreationState.value.copy(sprintTitle = title)
+    }
+
+    fun onDescription(description: String) {
+        _retroCreationState.value = _retroCreationState.value.copy(sprintDescription = description)
+    }
+
     fun addMeToThisRetro() {
-        val retroId = retroCreationState.value.retroId.value ?: ""
+        val retroId = retroCreationState.value.retroId?.value ?: ""
         viewModelScope.launch {
             addMeAndConnectToRetroUseCase.invoke(retroId).collect {
                 _retroCreationState.value = _retroCreationState.value.copy(
@@ -55,7 +68,9 @@ class RetroCreationViewModel @Inject constructor(
 }
 
 data class RetroCreationContainer(
-    val retroId: Resource<String> = Loading(),
+    val sprintTitle: String = "",
+    val sprintDescription: String = "",
+    val retroId: Resource<String>? = null,
     val addMeToTheRetroAction: ActionState = NOT_STARTED
 ) {
     val urlToShare get() = "$BASE_URL/$retroId"

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,6 +38,7 @@ import com.example.retromariokmm.android.ui.lifeanddifficulty.UserHealthScreen
 import com.example.retromariokmm.android.ui.login.LoginScreen
 import com.example.retromariokmm.android.ui.register.RegisterScreen
 import com.example.retromariokmm.android.ui.retros.creation.RetroCreationScreen
+import com.example.retromariokmm.android.ui.retros.creation.RetroCreationViewModel
 import com.example.retromariokmm.android.ui.retros.list.RetroScreen
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
@@ -143,15 +145,25 @@ class MainActivity : ComponentActivity() {
                                 type = NavType.StringType
                                 defaultValue = ""
                             }
-                        )) {navBackEntry ->
+                        )) { navBackEntry ->
                             val retroId = navBackEntry.arguments?.getString("retroId")
-                            RegisterScreen(retroId,navController)
+                            RegisterScreen(retroId, navController)
                         }
                         composable("retros_screen") {
                             RetroScreen(navController)
                         }
                         composable("retro_creation") {
-                            RetroCreationScreen(navController)
+                            val retroCreationViewModel: RetroCreationViewModel by viewModels()
+                            val retroCreationContainerState = retroCreationViewModel.retroCreationState.collectAsState()
+                            RetroCreationScreen(navController, retroCreationContainerState.value, addToRetroEvent = {
+                                retroCreationViewModel.addMeToThisRetro()
+                            }, onSprintTitleEvent = {
+                                retroCreationViewModel.onTitle(it)
+                            }, onSprintDescriptionEvent = {
+                                retroCreationViewModel.onDescription(it)
+                            }, createRetroEvent = {
+                                retroCreationViewModel.createRetro()
+                            })
                         }
                         composable("life_difficulty_screen") {
                             viewModel.getCurrentUser()
