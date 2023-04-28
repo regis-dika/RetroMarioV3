@@ -11,10 +11,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.retromariokmm.android.ui.components.DoubleTextFieldItem
 import com.example.retromariokmm.android.ui.components.TransparentHiltTextField
 import com.example.retromariokmm.utils.ActionState.*
 
@@ -22,60 +25,46 @@ import com.example.retromariokmm.utils.ActionState.*
 fun ActionDetailsScreen(
     actionId: String,
     navController: NavController,
-    viewModel: ActionDetailsViewModel = hiltViewModel()
+    state: ActionDetailsState,
+    onTitleChange: ((String) -> Unit),
+    onDescriptionChange: ((String) -> Unit),
+    validateEvent: (() -> Unit),
+    modifier: Modifier = Modifier
 ) {
 
-    val state = viewModel.state.collectAsState(initial = ActionDetailsState())
-
-    val hasBeenSave  = state.value.saveActionState == SUCCESS
+    val hasBeenSave = state.saveActionState == SUCCESS
     LaunchedEffect(key1 = hasBeenSave) {
         if (hasBeenSave) {
             navController.popBackStack()
         }
     }
-
-    Scaffold(floatingActionButton = {
-        FloatingActionButton(onClick = {
-            viewModel.saveAction()
-        }, backgroundColor = Color.Black) {
-            Icon(imageVector = Icons.Default.Check, contentDescription = "save note", tint = Color.White)
-        }
-    }) { padding ->
-        Column(
-            modifier = Modifier
-                .background(Color.Magenta)
-                .fillMaxSize()
-                .padding(16.dp),
-        ) {
-            TransparentHiltTextField(
-                text = state.value.title,
-                hint = "Enter a title...",
-                isHintVisible = false,
-                onValueChange = {
-                    viewModel.onChangeTitle(it)
-                },
-                onFocusChanged = {
-                    //viewModel.onNoteTitleFocusChanged(it.isFocused)
-                }, singleLine = true,
-                textStyle = TextStyle(fontSize = 20.sp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TransparentHiltTextField(
-                text = state.value.description,
-                hint = "Enter a content...",
-                isHintVisible = false,
-                onValueChange = {
-                    viewModel.onChangeDescription(it)
-                },
-                onFocusChanged = {
-                    //viewModel.onNoteContentFocusChanged(it.isFocused)
-                }, singleLine = true,
-                textStyle = TextStyle(fontSize = 20.sp),
-                modifier = Modifier.weight(1f)  // occupy tje remaining space
-
-            )
-        }
+    Surface(modifier = modifier
+        .fillMaxSize()
+        .padding(16.dp)) {
+        DoubleTextFieldItem(
+            firstEdiTitleValue = Pair("Title", state.title),
+            onFirstEdtChange = {
+                onTitleChange.invoke(it)
+            },
+            secondEdiTitleValue = Pair("Description", state.description),
+            onSecondEdtChange = {
+                onDescriptionChange.invoke(it)
+            },
+            validButton = Pair("Valider") {
+                validateEvent.invoke()
+            }
+        )
     }
+}
+
+@Preview
+@Composable
+fun ActionDetailsScreenPreview() {
+    ActionDetailsScreen(
+        actionId = "",
+        navController = rememberNavController(),
+        state = ActionDetailsState(),
+        {},
+        {},
+        {})
 }

@@ -31,6 +31,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 import com.example.retromariokmm.android.ui.actions.details.ActionDetailsScreen
+import com.example.retromariokmm.android.ui.actions.details.ActionDetailsState
+import com.example.retromariokmm.android.ui.actions.details.ActionDetailsViewModel
 import com.example.retromariokmm.android.ui.actions.list.ActionsScreen
 import com.example.retromariokmm.android.ui.comments.board.CommentsBoardScreen
 import com.example.retromariokmm.android.ui.comments.list.CommentsScreen
@@ -208,7 +210,16 @@ class MainActivity : ComponentActivity() {
                             }
                         )) { backStackEntry ->
                             val actionId = backStackEntry.arguments?.getString("actionId") ?: ""
-                            ActionDetailsScreen(actionId, navController)
+                            val actionDetailsViewModel: ActionDetailsViewModel by viewModels()
+                            val actionDetailState =
+                                actionDetailsViewModel.state.collectAsState(initial = ActionDetailsState())
+                            ActionDetailsScreen(actionId, navController, actionDetailState.value, onTitleChange = {
+                                actionDetailsViewModel.onChangeTitle(it)
+                            }, onDescriptionChange = {
+                                actionDetailsViewModel.onChangeDescription(it)
+                            }, validateEvent = {
+                                actionDetailsViewModel.saveAction()
+                            })
                         }
                     }
                 }
