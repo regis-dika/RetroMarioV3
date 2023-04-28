@@ -47,7 +47,6 @@ fun RegisterScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceAround
     ) {
-        Text(text = "Register")
         Text(text = "Email")
         OutlinedTextField(
             modifier = Modifier

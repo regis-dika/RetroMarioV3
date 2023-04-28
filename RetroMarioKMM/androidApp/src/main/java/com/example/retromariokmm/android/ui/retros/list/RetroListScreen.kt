@@ -46,10 +46,6 @@ fun RetroScreen(navController: NavController, viewModel: RetroListViewModel = hi
                 }) {
                     Text(text = "New Retro")
                 }
-                OutlinedButton(onClick = {
-                }) {
-                    Text(text = "Go to Updated HealthyScreen")
-                }
             }
             when (state.value.connectAction) {
                 NOT_STARTED -> {}
