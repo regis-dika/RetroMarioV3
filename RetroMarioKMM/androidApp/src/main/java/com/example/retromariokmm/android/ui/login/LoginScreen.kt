@@ -5,81 +5,60 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.retromariokmm.android.ui.components.DoubleTextFieldItem
 import com.example.retromariokmm.android.ui.login.LoginState.*
 
 @Composable
 fun LoginScreen(
     retroId: String? = null,
     navController: NavController,
-    viewModel: LoginScreenViewModel = hiltViewModel()
+    credentialsState: LoginCredentials,
+    loginState: LoginState,
+    onEmailEvent: ((String) -> Unit),
+    onPasswordEvent: ((String) -> Unit),
+    onLoginEvent: (() -> Unit)
 ) {
-    val credentialsState = viewModel.loginCredentials.collectAsState()
-    val loginState = viewModel.loginState.collectAsState()
-
     //navigation not good handle if use in when with no launchEffect
-    LaunchedEffect(key1 = loginState.value) {
-        if (loginState.value is Success) {
+    LaunchedEffect(key1 = loginState) {
+        if (loginState is Success) {
             navController.navigate("retros_screen")
         }
-        if (loginState.value is SuccessLoginAndAddUser) {
+        if (loginState is SuccessLoginAndAddUser) {
             navController.navigate("life_difficulty_screen")
         }
     }
 
-    val registerBtn = if(retroId == null) "Register" else "Register with id"
+    val loginBtn = if (retroId == null) "Sign in" else "Sign in Retro : $retroId"
+    val registerBtn = if (retroId == null) "Register" else "Register with id"
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "Email")
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(6.dp)
-                .background(Color.LightGray),
-            value = credentialsState.value.email,
-            onValueChange = {
-                viewModel.onEmailChange(it)
-            })
-
-        Spacer(modifier = Modifier.height(2.dp))
-
-        Text(text = "Password")
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(6.dp)
-                .background(Color.LightGray),
-            value = credentialsState.value.password,
-            onValueChange = {
-                viewModel.onPasswordChange(it)
-            })
-
-        if (retroId != null) {
-            viewModel.onRetroIdAvailable(retroId)
-            Snackbar(modifier = Modifier.fillMaxWidth()) {
-                Text(text = retroId)
-            }
-            OutlinedButton(onClick = { viewModel.onLoginWithRetroId() }) {
-                Text(text = "Go to login with id")
-            }
-        } else {
-            OutlinedButton(onClick = { viewModel.onLogin() }) {
-                Text(text = "Go to login")
-            }
-        }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        DoubleTextFieldItem(
+            firstEdiTitleValue = Pair("Email", credentialsState.email),
+            onFirstEdtChange = { onEmailEvent.invoke(it) },
+            secondEdiTitleValue = Pair("Password", credentialsState.password),
+            onSecondEdtChange = { onPasswordEvent.invoke(it) },
+            validButton = Pair(loginBtn) { onLoginEvent.invoke() }
+        )
         OutlinedButton(onClick = {
             navController.navigate("register_screen/${retroId}")
         }) {
             Text(text = registerBtn)
         }
-        when (val result = loginState.value) {
+        when (loginState) {
             is Error -> Snackbar() {
-                Text(text = result.msg)
+                Text(text = loginState.msg)
             }
             Idle -> {}
             Loading -> CircularProgressIndicator()
@@ -93,5 +72,16 @@ fun LoginScreen(
             }
         }
     }
+}
 
+@Preview
+@Composable
+fun LoginScreenPreview() {
+    LoginScreen(
+        navController = rememberNavController(),
+        credentialsState = LoginCredentials("", ""),
+        loginState = Idle,
+        onEmailEvent = {},
+        onPasswordEvent = {}) {
+    }
 }

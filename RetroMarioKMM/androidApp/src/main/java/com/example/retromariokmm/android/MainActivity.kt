@@ -36,6 +36,7 @@ import com.example.retromariokmm.android.ui.comments.board.CommentsBoardScreen
 import com.example.retromariokmm.android.ui.comments.list.CommentsScreen
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserHealthScreen
 import com.example.retromariokmm.android.ui.login.LoginScreen
+import com.example.retromariokmm.android.ui.login.LoginScreenViewModel
 import com.example.retromariokmm.android.ui.register.RegisterScreen
 import com.example.retromariokmm.android.ui.retros.creation.RetroCreationScreen
 import com.example.retromariokmm.android.ui.retros.creation.RetroCreationViewModel
@@ -138,7 +139,23 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = "login_screen") {
                         composable(route = "login_screen") {
                             val retroId = if (incomeDeeplink == null) null else getLastBitFromUrl(incomeDeeplink!!.path)
-                            LoginScreen(retroId, navController)
+                            val loginScreenViewModel: LoginScreenViewModel by viewModels()
+                            val credentialsState = loginScreenViewModel.loginCredentials.collectAsState()
+                            if (retroId != null) {
+                                loginScreenViewModel.onRetroIdAvailable(retroId)
+                            }
+                            val loginState = loginScreenViewModel.loginState.collectAsState()
+                            LoginScreen(
+                                retroId,
+                                navController,
+                                credentialsState = credentialsState.value,
+                                loginState = loginState.value,
+                                onEmailEvent = { loginScreenViewModel.onEmailChange(it) },
+                                onPasswordEvent = { loginScreenViewModel.onPasswordChange(it) },
+                                onLoginEvent = {
+                                    loginScreenViewModel.onLogin()
+                                }
+                            )
                         }
                         composable("register_screen/{retroId}", arguments = listOf(
                             navArgument(name = "retroId") {
