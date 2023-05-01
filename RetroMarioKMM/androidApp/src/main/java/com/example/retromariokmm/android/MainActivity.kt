@@ -31,6 +31,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 import com.example.retromariokmm.android.ui.actions.details.ActionDetailsScreen
+import com.example.retromariokmm.android.ui.actions.details.ActionDetailsState
+import com.example.retromariokmm.android.ui.actions.details.ActionDetailsViewModel
 import com.example.retromariokmm.android.ui.actions.list.ActionsScreen
 import com.example.retromariokmm.android.ui.comments.board.CommentsBoardScreen
 import com.example.retromariokmm.android.ui.comments.list.CommentsScreen
@@ -45,6 +47,7 @@ import com.google.firebase.dynamiclinks.PendingDynamicLinkData
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 
 @Composable
 fun MyApplicationTheme(
@@ -139,7 +142,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = "login_screen") {
                         composable(route = "login_screen") {
                             val retroId = if (incomeDeeplink == null) null else getLastBitFromUrl(incomeDeeplink!!.path)
-                            val loginScreenViewModel: LoginScreenViewModel by viewModels()
+                            val loginScreenViewModel: LoginScreenViewModel = hiltViewModel()
                             val credentialsState = loginScreenViewModel.loginCredentials.collectAsState()
                             if (retroId != null) {
                                 loginScreenViewModel.onRetroIdAvailable(retroId)
@@ -170,7 +173,7 @@ class MainActivity : ComponentActivity() {
                             RetroScreen(navController)
                         }
                         composable("retro_creation") {
-                            val retroCreationViewModel: RetroCreationViewModel by viewModels()
+                            val retroCreationViewModel: RetroCreationViewModel = hiltViewModel()
                             val retroCreationContainerState = retroCreationViewModel.retroCreationState.collectAsState()
                             RetroCreationScreen(navController, retroCreationContainerState.value, addToRetroEvent = {
                                 retroCreationViewModel.addMeToThisRetro()
@@ -207,8 +210,17 @@ class MainActivity : ComponentActivity() {
                                 defaultValue = ""
                             }
                         )) { backStackEntry ->
+                            val actionDetailsViewModel: ActionDetailsViewModel = hiltViewModel()
                             val actionId = backStackEntry.arguments?.getString("actionId") ?: ""
-                            ActionDetailsScreen(actionId, navController)
+                            val actionDetailState =
+                                actionDetailsViewModel.state.collectAsState(initial = ActionDetailsState())
+                            ActionDetailsScreen(actionId, navController, actionDetailState.value, onTitleChange = {
+                                actionDetailsViewModel.onChangeTitle(it)
+                            }, onDescriptionChange = {
+                                actionDetailsViewModel.onChangeDescription(it)
+                            }, validateEvent = {
+                                actionDetailsViewModel.saveAction()
+                            })
                         }
                     }
                 }
