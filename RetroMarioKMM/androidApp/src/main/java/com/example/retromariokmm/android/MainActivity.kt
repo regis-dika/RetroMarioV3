@@ -5,9 +5,9 @@ import android.content.ContentValues.TAG
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,6 +35,7 @@ import com.example.retromariokmm.android.ui.actions.details.ActionDetailsState
 import com.example.retromariokmm.android.ui.actions.details.ActionDetailsViewModel
 import com.example.retromariokmm.android.ui.actions.list.ActionsScreen
 import com.example.retromariokmm.android.ui.comments.board.CommentsBoardScreen
+import com.example.retromariokmm.android.ui.comments.list.CommentListScreen
 import com.example.retromariokmm.android.ui.comments.list.CommentsScreen
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserHealthScreen
 import com.example.retromariokmm.android.ui.login.LoginScreen
@@ -47,7 +48,6 @@ import com.google.firebase.dynamiclinks.PendingDynamicLinkData
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 @Composable
 fun MyApplicationTheme(
@@ -199,7 +199,9 @@ class MainActivity : ComponentActivity() {
                             }
                         )) { backStackEntry ->
                             val path = backStackEntry.arguments?.getString("path") ?: ""
-                            CommentsScreen(path, navController = navController)
+                            CommentListScreen(path, navController = navController) {
+                                Toast.makeText(applicationContext, it, Toast.LENGTH_SHORT).show()
+                            }
                         }
                         composable("actions_screen") {
                             ActionsScreen(navController = navController)

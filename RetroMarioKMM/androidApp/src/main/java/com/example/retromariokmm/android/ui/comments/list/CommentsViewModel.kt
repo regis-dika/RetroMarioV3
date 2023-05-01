@@ -10,6 +10,7 @@ import com.example.retromariokmm.domain.models.UserComment
 import com.example.retromariokmm.domain.usecases.comments.CommentsListUseCase
 import com.example.retromariokmm.domain.usecases.comments.CreateCommentUseCase
 import com.example.retromariokmm.domain.usecases.comments.UpdateLikeCommentUseCase
+import com.example.retromariokmm.domain.usecases.comments.UpdateCommentUseCase
 import com.example.retromariokmm.domain.usecases.users.CurrentUserUseCase
 import com.example.retromariokmm.utils.*
 import com.example.retromariokmm.utils.ActionState.*
@@ -26,7 +27,8 @@ class CommentsViewModel @Inject constructor(
     private val commentsListUseCase: CommentsListUseCase,
     private val createCommentUseCase: CreateCommentUseCase,
     private val currentUserUseCase: CurrentUserUseCase,
-    private val updateLikeCommentUseCase: UpdateLikeCommentUseCase
+    private val updateLikeCommentUseCase: UpdateLikeCommentUseCase,
+    private val updateCommentUseCase: UpdateCommentUseCase
 ) : ViewModel() {
     private val commentDescription = savedStateHandle.getStateFlow("commentDescription", "")
     private val _saveAction = MutableStateFlow(NOT_STARTED)
@@ -109,10 +111,32 @@ class CommentsViewModel @Inject constructor(
             }
         }
     }
+
+    fun onEditDescriptionChange(description: String) {
+        _commentsState.value = _commentsState.value.copy(descriptionEditable = description)
+    }
+
+    fun editComment(commentId: String) {
+        val editDescription = commentsState.value.descriptionEditable
+        viewModelScope.launch {
+            updateCommentUseCase.invoke(path, commentId, editDescription).collect {
+                _commentsState.value = _commentsState.value.copy(
+                    saveActionState = when (it) {
+                        is Error -> ERROR
+                        is Loading -> PENDING
+                        is Success -> SUCCESS
+                    }
+                )
+            }
+        }
+    }
 }
 
 data class CommentsScreen(
     val comments: Resource<List<CommentContainer>> = Loading(),
+    val descriptionEditable: String = "",
+    val saveActionState: ActionState = NOT_STARTED
+
 )
 
 data class NewCommentState(

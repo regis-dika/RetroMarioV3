@@ -1,6 +1,5 @@
 package com.example.retromariokmm.android.ui.comments.list
 
-import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,6 +16,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.retromariokmm.android.ui.components.CommentUserItem
 import com.example.retromariokmm.android.ui.components.toFeelings
+import com.example.retromariokmm.utils.ActionState
 import com.example.retromariokmm.utils.ActionState.*
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
@@ -24,14 +24,27 @@ import com.example.retromariokmm.utils.Success
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
-fun CommentsScreen(
+fun CommentListScreen(
     path: String,
     navController: NavController,
-    commentsViewModel: CommentsViewModel = hiltViewModel()
-) {
+    commentsViewModel: CommentsViewModel = hiltViewModel(),
+    onSuccessAction:((String) ->Unit)
+){
     val commentsState = commentsViewModel.commentsState.collectAsState()
     val newCommentState = commentsViewModel.newCommentState.collectAsState(initial = NewCommentState())
 
+    val editComment = commentsState.value.saveActionState
+    val createComment = newCommentState.value.saveActionState
+    LaunchedEffect(editComment){
+        if(editComment == ActionState.SUCCESS){
+           onSuccessAction.invoke("Comment edited with success")
+        }
+    }
+    LaunchedEffect(createComment){
+        if(createComment == ActionState.SUCCESS){
+            onSuccessAction.invoke("Comment created with success")
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -65,6 +78,15 @@ fun CommentsScreen(
                 }
                 else -> {}
             }
+            when (newCommentState.value.saveActionState) {
+                ERROR -> Snackbar() {
+                    Text(text = "Error on edit comment")
+                }
+                PENDING -> {
+                    CircularProgressIndicator()
+                }
+                else -> {}
+            }
             when (val list = commentsState.value.comments) {
                 is Error -> Snackbar() {
                     Text(text = list.msg)
@@ -82,9 +104,6 @@ fun CommentsScreen(
                             }) { comment ->
                                 CommentUserItem(
                                     commentContainer = comment,
-                                    onNoteClick = {
-                                        navController.navigate("comment_details_screen/${comment.userComment.id}/$path")
-                                    },
                                     onDeleteClick = { },
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -101,6 +120,12 @@ fun CommentsScreen(
                                             comment.userComment.id,
                                             it.toFeelings()
                                         )
+                                    },
+                                    onEditChange = {
+                                        commentsViewModel.onEditDescriptionChange(it)
+                                    },
+                                    onValidClick = {
+                                        commentsViewModel.editComment(comment.userComment.id)
                                     }
                                 )
                             }
