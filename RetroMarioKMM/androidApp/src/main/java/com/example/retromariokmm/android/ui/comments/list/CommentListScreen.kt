@@ -119,7 +119,7 @@ fun CommentListScreen(
                                     },
                                     onDisLikeClick = {
                                         event.invoke(
-                                            OnDisLikeEvent(
+                                            OnLikeEvent(
                                                 comment.userComment.id,
                                                 it.toFeelings()
                                             )
@@ -144,7 +144,6 @@ sealed class CommentListEvent {
     data class EditCommentEvent(val commentId: String) : CommentListEvent()
     data class EditDescriptionEvent(val description: String) : CommentListEvent()
     data class OnLikeEvent(val commentId: String, val feeling: Boolean?) : CommentListEvent()
-    data class OnDisLikeEvent(val commentId: String, val feeling: Boolean?) : CommentListEvent()
     object CreateCommentEvent : CommentListEvent()
     data class CurrentDescriptionEvent(val description: String) : CommentListEvent()
 }

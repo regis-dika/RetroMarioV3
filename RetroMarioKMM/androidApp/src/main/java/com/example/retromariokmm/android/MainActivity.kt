@@ -217,10 +217,6 @@ class MainActivity : ComponentActivity() {
                                         is CurrentDescriptionEvent -> commentsViewModel.onCurrentCommentChange(event.description)
                                         is EditCommentEvent -> commentsViewModel.editComment(event.commentId)
                                         is EditDescriptionEvent -> commentsViewModel.onEditDescriptionChange(event.description)
-                                        is OnDisLikeEvent -> commentsViewModel.updateLikeComment(
-                                            event.commentId,
-                                            event.feeling
-                                        )
                                         is OnLikeEvent -> commentsViewModel.updateLikeComment(
                                             event.commentId,
                                             event.feeling
