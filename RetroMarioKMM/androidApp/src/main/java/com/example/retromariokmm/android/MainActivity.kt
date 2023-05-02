@@ -35,8 +35,11 @@ import com.example.retromariokmm.android.ui.actions.details.ActionDetailsState
 import com.example.retromariokmm.android.ui.actions.details.ActionDetailsViewModel
 import com.example.retromariokmm.android.ui.actions.list.ActionsScreen
 import com.example.retromariokmm.android.ui.comments.board.CommentsBoardScreen
+import com.example.retromariokmm.android.ui.comments.list.CommentListEvent.*
 import com.example.retromariokmm.android.ui.comments.list.CommentListScreen
 import com.example.retromariokmm.android.ui.comments.list.CommentsScreen
+import com.example.retromariokmm.android.ui.comments.list.CommentsViewModel
+import com.example.retromariokmm.android.ui.comments.list.NewCommentState
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserHealthScreen
 import com.example.retromariokmm.android.ui.login.LoginScreen
 import com.example.retromariokmm.android.ui.login.LoginScreenViewModel
@@ -198,8 +201,32 @@ class MainActivity : ComponentActivity() {
                                 defaultValue = ""
                             }
                         )) { backStackEntry ->
+                            val commentsViewModel: CommentsViewModel = hiltViewModel()
+                            val commentsState = commentsViewModel.commentsState.collectAsState()
+                            val newCommentState =
+                                commentsViewModel.newCommentState.collectAsState(initial = NewCommentState())
                             val path = backStackEntry.arguments?.getString("path") ?: ""
-                            CommentListScreen(path, navController = navController) {
+                            CommentListScreen(
+                                path,
+                                navController = navController,
+                                commentsState.value,
+                                newCommentState.value,
+                                event = { event ->
+                                    when (event) {
+                                        CreateCommentEvent -> commentsViewModel.createComment()
+                                        is CurrentDescriptionEvent -> commentsViewModel.onCurrentCommentChange(event.description)
+                                        is EditCommentEvent -> commentsViewModel.editComment(event.commentId)
+                                        is EditDescriptionEvent -> commentsViewModel.onEditDescriptionChange(event.description)
+                                        is OnDisLikeEvent -> commentsViewModel.updateLikeComment(
+                                            event.commentId,
+                                            event.feeling
+                                        )
+                                        is OnLikeEvent -> commentsViewModel.updateLikeComment(
+                                            event.commentId,
+                                            event.feeling
+                                        )
+                                    }
+                                }) {
                                 Toast.makeText(applicationContext, it, Toast.LENGTH_SHORT).show()
                             }
                         }

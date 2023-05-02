@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.retromariokmm.android.ui.comments.list.CommentListEvent.*
 import com.example.retromariokmm.android.ui.components.CommentUserItem
 import com.example.retromariokmm.android.ui.components.toFeelings
 import com.example.retromariokmm.utils.ActionState
@@ -27,21 +28,20 @@ import com.example.retromariokmm.utils.Success
 fun CommentListScreen(
     path: String,
     navController: NavController,
-    commentsViewModel: CommentsViewModel = hiltViewModel(),
-    onSuccessAction:((String) ->Unit)
-){
-    val commentsState = commentsViewModel.commentsState.collectAsState()
-    val newCommentState = commentsViewModel.newCommentState.collectAsState(initial = NewCommentState())
-
-    val editComment = commentsState.value.saveActionState
-    val createComment = newCommentState.value.saveActionState
-    LaunchedEffect(editComment){
-        if(editComment == ActionState.SUCCESS){
-           onSuccessAction.invoke("Comment edited with success")
+    commentsState: CommentsScreen,
+    newCommentState: NewCommentState,
+    event: ((CommentListEvent) -> Unit),
+    onSuccessAction: ((String) -> Unit)
+) {
+    val editComment = commentsState.saveActionState
+    val createComment = newCommentState.saveActionState
+    LaunchedEffect(editComment) {
+        if (editComment == ActionState.SUCCESS) {
+            onSuccessAction.invoke("Comment edited with success")
         }
     }
-    LaunchedEffect(createComment){
-        if(createComment == ActionState.SUCCESS){
+    LaunchedEffect(createComment) {
+        if (createComment == ActionState.SUCCESS) {
             onSuccessAction.invoke("Comment created with success")
         }
     }
@@ -60,16 +60,16 @@ fun CommentListScreen(
                     .fillMaxWidth()
                     .padding(6.dp)
                     .background(Color.LightGray),
-                value = newCommentState.value.description,
+                value = newCommentState.description,
                 onValueChange = {
-                    commentsViewModel.onCurrentCommentChange(it)
+                    event.invoke(CurrentDescriptionEvent(it))
                 })
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                OutlinedButton(onClick = { commentsViewModel.createComment() }) {
+                OutlinedButton(onClick = { event.invoke(CreateCommentEvent) }) {
                     Text(text = "Valider")
                 }
             }
-            when (newCommentState.value.saveActionState) {
+            when (newCommentState.saveActionState) {
                 ERROR -> Snackbar() {
                     Text(text = "Error on create comment")
                 }
@@ -78,7 +78,7 @@ fun CommentListScreen(
                 }
                 else -> {}
             }
-            when (newCommentState.value.saveActionState) {
+            when (newCommentState.saveActionState) {
                 ERROR -> Snackbar() {
                     Text(text = "Error on edit comment")
                 }
@@ -87,7 +87,7 @@ fun CommentListScreen(
                 }
                 else -> {}
             }
-            when (val list = commentsState.value.comments) {
+            when (val list = commentsState.comments) {
                 is Error -> Snackbar() {
                     Text(text = list.msg)
                 }
@@ -110,22 +110,26 @@ fun CommentListScreen(
                                         .padding(6.dp)
                                         .animateItemPlacement(),
                                     onLikeClick = {
-                                        commentsViewModel.updateLikeComment(
-                                            comment.userComment.id,
-                                            it.toFeelings()
+                                        event.invoke(
+                                            OnLikeEvent(
+                                                comment.userComment.id,
+                                                it.toFeelings()
+                                            )
                                         )
                                     },
                                     onDisLikeClick = {
-                                        commentsViewModel.updateLikeComment(
-                                            comment.userComment.id,
-                                            it.toFeelings()
+                                        event.invoke(
+                                            OnDisLikeEvent(
+                                                comment.userComment.id,
+                                                it.toFeelings()
+                                            )
                                         )
                                     },
                                     onEditChange = {
-                                        commentsViewModel.onEditDescriptionChange(it)
+                                        event.invoke(EditDescriptionEvent(it))
                                     },
                                     onValidClick = {
-                                        commentsViewModel.editComment(comment.userComment.id)
+                                        event.invoke(EditCommentEvent(comment.userComment.id))
                                     }
                                 )
                             }
@@ -134,4 +138,13 @@ fun CommentListScreen(
             }
         }
     }
+}
+
+sealed class CommentListEvent {
+    data class EditCommentEvent(val commentId: String) : CommentListEvent()
+    data class EditDescriptionEvent(val description: String) : CommentListEvent()
+    data class OnLikeEvent(val commentId: String, val feeling: Boolean?) : CommentListEvent()
+    data class OnDisLikeEvent(val commentId: String, val feeling: Boolean?) : CommentListEvent()
+    object CreateCommentEvent : CommentListEvent()
+    data class CurrentDescriptionEvent(val description: String) : CommentListEvent()
 }
