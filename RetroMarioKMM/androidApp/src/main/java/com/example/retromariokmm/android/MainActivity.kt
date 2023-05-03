@@ -18,8 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -37,6 +36,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 import com.example.retromariokmm.android.helper.Permission
+import com.example.retromariokmm.android.ui.CameraScreen
 import com.example.retromariokmm.android.ui.actions.details.ActionDetailsScreen
 import com.example.retromariokmm.android.ui.actions.details.ActionDetailsState
 import com.example.retromariokmm.android.ui.actions.details.ActionDetailsViewModel
@@ -47,6 +47,7 @@ import com.example.retromariokmm.android.ui.comments.list.CommentListScreen
 import com.example.retromariokmm.android.ui.comments.list.CommentsScreen
 import com.example.retromariokmm.android.ui.comments.list.CommentsViewModel
 import com.example.retromariokmm.android.ui.comments.list.NewCommentState
+import com.example.retromariokmm.android.ui.components.CameraCapture
 import com.example.retromariokmm.android.ui.components.CameraPreview
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserHealthScreen
 import com.example.retromariokmm.android.ui.login.LoginScreen
@@ -184,25 +185,7 @@ class MainActivity : ComponentActivity() {
                             RetroScreen(navController)
                         }
                         composable("camera_preview") {
-                            Permission(
-                                permission = android.Manifest.permission.CAMERA,
-                                rationale = "You said you wanted a picture, so I'm going to have to ask for permission.",
-                                permissionNotAvailableContent = {
-                                    Column(Modifier.fillMaxSize()) {
-                                        Text("O noes! No Camera!")
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Button(onClick = {
-                                            startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                                data = Uri.fromParts("package", packageName, null)
-                                            })
-                                        }) {
-                                            Text("Open Settings")
-                                        }
-                                    }
-                                }
-                            ) {
-                                CameraPreview()
-                            }
+                            CameraScreen()
                         }
                         composable("retro_creation") {
                             val retroCreationViewModel: RetroCreationViewModel = hiltViewModel()
