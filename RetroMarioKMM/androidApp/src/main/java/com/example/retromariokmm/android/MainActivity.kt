@@ -2,13 +2,19 @@ package com.example.retromariokmm.android
 
 import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -30,6 +36,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
+import com.example.retromariokmm.android.helper.Permission
 import com.example.retromariokmm.android.ui.actions.details.ActionDetailsScreen
 import com.example.retromariokmm.android.ui.actions.details.ActionDetailsState
 import com.example.retromariokmm.android.ui.actions.details.ActionDetailsViewModel
@@ -40,6 +47,7 @@ import com.example.retromariokmm.android.ui.comments.list.CommentListScreen
 import com.example.retromariokmm.android.ui.comments.list.CommentsScreen
 import com.example.retromariokmm.android.ui.comments.list.CommentsViewModel
 import com.example.retromariokmm.android.ui.comments.list.NewCommentState
+import com.example.retromariokmm.android.ui.components.CameraPreview
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserHealthScreen
 import com.example.retromariokmm.android.ui.login.LoginScreen
 import com.example.retromariokmm.android.ui.login.LoginScreenViewModel
@@ -174,6 +182,27 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("retros_screen") {
                             RetroScreen(navController)
+                        }
+                        composable("camera_preview") {
+                            Permission(
+                                permission = android.Manifest.permission.CAMERA,
+                                rationale = "You said you wanted a picture, so I'm going to have to ask for permission.",
+                                permissionNotAvailableContent = {
+                                    Column(Modifier.fillMaxSize()) {
+                                        Text("O noes! No Camera!")
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Button(onClick = {
+                                            startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                                data = Uri.fromParts("package", packageName, null)
+                                            })
+                                        }) {
+                                            Text("Open Settings")
+                                        }
+                                    }
+                                }
+                            ) {
+                                CameraPreview()
+                            }
                         }
                         composable("retro_creation") {
                             val retroCreationViewModel: RetroCreationViewModel = hiltViewModel()

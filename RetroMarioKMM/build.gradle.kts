@@ -1,6 +1,6 @@
 buildscript {
     dependencies {
-        classpath("com.google.gms:google-services:4.3.10")
+        classpath("com.google.gms:google-services:4.3.15")
     }
 }
 plugins {
@@ -8,9 +8,9 @@ plugins {
     id("com.android.application").version("7.2.2").apply(false)
     id("com.android.library").version("7.2.2").apply(false)
     id("com.google.gms.google-services").version("4.3.13").apply(false)
-    id("com.google.dagger.hilt.android").version("2.42").apply(false)
-    kotlin("android").version("1.7.10").apply(false)
-    kotlin("multiplatform").version("1.7.10").apply(false)
+    id("com.google.dagger.hilt.android").version("2.43.2").apply(false)
+    kotlin("android").version("1.8.10").apply(false)
+    kotlin("multiplatform").version("1.8.10").apply(false)
 }
 
 tasks.register("clean", Delete::class) {

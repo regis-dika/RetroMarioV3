@@ -1,7 +1,7 @@
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
-    kotlin("plugin.serialization") version "1.7.10"
+    kotlin("plugin.serialization") version "1.8.10"
 }
 
 kotlin {
@@ -23,7 +23,7 @@ kotlin {
 
                 api("org.jetbrains.kotlin:kotlin-stdlib-common")
 
-                implementation ("org.jetbrains.kotlin:kotlin-stdlib-common:1.7.22")
+                implementation ("org.jetbrains.kotlin:kotlin-stdlib-common:1.8.10")
                 // FIRE STORE
                 implementation("dev.gitlive:firebase-firestore:1.6.2")
                 implementation("dev.gitlive:firebase-auth:1.6.2")
@@ -73,10 +73,10 @@ kotlin {
 
 android {
     namespace = "com.example.retromariokmm"
-    compileSdk = 32
+    compileSdk = 33
     defaultConfig {
         minSdk = 21
-        targetSdk = 32
+        targetSdk = 33
     }
 }
 dependencies {
