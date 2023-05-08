@@ -14,12 +14,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.retromariokmm.android.helper.Permission
 import com.example.retromariokmm.android.ui.components.CameraCapture
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @Composable
 fun CameraScreen(
+    navController: NavController,
+    onImageUri: ((String?) -> Unit),
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -49,13 +54,24 @@ fun CameraScreen(
                     painter = rememberImagePainter(imageUri),
                     contentDescription = "Captured image"
                 )
-                Button(
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                    onClick = {
-                        imageUri = emptyImageUri
+                Column(modifier = Modifier.align(Alignment.BottomCenter)) {
+                    Button(
+                        onClick = {
+                            imageUri = emptyImageUri
+                        }
+                    ) {
+                        Text("Remove image")
                     }
-                ) {
-                    Text("Remove image")
+                    Button(
+                        onClick = {
+                            val encodedUri = imageUri.encodedPath
+                            onImageUri.invoke(encodedUri)
+                            imageUri = emptyImageUri
+                            navController.popBackStack()
+                        }
+                    ) {
+                        Text("Valider")
+                    }
                 }
             }
         } else {

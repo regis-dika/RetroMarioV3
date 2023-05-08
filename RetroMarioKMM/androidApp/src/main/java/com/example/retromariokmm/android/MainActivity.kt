@@ -53,6 +53,7 @@ import com.example.retromariokmm.android.ui.lifeanddifficulty.UserHealthScreen
 import com.example.retromariokmm.android.ui.login.LoginScreen
 import com.example.retromariokmm.android.ui.login.LoginScreenViewModel
 import com.example.retromariokmm.android.ui.register.RegisterScreen
+import com.example.retromariokmm.android.ui.register.RegisterViewModel
 import com.example.retromariokmm.android.ui.retros.creation.RetroCreationScreen
 import com.example.retromariokmm.android.ui.retros.creation.RetroCreationViewModel
 import com.example.retromariokmm.android.ui.retros.list.RetroScreen
@@ -184,8 +185,14 @@ class MainActivity : ComponentActivity() {
                         composable("retros_screen") {
                             RetroScreen(navController)
                         }
-                        composable("camera_preview") {
-                            CameraScreen()
+                        composable("camera_preview") {navBackEntry ->
+                            val parentEntry = remember(navBackEntry) {
+                                navController.getBackStackEntry("register_screen/{retroId}")
+                            }
+                            val registerScreenViewModel = hiltViewModel<RegisterViewModel>(parentEntry)
+                            CameraScreen(navController, onImageUri = {
+                                registerScreenViewModel.onImagePath(it)
+                            })
                         }
                         composable("retro_creation") {
                             val retroCreationViewModel: RetroCreationViewModel = hiltViewModel()

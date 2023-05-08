@@ -1,11 +1,9 @@
 package com.example.retromariokmm.android.ui.register
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.net.Uri
-import android.provider.Settings
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -14,13 +12,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import com.example.retromariokmm.android.helper.Permission
-import com.example.retromariokmm.android.ui.components.CameraPreview
+import coil.compose.rememberAsyncImagePainter
 import com.example.retromariokmm.android.ui.register.RegisterActionState.Success
 import com.example.retromariokmm.android.ui.register.RegisterActionState.SuccessLoginAndAddUser
 
@@ -52,10 +48,26 @@ fun RegisterScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceAround
     ) {
-        IconButton(modifier = Modifier.size(15.dp), onClick = {
-            navController.navigate("camera_preview")
-        }) {
-            Icon(imageVector = Icons.Default.Edit, contentDescription = null)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            if (state.picturePath != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        model = Uri.parse(state.picturePath)
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier.size(60.dp),
+                    contentScale = ContentScale.Crop
+                )
+            }
+            IconButton(modifier = Modifier.size(15.dp), onClick = {
+                navController.navigate("camera_preview")
+            }) {
+                Icon(imageVector = Icons.Default.Edit, contentDescription = null)
+            }
         }
         Text(text = "Email")
         OutlinedTextField(

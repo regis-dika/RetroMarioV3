@@ -24,6 +24,9 @@ class RegisterViewModel@Inject constructor(
     private val _state = MutableStateFlow(RegisterState())
     val state = _state.asStateFlow()
 
+    init {
+        _state.value
+    }
     fun onEmailChange(email: String) {
         _state.value = _state.value.copy(email = email)
     }
@@ -81,6 +84,10 @@ class RegisterViewModel@Inject constructor(
             }
         }
     }
+
+    fun onImagePath(path: String?) {
+        _state.value = _state.value.copy(picturePath = path)
+    }
 }
 
 sealed interface RegisterActionState {
@@ -92,6 +99,7 @@ sealed interface RegisterActionState {
 }
 
 data class RegisterState(
+    val picturePath : String? = null,
     val email: String = "",
     val password: String = "",
     val firstname: String = "",
