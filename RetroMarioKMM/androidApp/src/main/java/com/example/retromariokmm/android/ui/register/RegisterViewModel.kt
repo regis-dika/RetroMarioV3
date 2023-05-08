@@ -23,10 +23,6 @@ class RegisterViewModel@Inject constructor(
 ) : ViewModel() {
     private val _state = MutableStateFlow(RegisterState())
     val state = _state.asStateFlow()
-
-    init {
-        _state.value
-    }
     fun onEmailChange(email: String) {
         _state.value = _state.value.copy(email = email)
     }
@@ -52,10 +48,11 @@ class RegisterViewModel@Inject constructor(
         val password = state.value.password
         val firstname = state.value.firstname
         val name = state.value.name
+        val pictureUrl = state.value.picturePath
         val retroId = state.value.retroId
         viewModelScope.launch {
             if (retroId != null) {
-                registerUseCase.invoke(email, password, firstname, name).flatMapLatest {
+                registerUseCase.invoke(email, password, firstname, name,pictureUrl).flatMapLatest {
                     when (it) {
                         is Error -> flowOf(RegisterActionState.Error(it.msg))
                         is Loading -> flowOf(RegisterActionState.Loading)
@@ -71,7 +68,7 @@ class RegisterViewModel@Inject constructor(
                     _state.value = _state.value.copy(saveState = it)
                 }
             } else {
-                registerUseCase.invoke(state.value.email, state.value.password, state.value.firstname, state.value.name)
+                registerUseCase.invoke(state.value.email, state.value.password, state.value.firstname, state.value.name,pictureUrl)
                     .collect {
                         _state.value = _state.value.copy(
                             saveState = when (it) {
