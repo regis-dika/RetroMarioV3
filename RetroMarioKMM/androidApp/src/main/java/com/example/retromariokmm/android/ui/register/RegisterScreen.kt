@@ -1,31 +1,32 @@
 package com.example.retromariokmm.android.ui.register
 
 import android.annotation.SuppressLint
+import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.retromariokmm.android.ui.register.RegisterActionState.Success
 import com.example.retromariokmm.android.ui.register.RegisterActionState.SuccessLoginAndAddUser
-import com.example.retromariokmm.utils.ActionState
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun RegisterScreen(
     retroId: String? = null,
     navController: NavController,
-    registerViewModel: RegisterViewModel = hiltViewModel()
+    registerViewModel: RegisterViewModel = hiltViewModel(),
+    modifier: Modifier = Modifier
 ) {
     val state by registerViewModel.state.collectAsState()
 
@@ -47,6 +48,27 @@ fun RegisterScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceAround
     ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            if (state.picturePath != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        model = Uri.parse(state.picturePath)
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier.size(60.dp),
+                    contentScale = ContentScale.Crop
+                )
+            }
+            IconButton(modifier = Modifier.size(15.dp), onClick = {
+                navController.navigate("camera_preview")
+            }) {
+                Icon(imageVector = Icons.Default.Edit, contentDescription = null)
+            }
+        }
         Text(text = "Email")
         OutlinedTextField(
             modifier = Modifier

@@ -2,18 +2,23 @@ package com.example.retromariokmm.android
 
 import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -30,6 +35,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
+import com.example.retromariokmm.android.helper.Permission
+import com.example.retromariokmm.android.ui.CameraScreen
 import com.example.retromariokmm.android.ui.actions.details.ActionDetailsScreen
 import com.example.retromariokmm.android.ui.actions.details.ActionDetailsState
 import com.example.retromariokmm.android.ui.actions.details.ActionDetailsViewModel
@@ -40,10 +47,13 @@ import com.example.retromariokmm.android.ui.comments.list.CommentListScreen
 import com.example.retromariokmm.android.ui.comments.list.CommentsScreen
 import com.example.retromariokmm.android.ui.comments.list.CommentsViewModel
 import com.example.retromariokmm.android.ui.comments.list.NewCommentState
+import com.example.retromariokmm.android.ui.components.CameraCapture
+import com.example.retromariokmm.android.ui.components.CameraPreview
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserHealthScreen
 import com.example.retromariokmm.android.ui.login.LoginScreen
 import com.example.retromariokmm.android.ui.login.LoginScreenViewModel
 import com.example.retromariokmm.android.ui.register.RegisterScreen
+import com.example.retromariokmm.android.ui.register.RegisterViewModel
 import com.example.retromariokmm.android.ui.retros.creation.RetroCreationScreen
 import com.example.retromariokmm.android.ui.retros.creation.RetroCreationViewModel
 import com.example.retromariokmm.android.ui.retros.list.RetroScreen
@@ -174,6 +184,15 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("retros_screen") {
                             RetroScreen(navController)
+                        }
+                        composable("camera_preview") {navBackEntry ->
+                            val parentEntry = remember(navBackEntry) {
+                                navController.getBackStackEntry("register_screen/{retroId}")
+                            }
+                            val registerScreenViewModel = hiltViewModel<RegisterViewModel>(parentEntry)
+                            CameraScreen(navController, onImageUri = {
+                                registerScreenViewModel.onImagePath(it)
+                            })
                         }
                         composable("retro_creation") {
                             val retroCreationViewModel: RetroCreationViewModel = hiltViewModel()

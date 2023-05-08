@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface RetroMarioRepository {
     //users
-    suspend fun createUser(email: String, password: String,firstName:String,lastname:String): Flow<Resource<Unit>>
+    suspend fun createUser(email: String, password: String,firstName:String,lastname:String,pictureUrl:String?): Flow<Resource<Unit>>
     suspend fun signIn(email: String, password: String): Resource<Unit>
     fun getRetroUsers(): Flow<Resource<List<RetroUser>>>
     suspend fun updateLife(life: Int): Flow<Resource<Unit>>

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 class RegisterUseCase(private val repository: FirebaseRetroMarioRepositoryImpl) {
     //TODO Inject repo
 
-    suspend fun invoke(email: String, password: String, firstName: String, name: String): Flow<Resource<Unit>> {
-        return repository.createUser(email, password, firstName, name)
+    suspend fun invoke(email: String, password: String, firstName: String, name: String,pictureUrl:String?): Flow<Resource<Unit>> {
+        return repository.createUser(email, password, firstName, name,pictureUrl)
     }
 }
