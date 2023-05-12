@@ -1,4 +1,4 @@
-package com.example.retromariokmm.android
+package com.example.retromariokmm.android.activity
 
 import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
@@ -11,10 +11,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -51,6 +48,7 @@ import com.example.retromariokmm.android.ui.comments.list.CommentsViewModel
 import com.example.retromariokmm.android.ui.comments.list.NewCommentState
 import com.example.retromariokmm.android.ui.components.CameraCapture
 import com.example.retromariokmm.android.ui.components.CameraPreview
+import com.example.retromariokmm.android.ui.components.RetroTopAppBar
 import com.example.retromariokmm.android.ui.lifeanddifficulty.UserHealthScreen
 import com.example.retromariokmm.android.ui.login.LoginScreen
 import com.example.retromariokmm.android.ui.login.LoginScreenViewModel
@@ -59,6 +57,9 @@ import com.example.retromariokmm.android.ui.register.RegisterViewModel
 import com.example.retromariokmm.android.ui.retros.creation.RetroCreationScreen
 import com.example.retromariokmm.android.ui.retros.creation.RetroCreationViewModel
 import com.example.retromariokmm.android.ui.retros.list.RetroScreen
+import com.example.retromariokmm.utils.Error
+import com.example.retromariokmm.utils.Loading
+import com.example.retromariokmm.utils.Success
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
 import com.google.firebase.ktx.Firebase
@@ -133,35 +134,18 @@ class MainActivity : ComponentActivity() {
         setContent {
             val viewModel: MainActivityViewModel = hiltViewModel()
             val state = viewModel.userState.collectAsState()
+            val navController = rememberNavController()
+            val appBarState = rememberAppBarState(navController)
 
             MyApplicationTheme {
                 Scaffold(
                     topBar = {
-                        TopAppBar(
-                            title = {
-                                state.value.name?.let {
-                                    Text(text = "Salut " + state.value.firstName)
-                                }
-                            },
-                            navigationIcon = {
-                                IconButton(onClick = {}) {
-                                    Icon(Icons.Filled.ArrowBack, "backIcon")
-                                }
-                            },
-                            backgroundColor = MaterialTheme.colors.primary,
-                            contentColor = Color.White,
-                            elevation = 10.dp,
-                            actions = {
-                                IconButton(modifier = Modifier.clip(CircleShape), onClick = {}) {
-                                    AsyncImage(model = state.value.bitmap, contentDescription = null)
-                                }
-                                OutlinedButton(onClick = { /*TODO*/ }) {
-                                    Text(text = "Next step")
-                                }
-                            }
+                        RetroTopAppBar(
+                            appBarState = appBarState,
+                            picture = state.value.bitmap,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }) {
-                    val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = "login_screen") {
                         composable(route = "login_screen") {
                             val retroId = if (incomeDeeplink == null) null else getLastBitFromUrl(incomeDeeplink!!.path)
@@ -193,6 +177,7 @@ class MainActivity : ComponentActivity() {
                             RegisterScreen(retroId, navController)
                         }
                         composable("retros_screen") {
+                            viewModel.getCurrentUser()
                             RetroScreen(navController)
                         }
                         composable("camera_preview") { navBackEntry ->
@@ -218,7 +203,6 @@ class MainActivity : ComponentActivity() {
                             })
                         }
                         composable("life_difficulty_screen") {
-                            viewModel.getCurrentUser()
                             UserHealthScreen(navController)
                         }
                         composable("comments_board_screen") {
