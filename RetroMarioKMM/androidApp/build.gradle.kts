@@ -67,5 +67,7 @@ dependencies {
     implementation("androidx.camera:camera-view:1.3.0-alpha06")
     implementation("com.google.guava:guava:29.0-android")
 
+    //reflect for nested class Screen::class.nestedClasses
+    implementation(kotlin("reflect"))
 
 }
