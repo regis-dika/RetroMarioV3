@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -138,17 +140,25 @@ class MainActivity : ComponentActivity() {
                         TopAppBar(
                             title = {
                                 state.value.name?.let {
-                                    Text(text = "Salut " + state.value.name)
+                                    Text(text = "Salut " + state.value.firstName)
                                 }
                             },
                             navigationIcon = {
-                                IconButton(modifier = Modifier.clip(CircleShape), onClick = {}) {
-                                    AsyncImage(model = state.value.bitmap, contentDescription = null)
+                                IconButton(onClick = {}) {
+                                    Icon(Icons.Filled.ArrowBack, "backIcon")
                                 }
                             },
                             backgroundColor = MaterialTheme.colors.primary,
                             contentColor = Color.White,
-                            elevation = 10.dp
+                            elevation = 10.dp,
+                            actions = {
+                                IconButton(modifier = Modifier.clip(CircleShape), onClick = {}) {
+                                    AsyncImage(model = state.value.bitmap, contentDescription = null)
+                                }
+                                OutlinedButton(onClick = { /*TODO*/ }) {
+                                    Text(text = "Next step")
+                                }
+                            }
                         )
                     }) {
                     val navController = rememberNavController()
@@ -185,7 +195,7 @@ class MainActivity : ComponentActivity() {
                         composable("retros_screen") {
                             RetroScreen(navController)
                         }
-                        composable("camera_preview") {navBackEntry ->
+                        composable("camera_preview") { navBackEntry ->
                             val parentEntry = remember(navBackEntry) {
                                 navController.getBackStackEntry("register_screen/{retroId}")
                             }
