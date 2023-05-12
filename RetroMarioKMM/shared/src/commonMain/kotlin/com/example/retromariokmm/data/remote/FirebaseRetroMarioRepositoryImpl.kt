@@ -95,6 +95,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
             val result = firebaseAuth.createUserWithEmailAndPassword(email, password)
             val user = result.user
             if (user != null) {
+
                 user.updateProfile("displayName", pictureUrl)
                 currentUser = RetroUser(user.uid, firstName, lastname, bitmap = pictureUrl ?: "")
                 userCollection.document(user.uid).set(currentUser)
@@ -130,14 +131,14 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         }
     }
 
-    fun fetchRetroUsers(): Flow<Resource<List<RetroUser>>> = callbackFlow {
-        userCollection.snapshots.collect {
-            val updatedList = it.documents.map { dc ->
+    private fun fetchRetroUsers(): Flow<Resource<List<RetroUser>>> {
+       return userCollection.snapshots.map {
+            Success(it.documents.map { dc ->
                 dc.toRetroUser()
-            }
-            trySend(Success(updatedList))
-        }
-        awaitClose()
+            })
+        }.catch {
+           Error<List<RetroUser>>(it.message ?: "Error fetchRetroUsers")
+       }
     }
 
     override fun getRetroUsers(): Flow<Resource<List<RetroUser>>> = getUpdatedCollection<RetroUser>("users") {

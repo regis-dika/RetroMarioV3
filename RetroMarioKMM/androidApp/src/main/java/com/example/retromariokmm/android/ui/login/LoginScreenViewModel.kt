@@ -35,14 +35,16 @@ class LoginScreenViewModel @Inject constructor(
             if (retroId != null) {
                 viewModelScope.launch {
                     val result = loginUseCase.invoke(email, password)
-                    if (result is Success) {
-                        addMeAndConnectToRetroUseCase.invoke(retroId).collect { addUserResult ->
+                    when(result) {
+                       is Success -> addMeAndConnectToRetroUseCase.invoke(retroId).collect { addUserResult ->
                             _loginState.value = when (addUserResult) {
                                 is Error -> LoginState.Error(addUserResult.msg)
                                 is Loading -> LoginState.Loading
                                 is Success -> LoginState.SuccessLoginAndAddUser
                             }
                         }
+                        is Loading -> LoginState.Loading
+                        is Error -> LoginState.Error(result.msg)
                     }
                 }
             } else {

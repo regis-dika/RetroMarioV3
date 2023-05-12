@@ -14,11 +14,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.retromariokmm.android.activity.AppBarIcons.Add
+import com.example.retromariokmm.android.activity.AppBarIcons.Next
+import com.example.retromariokmm.android.activity.Screen.CommentBoard
+import com.example.retromariokmm.android.activity.Screen.Retros
 import com.example.retromariokmm.android.ui.components.RetroItem
 import com.example.retromariokmm.utils.ActionState.*
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
 import com.example.retromariokmm.utils.Success
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @Composable
 fun RetroScreen(navController: NavController, viewModel: RetroListViewModel = hiltViewModel()) {
@@ -30,6 +36,15 @@ fun RetroScreen(navController: NavController, viewModel: RetroListViewModel = hi
             navController.navigate("life_difficulty_screen")
         }
     }
+
+    LaunchedEffect(key1 = Unit) {
+        Retros.buttons.onEach {
+            when (it) {
+                Add -> navController.navigate("retro_creation")
+                else -> {}
+            }
+        }.launchIn(this)
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -40,13 +55,6 @@ fun RetroScreen(navController: NavController, viewModel: RetroListViewModel = hi
                 .fillMaxSize()
                 .padding(6.dp)
         ) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                OutlinedButton(onClick = {
-                    navController.navigate("retro_creation")
-                }) {
-                    Text(text = "New Retro")
-                }
-            }
             when (state.value.connectAction) {
                 NOT_STARTED -> {}
                 PENDING -> CircularProgressIndicator()
