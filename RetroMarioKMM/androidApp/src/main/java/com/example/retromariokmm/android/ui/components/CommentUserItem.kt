@@ -26,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.retromariokmm.android.MyApplicationTheme
+import com.example.retromariokmm.android.activity.MyApplicationTheme
 import com.example.retromariokmm.android.helper.RetroBorder
 import com.example.retromariokmm.android.ui.comments.list.CommentContainer
 import com.example.retromariokmm.android.ui.components.FeelingsState.LIKE

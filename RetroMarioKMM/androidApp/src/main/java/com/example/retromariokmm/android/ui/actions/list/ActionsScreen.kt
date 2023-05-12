@@ -9,21 +9,39 @@ import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Snackbar
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.retromariokmm.android.activity.AppBarIcons.Add
+import com.example.retromariokmm.android.activity.AppBarIcons.Next
+import com.example.retromariokmm.android.activity.Screen.Actions
+import com.example.retromariokmm.android.activity.Screen.CommentBoard
 import com.example.retromariokmm.android.ui.components.UserActionItem
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
 import com.example.retromariokmm.utils.Success
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ActionsScreen(navController: NavController, viewModel: ActionsViewModel = hiltViewModel()) {
     val state = viewModel.actionsState.collectAsState(initial = Loading())
+
+    LaunchedEffect(key1 = Unit){
+        Actions.buttons.onEach {
+            when(it){
+                Next -> navController.navigate("life_difficulty_screen")
+                Add -> navController.navigate("action_details_screen/ ")
+                else -> {}
+            }
+        }.launchIn(this)
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -34,19 +52,6 @@ fun ActionsScreen(navController: NavController, viewModel: ActionsViewModel = hi
                 .fillMaxSize()
                 .padding(6.dp)
         ) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                OutlinedButton(onClick = {
-                    navController.navigate("action_details_screen/ ")
-                }) {
-                    Text(text = "New Action")
-                }
-                OutlinedButton(onClick = {
-                    navController.navigate("life_difficulty_screen")
-                }) {
-                    Text(text = "Go to Updated HealthyScreen")
-                }
-            }
-
             when (val list = state.value) {
                 is Error -> Snackbar() {
                     Text(text = list.msg)

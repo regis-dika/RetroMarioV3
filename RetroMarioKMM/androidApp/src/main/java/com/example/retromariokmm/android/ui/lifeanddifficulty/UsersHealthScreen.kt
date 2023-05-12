@@ -6,17 +6,22 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.retromariokmm.android.activity.AppBarIcons.Next
+import com.example.retromariokmm.android.activity.Screen
 import com.example.retromariokmm.android.ui.components.HealthyBoardModel.MainUser
 import com.example.retromariokmm.android.ui.components.HealthyBoardModel.OtherUser
 import com.example.retromariokmm.android.ui.components.RetroUserItem
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
 import com.example.retromariokmm.utils.Success
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -26,16 +31,20 @@ fun UserHealthScreen(
 ) {
     val state = lifeAndDifficultyViewModel.usersState.collectAsState()
 
+    LaunchedEffect(key1 = Unit){
+        Screen.Healthy.buttons.onEach {
+            when(it){
+                Next -> navController.navigate("comments_board_screen")
+                else -> {}
+            }
+        }.launchIn(this)
+    }
+
     Column(
         Modifier
             .fillMaxSize()
             .padding(4.dp)
     ) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            OutlinedButton(onClick = { navController.navigate("comments_board_screen") }) {
-                Text(text = "Next")
-            }
-        }
         Box(
             modifier = Modifier
                 .fillMaxSize()
