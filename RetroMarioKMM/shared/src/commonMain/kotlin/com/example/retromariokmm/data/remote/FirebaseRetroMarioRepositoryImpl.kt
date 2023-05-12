@@ -8,16 +8,12 @@ import com.example.retromariokmm.domain.models.*
 import com.example.retromariokmm.domain.repository.RetroMarioRepository
 import com.example.retromariokmm.utils.*
 import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.app
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.QuerySnapshot
 import dev.gitlive.firebase.firestore.firestore
-import dev.gitlive.firebase.installations.FirebaseInstallations
-import dev.gitlive.firebase.installations.installations
-import dev.gitlive.firebase.options
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 
