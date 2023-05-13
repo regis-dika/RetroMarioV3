@@ -119,6 +119,10 @@ object UseCaseModule {
         LogoutUseCase(firebaseRetroMarioRepositoryImpl)
 
     @Provides
+    fun provideSetCurrentUser(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        SetCurrentUserUseCase(firebaseRetroMarioRepositoryImpl)
+
+    @Provides
     fun provideAddUserAndConnectToRetroUseCase(
         addUserToRetroRetroUseCase: AddUserToRetroRetroUseCase,
         connectUserToRetroUseCase: ConnectUserToRetroUseCase

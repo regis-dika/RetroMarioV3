@@ -144,6 +144,9 @@ class MainActivity : ComponentActivity() {
                 if (logoutAction == SUCCESS) {
                     navController.navigate("login_screen",NavOptions.Builder().setPopUpTo("login_screen",true).build())
                 }
+                if (state.value.retroUser != null){
+                    navController.navigate("retros_screen")
+                }
             }
 
             MyApplicationTheme {
