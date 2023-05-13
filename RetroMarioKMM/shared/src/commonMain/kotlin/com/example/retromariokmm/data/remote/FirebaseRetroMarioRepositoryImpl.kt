@@ -38,6 +38,11 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         private set(value) {
             field = value
         }
+
+    fun setUserUser(currentUser: RetroUser) {
+        this.currentUser = currentUser
+    }
+
     override suspend fun createRetro(title: String, description: String) = flow {
         emit(Loading())
         try {
@@ -250,17 +255,17 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
     override suspend fun updateActionCheckState(actionId: String, isCheck: Boolean) =
         updateDocument(Pair("actions", actionId), hashMapOf("isCheck" to isCheck))
 
-    override suspend fun logout(): Flow<Resource<Unit>> = flow{
-        if (currentUser != null && currentRetroSession != null){
+    override suspend fun logout(): Flow<Resource<Unit>> = flow {
+        if (currentUser != null && currentRetroSession != null) {
             try {
                 firebaseAuth.signOut()
                 emit(Success(Unit))
                 currentUser = null
                 currentRetroSession = null
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 emit(com.example.retromariokmm.utils.Error<Unit>(e.toString()))
             }
-        }else{
+        } else {
             emit(com.example.retromariokmm.utils.Error("No current user or no current retro session"))
         }
     }
@@ -390,7 +395,7 @@ suspend inline fun <T> ifConnected(
                 block.invoke().map {
                     it
                 }
-            }else{
+            } else {
                 flowOf(Error<T>("No retro session"))
             }
         }
