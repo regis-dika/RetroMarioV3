@@ -1,5 +1,6 @@
 package com.example.retromariokmm.data.remote
 
+import com.example.retromariokmm.data.remote.UserSession.UserConnected
 import com.example.retromariokmm.data.toRetro
 import com.example.retromariokmm.data.toRetroUser
 import com.example.retromariokmm.data.toUserAction
@@ -25,6 +26,7 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
     private val retroCollection = fireStore.collection("retros")
     private val userCollection = fireStore.collection("users")
 
+    //TODO combine in one data class UserConnected(val currentUser,val currentRetro)
     var currentUser: RetroUser? = null
         get() = field
         private set(value) {
@@ -36,7 +38,6 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
         private set(value) {
             field = value
         }
-
     override suspend fun createRetro(title: String, description: String) = flow {
         emit(Loading())
         try {
@@ -132,13 +133,13 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
     }
 
     private fun fetchRetroUsers(): Flow<Resource<List<RetroUser>>> {
-       return userCollection.snapshots.map {
+        return userCollection.snapshots.map {
             Success(it.documents.map { dc ->
                 dc.toRetroUser()
             })
         }.catch {
-           Error<List<RetroUser>>(it.message ?: "Error fetchRetroUsers")
-       }
+            Error<List<RetroUser>>(it.message ?: "Error fetchRetroUsers")
+        }
     }
 
     override fun getRetroUsers(): Flow<Resource<List<RetroUser>>> = getUpdatedCollection<RetroUser>("users") {
@@ -249,6 +250,21 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
     override suspend fun updateActionCheckState(actionId: String, isCheck: Boolean) =
         updateDocument(Pair("actions", actionId), hashMapOf("isCheck" to isCheck))
 
+    override suspend fun logout(): Flow<Resource<Unit>> = flow{
+        if (currentUser != null && currentRetroSession != null){
+            try {
+                firebaseAuth.signOut()
+                emit(Success(Unit))
+                currentUser = null
+                currentRetroSession = null
+            }catch (e:Exception){
+                emit(com.example.retromariokmm.utils.Error<Unit>(e.toString()))
+            }
+        }else{
+            emit(com.example.retromariokmm.utils.Error("No current user or no current retro session"))
+        }
+    }
+
 //generic function
 
     fun createCollectionFlow(path: String, newObject: IdentifiedObject) =
@@ -357,4 +373,32 @@ class FirebaseRetroMarioRepositoryImpl() : RetroMarioRepository {
             emit(Error("Error no current retro"))
         }
     }
+}
+
+/**
+ * Helper to get the ConnectDevice
+ * It calls the block if a device is currently connected, otherwise it emit a Resource Error
+ * Designed to be used by use cases
+ */
+suspend inline fun <T> ifConnected(
+    userSession: UserSession,
+    crossinline block: suspend () -> Flow<Resource<T>>
+): Flow<Resource<T>> {
+    return when (userSession) {
+        is UserConnected -> {
+            if (userSession.currentRetroSession != null) {
+                block.invoke().map {
+                    it
+                }
+            }else{
+                flowOf(Error<T>("No retro session"))
+            }
+        }
+        else -> flowOf(Error<T>("No user connected"))
+    }
+}
+
+sealed class UserSession {
+    data class UserConnected(val currentUser: RetroUser, val currentRetroSession: Retro? = null) : UserSession()
+    object UserDisconnected : UserSession()
 }

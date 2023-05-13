@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -57,6 +58,7 @@ import com.example.retromariokmm.android.ui.register.RegisterViewModel
 import com.example.retromariokmm.android.ui.retros.creation.RetroCreationScreen
 import com.example.retromariokmm.android.ui.retros.creation.RetroCreationViewModel
 import com.example.retromariokmm.android.ui.retros.list.RetroScreen
+import com.example.retromariokmm.utils.ActionState.*
 import com.example.retromariokmm.utils.Error
 import com.example.retromariokmm.utils.Loading
 import com.example.retromariokmm.utils.Success
@@ -137,12 +139,22 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val appBarState = rememberAppBarState(navController)
 
+            val logoutAction = state.value.logoutAction
+            LaunchedEffect(logoutAction) {
+                if (logoutAction == SUCCESS) {
+                    navController.navigate("login_screen",NavOptions.Builder().setPopUpTo("login_screen",true).build())
+                }
+            }
+
             MyApplicationTheme {
                 Scaffold(
                     topBar = {
                         RetroTopAppBar(
                             appBarState = appBarState,
-                            picture = state.value.bitmap,
+                            picture = state.value.retroUser?.bitmap,
+                            onLogoutEvent = {
+                                viewModel.logout()
+                            },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }) {

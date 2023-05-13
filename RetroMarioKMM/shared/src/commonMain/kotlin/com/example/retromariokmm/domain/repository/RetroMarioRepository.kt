@@ -38,4 +38,5 @@ interface RetroMarioRepository {
     suspend fun updateAction(actionId: String, title: String, description: String): Flow<Resource<Unit>>
     suspend fun updateActorList(actionId: String, takeAction: Boolean)
     suspend fun updateActionCheckState(actionId: String, isCheck: Boolean): Flow<Resource<Unit>>
+    suspend fun logout():Flow<Resource<Unit>>
 }
