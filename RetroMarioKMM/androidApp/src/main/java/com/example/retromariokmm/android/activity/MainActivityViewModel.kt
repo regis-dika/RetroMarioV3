@@ -43,7 +43,8 @@ class MainActivityViewModel @Inject constructor(
                         is Error -> ERROR
                         is Loading -> PENDING
                         is Success -> SUCCESS
-                    }
+                    },
+                    retroUser = null
                 )
             }
         }
