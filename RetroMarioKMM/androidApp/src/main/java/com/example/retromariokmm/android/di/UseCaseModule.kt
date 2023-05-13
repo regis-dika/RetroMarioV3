@@ -4,6 +4,7 @@ import com.example.retromariokmm.data.remote.FirebaseRetroMarioRepositoryImpl
 import com.example.retromariokmm.domain.usecases.actions.*
 import com.example.retromariokmm.domain.usecases.comments.*
 import com.example.retromariokmm.domain.usecases.login.LoginUseCase
+import com.example.retromariokmm.domain.usecases.logout.LogoutUseCase
 import com.example.retromariokmm.domain.usecases.register.RegisterUseCase
 import com.example.retromariokmm.domain.usecases.retros.*
 import com.example.retromariokmm.domain.usecases.users.*
@@ -112,6 +113,10 @@ object UseCaseModule {
     @Provides
     fun provideActionListFromRetroUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
         ActionListFromRetroUseCase(firebaseRetroMarioRepositoryImpl)
+
+    @Provides
+    fun provideLogoutUseCase(firebaseRetroMarioRepositoryImpl: FirebaseRetroMarioRepositoryImpl) =
+        LogoutUseCase(firebaseRetroMarioRepositoryImpl)
 
     @Provides
     fun provideAddUserAndConnectToRetroUseCase(
